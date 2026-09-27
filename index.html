@@ -3,123 +3,864 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🇹🇷 Türkiye Havzaları 3D & Meta Quest 3 WebXR Stüdyosu</title>
+  <title>🇹🇷 Türkiye Havzaları ve Akarsuları 3D Haritası & 3D Model Stüdyosu</title>
   
+  <!-- MapLibre GL CSS -->
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body, html { width: 100%; height: 100%; overflow: hidden; background-color: #05070d; color: #f1f5f9; }
-    #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
 
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #05070d;
+      color: #f1f5f9;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    /* Sol Üst Kontrol Paneli */
     .control-panel {
-      position: absolute; top: 20px; left: 20px; z-index: 10;
-      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px;
-      padding: 18px 20px; width: 310px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65);
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 18px 20px;
+      width: 310px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65);
     }
-    .panel-title { font-size: 1.05rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-    .panel-subtitle { font-size: 0.78rem; color: #94a3b8; margin-bottom: 14px; line-height: 1.35; }
-    .control-group { display: flex; flex-direction: column; gap: 10px; }
-    .toggle-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.84rem; color: #e2e8f0; cursor: pointer; user-select: none; }
-    .toggle-row input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; accent-color: #38bdf8; }
-    .badge { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
-    .badge-basin { background-color: #ef4444; } .badge-river { background-color: #0284c7; }
-    .slider-container { margin-top: 4px; display: flex; flex-direction: column; gap: 4px; }
-    .slider-header { display: flex; justify-content: space-between; font-size: 0.76rem; color: #94a3b8; }
-    .slider-container input[type="range"] { width: 100%; accent-color: #38bdf8; cursor: pointer; }
-    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-    .btn { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #f8fafc; padding: 7px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-align: center; }
-    .btn:hover { background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; color: #ffffff; }
 
+    .panel-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .panel-subtitle {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      margin-bottom: 14px;
+      line-height: 1.35;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.84rem;
+      color: #e2e8f0;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle-row input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #38bdf8;
+    }
+
+    .badge {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .badge-basin { background-color: #ef4444; }
+    .badge-river { background-color: #0284c7; }
+
+    .slider-container {
+      margin-top: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.76rem;
+      color: #94a3b8;
+    }
+
+    .slider-container input[type="range"] {
+      width: 100%;
+      accent-color: #38bdf8;
+      cursor: pointer;
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #f8fafc;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .btn:hover {
+      background: rgba(56, 189, 248, 0.25);
+      border-color: #38bdf8;
+      color: #ffffff;
+    }
+
+    /* Sağ Üst Seçili Havza & 3D İndirme Kutusu */
     #selection-card {
-      position: absolute; top: 20px; right: 60px; z-index: 20;
-      background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(16px);
-      border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 16px;
-      padding: 16px 20px; width: 280px; box-shadow: 0 12px 40px rgba(168, 85, 247, 0.2), 0 8px 24px rgba(0, 0, 0, 0.7);
-      display: none; animation: slideIn 0.3s ease-out;
+      position: absolute;
+      top: 20px;
+      right: 60px;
+      z-index: 20;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      border-radius: 16px;
+      padding: 16px 20px;
+      width: 280px;
+      box-shadow: 0 12px 40px rgba(168, 85, 247, 0.2), 0 8px 24px rgba(0, 0, 0, 0.7);
+      display: none;
+      animation: slideIn 0.3s ease-out;
     }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    .selection-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 8px; margin-bottom: 10px; }
-    .selection-title { font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; color: #c084fc; font-weight: 700; }
-    .btn-close-selection { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 0.8rem; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .selection-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+
+    .selection-title {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #c084fc;
+      font-weight: 700;
+    }
+
+    .btn-close-selection {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
     .btn-close-selection:hover { color: #f43f5e; }
-    .selected-basin-name { font-size: 1.05rem; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
-    .selected-basin-sub { font-size: 0.76rem; color: #94a3b8; margin-bottom: 14px; }
-    .btn-preview-3d { width: 100%; padding: 11px 14px; background: linear-gradient(135deg, #9333ea, #7c3aed); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 0.86rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 16px rgba(147, 51, 234, 0.4); transition: all 0.2s ease; }
-    .btn-preview-3d:hover { background: linear-gradient(135deg, #a855f7, #8b5cf6); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6); }
 
-    #tooltip { position: absolute; z-index: 100; pointer-events: none; display: none; padding: 6px 12px; background: rgba(15, 23, 42, 0.95); color: #ffffff; font-size: 0.8rem; font-weight: 600; border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.4); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5); transform: translate(-50%, -120%); white-space: nowrap; }
+    .selected-basin-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
 
-    #status-overlay { position: fixed; inset: 0; z-index: 3000; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
-    .status-box { background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(168, 85, 247, 0.4); padding: 24px 32px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; gap: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.8); max-width: 360px; text-align: center; }
-    .spinner { width: 32px; height: 32px; border: 3px solid rgba(168, 85, 247, 0.2); border-top-color: #c084fc; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .selected-basin-sub {
+      font-size: 0.76rem;
+      color: #94a3b8;
+      margin-bottom: 14px;
+    }
+
+    .btn-preview-3d {
+      width: 100%;
+      padding: 11px 14px;
+      background: linear-gradient(135deg, #9333ea, #7c3aed);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.86rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(147, 51, 234, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn-preview-3d:hover {
+      background: linear-gradient(135deg, #a855f7, #8b5cf6);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6);
+    }
+
+    /* Bilgi Tooltip */
+    #tooltip {
+      position: absolute;
+      z-index: 100;
+      pointer-events: none;
+      display: none;
+      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.95);
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      transform: translate(-50%, -120%);
+      white-space: nowrap;
+    }
+
+    /* Yükleniyor / Durum Modal Penceresi */
+    #status-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .status-box {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      padding: 24px 32px;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.8);
+      max-width: 360px;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(168, 85, 247, 0.2);
+      border-top-color: #c084fc;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
     @keyframes spin { to { transform: rotate(360deg); } }
-    #status-text { font-size: 0.9rem; color: #e2e8f0; font-weight: 600; }
 
-    /* 3D Stüdyo & WebXR Alanı */
-    #studio-modal { position: fixed; inset: 0; z-index: 150; background: #020617; display: none; flex-direction: row; overflow: hidden; }
-    #three-canvas-container { flex: 1; height: 100%; position: relative; background: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%); }
-    #studio-sidebar { width: 340px; height: 100%; background: rgba(15, 23, 42, 0.95); border-left: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; z-index: 10; box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5); overflow-y: auto; }
-    .studio-header { padding: 18px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.5); }
-    .studio-title { font-size: 1.05rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 8px; }
-    .btn-close-studio { width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); border: none; color: #ffffff; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    #status-text {
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    /* ========================================================
+       3D HARİTA STÜDYOSU (ÖNİZLEME & STL/OBJ İNDİRME MODALI)
+       ======================================================== */
+    #studio-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 150;
+      background: #020617;
+      display: none;
+      flex-direction: row;
+      overflow: hidden;
+    }
+
+    /* WebXR Passthrough (AR) Modu Şeffaflık ve Arayüz Düzenlemeleri */
+    :xr-overlay {
+      background: transparent !important;
+    }
+    #studio-modal.in-webxr {
+      background: transparent !important;
+    }
+    #studio-modal.in-webxr #three-canvas-container {
+      background: transparent !important;
+    }
+    #studio-modal.in-webxr #studio-sidebar {
+      display: none !important;
+    }
+    #studio-modal.in-webxr .studio-instructions {
+      display: none !important;
+    }
+    #studio-modal.in-webxr #xr-hud {
+      display: flex !important;
+    }
+
+    #three-canvas-container {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%);
+    }
+
+    #studio-sidebar {
+      width: 340px;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .studio-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(30, 41, 59, 0.5);
+    }
+
+    .studio-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-close-studio {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #ffffff;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
     .btn-close-studio:hover { background: #e11d48; }
 
-    /* Passthrough Butonu Stili */
-    .btn-xr-ar { width: 100%; padding: 14px; margin: 16px 20px; width: calc(100% - 40px); background: linear-gradient(135deg, #10b981, #059669); border: 1px solid #34d399; border-radius: 12px; color: white; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-xr-ar:hover { background: linear-gradient(135deg, #059669, #047857); transform: translateY(-2px); }
+    /* Stüdyo Sekmeleri */
+    .studio-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(15, 23, 42, 0.6);
+    }
 
-    .studio-tabs { display: flex; border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: rgba(15, 23, 42, 0.6); }
-    .studio-tab-btn { flex: 1; padding: 12px 6px; background: none; border: none; border-bottom: 2px solid transparent; color: #94a3b8; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease; }
-    .studio-tab-btn.active { color: #38bdf8; border-bottom-color: #38bdf8; background: rgba(56, 189, 248, 0.08); }
-    .studio-body { flex: 1; padding: 20px; }
-    .tab-content { display: none; flex-direction: column; gap: 18px; }
-    .tab-content.active { display: flex; }
+    .studio-tab-btn {
+      flex: 1;
+      padding: 12px 6px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: #94a3b8;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
 
-    .section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #38bdf8; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-    .option-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .opt-btn { padding: 9px 8px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; color: #cbd5e1; font-size: 0.78rem; font-weight: 600; cursor: pointer; text-align: center; }
-    .opt-btn.active { background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; color: #38bdf8; }
+    .studio-tab-btn:hover {
+      color: #f8fafc;
+    }
 
-    .stepper-row { display: flex; align-items: center; gap: 8px; }
-    .stepper-btn { width: 32px; height: 32px; border-radius: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); color: white; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .studio-tab-btn.active {
+      color: #38bdf8;
+      border-bottom-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .studio-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Sayı Artırma/Azaltma Stepper */
+    .stepper-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stepper-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .stepper-btn:hover {
+      background: rgba(56, 189, 248, 0.3);
+      border-color: #38bdf8;
+    }
+
+    /* Bilgi Kutusu */
+    .info-callout {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.76rem;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+
+    .info-stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .option-btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .opt-btn {
+      padding: 9px 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      color: #cbd5e1;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .opt-btn.active {
+      background: rgba(56, 189, 248, 0.25);
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+
+    /* İndirme Butonları */
+    .download-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-download-stl {
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #a855f7, #9333ea);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.86rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+      transition: all 0.2s;
+    }
+
+    .btn-download-stl:hover {
+      background: linear-gradient(135deg, #c084fc, #a855f7);
+      transform: translateY(-1px);
+    }
+
+    .btn-download-obj {
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.86rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+      transition: all 0.2s;
+    }
+
+    .btn-download-obj:hover {
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      transform: translateY(-1px);
+    }
+
+    .download-desc {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      line-height: 1.35;
+    }
+
+    .studio-instructions {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 10;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.76rem;
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+    }
+
+    .instructions-footer {
+      position: absolute;
+      bottom: 16px;
+      left: 20px;
+      z-index: 10;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      pointer-events: none;
+    }
+
+    .author-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: #38bdf8;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .author-tag b {
+      color: #ffffff;
+    }
+
+    .studio-author-badge {
+      font-size: 0.73rem;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      padding: 6px 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* ========================================================
+       KAYNAKÇA MODAL PENCERESİ STİLLERİ
+       ======================================================== */
+    #bibliography-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2500;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .bib-container {
+      background: #0f172a;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(56, 189, 248, 0.15);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 820px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalFadeIn 0.25s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .bib-header {
+      padding: 18px 24px;
+      background: rgba(30, 41, 59, 0.7);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .bib-title-box {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .bib-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bib-subtitle {
+      font-size: 0.78rem;
+      color: #94a3b8;
+    }
+
+    .btn-close-bib {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-close-bib:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #ef4444;
+      transform: rotate(90deg);
+    }
+
+    .bib-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .bib-card {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .bib-card:hover {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .bib-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bib-card-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .bib-card-badge {
+      font-size: 0.70rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.12);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    .bib-card-desc {
+      font-size: 0.76rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+    }
+
+    .bib-card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 0.73rem;
+      color: #94a3b8;
+      margin-top: 4px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+
+    .bib-card-meta a {
+      color: #38bdf8;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .bib-card-meta a:hover {
+      text-decoration: underline;
+      color: #7dd3fc;
+    }
+
+    .bib-card-meta code {
+      background: rgba(15, 23, 42, 0.6);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #93c5fd;
+      font-size: 0.71rem;
+      word-break: break-all;
+    }
+
+    .bib-footer {
+      padding: 14px 24px;
+      background: rgba(15, 23, 42, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.76rem;
+      color: #94a3b8;
+    }
   </style>
 </head>
 <body>
 
-  <!-- 2D Harita -->
+  <!-- MapLibre Harita Konteyneri -->
   <div id="map"></div>
+
+  <!-- Uçan Bilgi Kutusu (Tooltip) -->
   <div id="tooltip"></div>
 
-  <!-- Sol Üst Panel -->
+  <!-- Sol Üst Harita Kontrol Paneli -->
   <div class="control-panel">
     <div class="panel-title">
-      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="15" viewBox="0 -30000 90000 60000" style="border-radius: 3px; box-shadow: 0 1px 4px rgba(0,0,0,0.5);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="15" viewBox="0 -30000 90000 60000" style="border-radius: 3px; box-shadow: 0 1px 4px rgba(0,0,0,0.5); flex-shrink: 0;" aria-label="Türkiye Bayrağı">
         <path fill="#e30a17" d="m0-30000h90000v60000H0z"/>
         <path fill="#fff" d="m41750 0 13568-4408-8386 11541V-7133l8386 11541zm925 8021a15000 15000 0 1 1 0-16042 12000 12000 0 1 0 0 16042z"/>
       </svg>
       <span>Türkiye Havzaları 3D</span>
     </div>
-    <div class="panel-subtitle">Bir havzaya tıklayarak 3D modelini ve AR görüntüsünü oluşturun.</div>
+    <div class="panel-subtitle">
+      Bir havzaya tıklayarak sınırlarını ve 3D modelini oluşturabilirsiniz.
+    </div>
+    <div class="author-tag">
+      <span>✨</span> By <b>Nesretullah SATAR</b>
+    </div>
 
     <div class="control-group">
       <label class="toggle-row">
         <span><span class="badge badge-basin"></span>Havza Sınırları</span>
         <input type="checkbox" id="chk-basins" checked />
       </label>
+
       <label class="toggle-row">
         <span><span class="badge badge-river"></span>Akarsu Ağları</span>
         <input type="checkbox" id="chk-rivers" checked />
       </label>
+
       <label class="toggle-row">
         <span><span class="badge" style="background-color: #f59e0b;"></span>🏛️ İl Sınırları</span>
         <input type="checkbox" id="chk-provinces" checked />
       </label>
+
       <label class="toggle-row">
         <span><span class="badge" style="background-color: #10b981;"></span>👥 Şehirler & Nüfus</span>
         <input type="checkbox" id="chk-cities" checked />
       </label>
+
       <label class="toggle-row">
         <span>🏔️ 3D Yükseklik (DEM)</span>
         <input type="checkbox" id="chk-terrain" checked />
@@ -137,10 +878,14 @@
         <button class="btn" id="btn-reset-view">📍 Genel Bakış</button>
         <button class="btn" id="btn-toggle-2d">📐 2D / 3D</button>
       </div>
+
+      <button class="btn" id="btn-open-bibliography" style="width: 100%; margin-top: 8px; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600; padding: 8px 10px;">
+        <span>📚</span> Kaynakça & Veri Kaynakları
+      </button>
     </div>
   </div>
 
-  <!-- Sağ Üst Seçim Kartı -->
+  <!-- Sağ Üst: Seçili Havza ve 3D İndirme Paneli -->
   <div id="selection-card">
     <div class="selection-header">
       <span class="selection-title">Seçili Havza</span>
@@ -149,105 +894,541 @@
     <div class="selected-basin-name" id="selected-basin-name">Fırat-Dicle Havzası</div>
     <div class="selected-basin-sub" id="selected-basin-sub">3D modelini üretmek için butona basın</div>
 
+    <!-- Havza Beşeri Coğrafya & Nüfus Analiz Kartı -->
     <div id="basin-human-geo-card" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 10px; padding: 10px; margin-top: 8px; margin-bottom: 8px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
         <span style="font-size: 0.74rem; font-weight: 700; color: #34d399;">👥 BEŞERİ NÜFUS:</span>
         <span id="basin-pop-val" style="font-size: 0.82rem; font-weight: 800; color: #ffffff;">Hesaplanıyor...</span>
       </div>
-      <div style="font-size: 0.72rem; color: #cbd5e1; margin-bottom: 5px;" id="basin-cities-list">İller: Yükleniyor...</div>
+      <div style="font-size: 0.72rem; color: #cbd5e1; margin-bottom: 5px; line-height: 1.35;" id="basin-cities-list">
+        <span style="color: #94a3b8;">İller:</span> Yükleniyor...
+      </div>
       <div style="font-size: 0.70rem; color: #38bdf8; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;" id="basin-water-stress">
-        💧 Su Tüketim Baskısı Analizi...
+        💧 Su Tüketim Baskısı Analiz Ediliyor...
       </div>
     </div>
 
-    <button class="btn-preview-3d" id="btn-start-3d-build">✨ 3D Önizleme Oluştur</button>
+    <!-- DEM Çözünürlük Seçimi (30m vs Standart) -->
+    <div style="margin-top: 8px; margin-bottom: 10px;">
+      <div style="font-size: 0.72rem; font-weight: 700; color: #94a3b8; margin-bottom: 5px; display: flex; justify-content: space-between;">
+        <span>DEM ÇÖZÜNÜRLÜK MODU</span>
+        <span id="dem-mode-indicator" style="color: #38bdf8; font-weight: 700;">⚡ 30m Ultra HD</span>
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <button class="opt-btn" id="btn-mode-std" style="flex: 1; padding: 7px 4px; font-size: 0.72rem;">Standart (60m)</button>
+        <button class="opt-btn active" id="btn-mode-30m" style="flex: 1.2; padding: 7px 4px; font-size: 0.72rem; border-color: #38bdf8; color: #38bdf8;">⚡ 30m Ultra HD</button>
+      </div>
+    </div>
+
+    <button class="btn-preview-3d" id="btn-start-3d-build">
+      <span>✨</span> 3D Önizleme Oluştur
+    </button>
   </div>
 
+  <!-- Sol Alt Bilgi -->
+  <div class="instructions-footer" style="pointer-events: auto;">
+    ✨ By <b>Nesretullah SATAR</b> &bull; <a href="javascript:void(0)" id="link-open-bib-footer" style="color: #38bdf8; text-decoration: underline; font-weight: 600; cursor: pointer;">📚 Kaynakça</a> &bull; İpucu: Havzaya sol tıklayın; sağ tıkla sürükleyerek 3D açıyı değiştirin.
+  </div>
+
+  <!-- Yükleniyor / İşlem Durum Katmanı -->
   <div id="status-overlay">
     <div class="status-box">
       <div class="spinner"></div>
-      <div id="status-text">İşleniyor...</div>
+      <div id="status-text">DEM Verileri İndiriliyor...</div>
     </div>
   </div>
 
-  <!-- 3D Stüdyo -->
+  <!-- ========================================================
+       3D HARİTA STÜDYOSU (ÖNİZLEME & STL/OBJ İNDİRME EKRANI)
+       ======================================================== -->
   <div id="studio-modal">
-    <div id="three-canvas-container"></div>
+    <div id="three-canvas-container">
+      <div class="studio-instructions">
+        Sol Tık: Döndür | Sağ Tık: Kaydır | Tekerlek: Yaklaş / Uzaklaş
+      </div>
+    </div>
+
+    <!-- WEBXR AR ALT BİLGİ VE KONTROL PANELİ (HUD) -->
+    <div id="xr-hud" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(168, 85, 247, 0.6); box-shadow: 0 10px 30px rgba(0,0,0,0.65), 0 0 20px rgba(168, 85, 247, 0.3); border-radius: 999px; padding: 10px 22px; align-items: center; gap: 14px; color: #f8fafc; font-family: inherit;">
+      <span style="font-size: 1.15rem;">🥽</span>
+      <div id="xr-hud-text" style="font-size: 0.85rem; font-weight: 600; color: #f1f5f9; white-space: nowrap;">
+        Hedef çemberi masaya veya zemine tutun, yerleştirmek için tetiğe basın.
+      </div>
+      <button id="btn-xr-hud-exit" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);">
+        ✕ Çıkış
+      </button>
+    </div>
+
     <div id="studio-sidebar">
       <div class="studio-header">
-        <div class="studio-title">📦 3D Model Stüdyosu</div>
+        <div class="studio-title">
+          <span>📦</span> 3D Harita Stüdyosu
+        </div>
         <button class="btn-close-studio" id="btn-close-studio">✕</button>
       </div>
 
-      <!-- QUEST 3 PASSTHROUGH BUTONU -->
-      <button class="btn-xr-ar" id="btn-enter-ar">
-        <span>🥽</span> Masada Gör (Quest 3 AR)
-      </button>
-
-      <div style="margin: 0 20px 10px 20px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 12px; font-size: 0.74rem; color: #cbd5e1; line-height: 1.4;">
-        <b>Quest 3 Kullanımı:</b><br>
-        Bu siteyi Quest Browser'dan açıp AR butonuna basın. Mavi halkayı masanıza doğrultup <b>Tetik (Trigger)</b> ile sabitleyin. <b>Sağ Joystick</b> ile modeli büyütüp küçültebilirsiniz.
+      <!-- META QUEST PASSTHROUGH AR BANNER / BUTONU -->
+      <div id="meta-quest-ar-box" style="margin: 12px 16px 0 16px; background: linear-gradient(135deg, rgba(147, 51, 234, 0.22), rgba(59, 130, 246, 0.22)); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.82rem; font-weight: 800; color: #c084fc; display: flex; align-items: center; gap: 6px;">
+            <span>🥽</span> Meta Quest Passthrough
+          </span>
+          <span style="font-size: 0.68rem; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.15); padding: 2px 6px; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.3);">
+            WebXR AR
+          </span>
+        </div>
+        <p style="font-size: 0.70rem; color: #cbd5e1; line-height: 1.35; margin: 0;">
+          3D havza modelini Meta Quest 2 / 3 / 3S / Pro ile odanızdaki masaya veya zemine oturtup gerçek dünyada inceleyin.
+        </p>
+        <button id="btn-enter-ar" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #9333ea, #3b82f6); border: none; border-radius: 8px; color: #ffffff; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 14px rgba(147, 51, 234, 0.4); transition: all 0.2s;">
+          <span>🕶️</span> Masada Gör (Passthrough AR)
+        </button>
       </div>
 
-      <div class="studio-tabs">
+      <!-- Stüdyo Tab Butonları -->
+      <div class="studio-tabs" style="margin-top: 8px;">
         <button class="studio-tab-btn active" id="tab-btn-view">Görünüm</button>
         <button class="studio-tab-btn" id="tab-btn-tools">Araçlar</button>
+        <button class="studio-tab-btn" id="tab-btn-export">Çıktı</button>
+      </div>
+
+      <div style="padding: 10px 20px 0 20px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <div class="studio-author-badge" style="flex: 1;">
+          ✨ By <b>Nesretullah SATAR</b>
+        </div>
+        <button id="btn-studio-bibliography" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; font-size: 0.74rem; font-weight: 600; border-radius: 8px; padding: 6px 10px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
+          📚 Kaynakça
+        </button>
       </div>
 
       <div class="studio-body">
+        <!-- 1. GÖRÜNÜM SEKMESİ -->
         <div class="tab-content active" id="tab-content-view">
+          <!-- Model Kesim Biçimi (Organik vs Dikdörtgen Blok) -->
           <div>
             <div class="section-title">✂️ Model Kesim Biçimi</div>
             <div class="option-btn-grid">
-              <button class="opt-btn active" id="btn-clip-organic">✂️ Organik Havza</button>
+              <button class="opt-btn active" id="btn-clip-organic">✂️ Organik Havza Kesimi</button>
               <button class="opt-btn" id="btn-clip-box">🔲 Dikdörtgen Blok</button>
             </div>
+            <p style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px;">
+              <b>Organik Kesim:</b> Araziyi tam havza poligon sınırından keserek çevre fazlalıkları temizler ve bağımsız 3D havza adası üretir.
+            </p>
           </div>
-          <div style="margin-top: 10px;">
+
+          <!-- Güneş Açısı / Saat Sürgüsü -->
+          <div>
+            <div class="section-title">☀️ Güneş Açısı (Gölge Yönü)</div>
+            <div class="slider-container">
+              <div class="slider-header">
+                <span>Günün Saati</span>
+                <span id="sun-hour-val" style="color: #fbbf24; font-weight: 700;">14:00</span>
+              </div>
+              <input type="range" id="slider-sun-hour" min="6" max="18" step="1" value="14" style="accent-color: #f59e0b;" />
+            </div>
+            <p style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px;">
+              Günün saatine göre vadilerin ve dağların gölgelenmesini değiştirin.
+            </p>
+          </div>
+
+          <!-- Yükselti Abartısı -->
+          <div>
+            <div class="section-title">🏔️ Yükselti Abartısı</div>
+            <div class="slider-container">
+              <div class="slider-header">
+                <span>Yükselti Çarpanı</span>
+                <span id="three-exaggeration-val">1.0x (Orijinal)</span>
+              </div>
+              <input type="range" id="three-slider-exaggeration" min="0.2" max="4.0" step="0.1" value="1.0" />
+            </div>
+            <p style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px;">
+              1.0x gerçekçi 1:1 ölçekli topoğrafik yükselti profilidir.
+            </p>
+          </div>
+
+          <!-- Yüzey Görünümü / Doku Seçimi -->
+          <div>
             <div class="section-title">🎨 Yüzey Görünümü</div>
             <div class="option-btn-grid">
               <button class="opt-btn active" id="btn-tex-satellite">🌍 Uydu</button>
               <button class="opt-btn" id="btn-tex-relief">🏔️ Yükselti</button>
-              <button class="opt-btn" id="btn-tex-clay">⚪ Kil</button>
-              <button class="opt-btn" id="btn-tex-wireframe">🕸️ Kafes</button>
+              <button class="opt-btn" id="btn-tex-clay">⚪ 3D Baskı (Kil)</button>
+              <button class="opt-btn" id="btn-tex-wireframe">🕸️ Tel Kafes</button>
             </div>
           </div>
-          <button class="btn" id="btn-reset-studio-cam" style="width: 100%; padding: 10px; margin-top: 10px;">📍 Kamerayı Sıfırla</button>
+
+          <!-- 3D Şehir Pinleri & Beşeri Merkezler -->
+          <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px; margin-top: 6px;">
+            <label class="toggle-row" style="margin-bottom: 0;">
+              <span style="color: #34d399; font-weight: 600; font-size: 0.82rem;">📍 3D Şehir Merkezleri & Pinler</span>
+              <input type="checkbox" id="chk-3d-cities" checked style="accent-color: #10b981;" />
+            </label>
+            <p style="font-size: 0.70rem; color: #94a3b8; margin-top: 4px; line-height: 1.3;">
+              Havza içindeki il merkezlerini ve nüfuslarını 3D arazi üzerinde yükseltiye uygun pinlerle gösterir.
+            </p>
+          </div>
+
+          <!-- DEM Veri & Topoğrafya Analiz Kartı -->
+          <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 12px; margin-top: 6px;">
+            <div class="section-title" style="color: #38bdf8; margin-bottom: 8px; font-size: 0.76rem;">
+              <span>📐</span> DEM Veri & Çözünürlük Detayı
+            </div>
+            <div style="font-size: 0.74rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 5px;">
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: #94a3b8;">Hassasiyet:</span>
+                <span id="stat-dem-resolution" style="font-weight: 700; color: #38bdf8;">29.7 Metre / Piksel (30m SRTM)</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: #94a3b8;">Mesh Grid Yoğunluğu:</span>
+                <span id="stat-dem-grid" style="font-weight: 700; color: #c084fc;">256x256 (65.536 Nokta)</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: #94a3b8;">Yükselti Aralığı:</span>
+                <span id="stat-dem-range" style="font-weight: 700; color: #22c55e;">Hesaplanıyor...</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: #94a3b8;">Kaynak:</span>
+                <span style="font-weight: 600; color: #e2e8f0;">SRTM 30m / Copernicus GLO-30</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hızlı Kamera Sıfırlama -->
+          <button class="btn" id="btn-reset-studio-cam" style="width: 100%; padding: 10px; margin-top: 6px;">
+            📍 Modeli Ortala / Karşıdan Bak
+          </button>
         </div>
 
+        <!-- 2. ARAÇLAR SEKMESİ (TAŞKIN & YAĞMUR SİMÜLASYONU) -->
         <div class="tab-content" id="tab-content-tools">
-          <div style="background: rgba(30, 58, 138, 0.2); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 12px; padding: 14px;">
-            <label class="toggle-row" style="margin-bottom: 8px;">
-              <span style="font-weight: 700; color: #60a5fa;">🌊 Taşkın Simülasyonu</span>
+          <!-- Taşkın Simülasyonu Kartı -->
+          <div style="background: rgba(30, 58, 138, 0.2); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+            <label class="toggle-row" style="margin-bottom: 2px;">
+              <span style="font-weight: 700; color: #60a5fa; font-size: 0.88rem;">🌊 Taşkın Simülasyonu</span>
               <input type="checkbox" id="chk-flood-sim" style="accent-color: #3b82f6;" />
             </label>
-            <div id="flood-controls" style="opacity: 0.4; pointer-events: none;">
-              <div class="slider-header"><span>Yağış Şiddeti</span><span id="rain-intensity-val">25 kg/m²/sa</span></div>
-              <input type="range" id="slider-rain-intensity" min="0" max="100" step="1" value="50" style="width:100%; margin-bottom: 10px;" />
-              
-              <div class="slider-header"><span>Yağış Süresi</span><span id="rain-duration-val">12 Saat</span></div>
-              <input type="range" id="slider-rain-duration" min="1" max="72" step="1" value="12" style="width:100%;" />
+
+            <div id="flood-controls" style="display: flex; flex-direction: column; gap: 14px; opacity: 0.4; pointer-events: none; transition: opacity 0.3s;">
+              <!-- Yağış Şiddeti -->
+              <div>
+                <div class="slider-header" style="margin-bottom: 6px;">
+                  <span style="font-weight: 600; color: #e2e8f0;">Yağış Şiddeti</span>
+                  <span id="rain-intensity-val" style="color: #38bdf8; font-weight: 700;">25 kg/m²/sa</span>
+                </div>
+                <div class="stepper-row">
+                  <button class="stepper-btn" id="btn-rain-intensity-minus">-</button>
+                  <input type="range" id="slider-rain-intensity" min="0" max="100" step="1" value="50" style="flex: 1; accent-color: #38bdf8;" />
+                  <button class="stepper-btn" id="btn-rain-intensity-plus">+</button>
+                </div>
+              </div>
+
+              <!-- Yağış Süresi -->
+              <div>
+                <div class="slider-header" style="margin-bottom: 6px;">
+                  <span style="font-weight: 600; color: #e2e8f0;">Yağış Süresi</span>
+                  <span id="rain-duration-val" style="color: #38bdf8; font-weight: 700;">12 Saat</span>
+                </div>
+                <div class="stepper-row">
+                  <button class="stepper-btn" id="btn-rain-duration-minus">-</button>
+                  <input type="range" id="slider-rain-duration" min="1" max="72" step="1" value="12" style="flex: 1; accent-color: #38bdf8;" />
+                  <button class="stepper-btn" id="btn-rain-duration-plus">+</button>
+                </div>
+              </div>
+
+              <!-- MGM Toplam Su Birikimi Hesabı -->
+              <div class="info-callout">
+                <div class="info-stat-row">
+                  <span>Toplam Su Birikimi:</span>
+                  <span id="total-water-val" style="color: #f43f5e; font-size: 0.95rem; font-weight: 800;">300 kg/m²</span>
+                </div>
+                <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 4px;">
+                  MGM standartlarına göre yağışın şiddeti ve süresi çarpılarak havzada biriken su miktarı (kg/m²) hesaplanır ve taşkın seviyesi simüle edilir.
+                </div>
+              </div>
+
+              <!-- Su Görünürlüğü (Opaklık & Renk Seçimi) -->
+              <div>
+                <div class="slider-header" style="margin-bottom: 6px;">
+                  <span style="font-weight: 600; color: #e2e8f0;">Su Görünürlüğü (Opaklık)</span>
+                  <span id="water-opacity-val" style="color: #38bdf8; font-weight: 700;">%88 (Net)</span>
+                </div>
+                <input type="range" id="slider-water-opacity" min="30" max="100" step="5" value="88" style="width: 100%; accent-color: #0284c7; cursor: pointer;" />
+              </div>
+
+              <div>
+                <div class="section-title" style="margin-bottom: 6px; font-size: 0.76rem;">💧 Su Rengi Tonu</div>
+                <div style="display: flex; gap: 8px;">
+                  <button class="opt-btn active" id="btn-water-color-ocean" style="flex: 1; padding: 6px 4px; font-size: 0.72rem;">Okyanus Mavisi</button>
+                  <button class="opt-btn" id="btn-water-color-deep" style="flex: 1; padding: 6px 4px; font-size: 0.72rem;">Derin Mavi</button>
+                  <button class="opt-btn" id="btn-water-color-cyan" style="flex: 1; padding: 6px 4px; font-size: 0.72rem;">Turkuaz</button>
+                </div>
+              </div>
             </div>
           </div>
-          
-          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px; margin-top: 10px;">
+
+          <!-- Yağmur Parçacıkları Toggle -->
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px;">
             <label class="toggle-row">
-              <span style="font-weight: 600;">🌧️ Yağmur Parçacıkları</span>
+              <span style="font-weight: 600; color: #e2e8f0;">🌧️ Yağmur Parçacıkları & Su Akışı</span>
               <input type="checkbox" id="chk-rain-particles" />
             </label>
+            <p style="font-size: 0.72rem; color: #94a3b8; margin-top: 6px;">
+              Arazinin üzerine düşen yağmur damlalarının eğim yönünde akışını gösterir.
+            </p>
+          </div>
+
+          <!-- Yerel DEM / Raster Yükleme Kartı -->
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+            <div class="section-title" style="color: #f59e0b; margin-bottom: 2px;">📂 Özel DEM / Raster Yükle</div>
+            <p style="font-size: 0.72rem; color: #94a3b8; line-height: 1.35;">
+              Bilgisayarınızdaki yerel yükseklik haritasını (.png, .jpg, .tif yükseklik rasterı) yükleyerek 3D blok oluşturabilirsiniz.
+            </p>
+            <input type="file" id="local-dem-file-input" accept=".png,.jpg,.jpeg,.tif,.tiff" style="display: none;" />
+            <button class="btn" id="btn-trigger-local-dem" style="width: 100%; padding: 8px; font-size: 0.78rem; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24;">
+              📁 Bilgisayarımdan DEM Yükle (.tif / .png)
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. ÇIKTI SEKMESİ (STL & OBJ EXPORT) -->
+        <div class="tab-content" id="tab-content-export">
+          <div class="download-card">
+            <div class="section-title" style="color: #c084fc;">💾 3D Dosyayı İndir</div>
+            <p class="download-desc">
+              Oluşturduğunuz 3D arazi modelini 3D yazıcılar veya 3D modelleme yazılımları (Blender, Unity, CAD vb.) için doğrudan indirebilirsiniz.
+            </p>
+
+            <div class="info-callout" style="background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.3);">
+              <div class="info-stat-row">
+                <span style="color: #e2e8f0;">Aktif Model Biçimi:</span>
+                <span id="export-mode-label" style="color: #c084fc; font-weight: 700;">✂️ Organik Havza Kesimi</span>
+              </div>
+              <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 4px;" id="export-mode-desc">
+                Havza sınırlarına göre kırpılmış, altı düz kaideli ve katı (manifold) 3D yazıcı bloğu.
+              </div>
+            </div>
+            
+            <button class="btn-download-stl" id="btn-export-stl">
+              <span>🖨️ STL Formatında İndir</span>
+              <span id="stl-subtext" style="font-size: 0.7rem; opacity: 0.8;">3D Yazıcı (Organik Havza)</span>
+            </button>
+
+            <button class="btn-download-obj" id="btn-export-obj">
+              <span>🎨 OBJ Formatında İndir</span>
+              <span id="obj-subtext" style="font-size: 0.7rem; opacity: 0.8;">Blender / CAD (Havza)</span>
+            </button>
+
+            <button class="btn-preview-3d" id="btn-export-ar" style="margin-top: 6px; padding: 12px; background: linear-gradient(135deg, #9333ea, #3b82f6); box-shadow: 0 4px 14px rgba(147, 51, 234, 0.35);">
+              <span>🥽 Meta Quest AR ile Masada Gör</span>
+            </button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- ========================================================
+       KAYNAKÇA VE VERİ KAYNAKLARI PENCERESİ (BIBLIOGRAPHY MODAL)
+       ======================================================== -->
+  <div id="bibliography-modal">
+    <div class="bib-container">
+      <div class="bib-header">
+        <div class="bib-title-box">
+          <div class="bib-title">
+            <span>📚</span> Kaynakça ve Coğrafi Veri Kaynakları
+          </div>
+          <div class="bib-subtitle">
+            Bu projede yararlanılan harita altlıkları, hidrolojik sınırlar, DEM yükseklik modelleri, uydu verileri ve demografik veri tabanları
+          </div>
+        </div>
+        <button class="btn-close-bib" id="btn-close-bib" title="Kapat">✕</button>
+      </div>
+
+      <div class="bib-body">
+        <!-- 1. Havza Sınırları & Hidroloji -->
+        <div class="bib-card">
+          <div class="bib-card-header">
+            <div class="bib-card-title">
+              <span>🌊</span> 1. Türkiye 25 Akarsu Havzası Sınırları & Hidroloji Katmanı
+            </div>
+            <span class="bib-card-badge">Vektör Poligon (GeoJSON)</span>
+          </div>
+          <div class="bib-card-desc">
+            Türkiye'nin 25 ana hidrolojik akarsu havzasının coğrafi sınırları, kapalı/açık havza poligonları ve havza adlandırma standartlarını içerir. 2D interaktif harita sınır çizimleri, tıklanabilir havza seçimi ve 3D organik arazi kesiminde temel geometrik maske olarak kullanılmıştır.
+          </div>
+          <div class="bib-card-meta">
+            <span>🏛️ <b>Kaynak Kurum:</b> T.C. Tarım ve Orman Bakanlığı &bull; Su Yönetimi Genel Müdürlüğü (SYGM) & Devlet Su İşleri (DSİ)</span>
+            <span>🌐 <b>Kurum Resmi Web Siteleri:</b> <a href="https://www.tarimorman.gov.tr/SYGM" target="_blank" rel="noopener">tarimorman.gov.tr/SYGM</a> &bull; <a href="https://www.dsi.gov.tr" target="_blank" rel="noopener">dsi.gov.tr</a></span>
+            <span>🔗 <b>Kullanılan Doğrudan Veri URL:</b> <a href="https://modernsoruatlasi.com.tr/data/turkiye_havzalar_isimli.json" target="_blank" rel="noopener">https://modernsoruatlasi.com.tr/data/turkiye_havzalar_isimli.json</a></span>
+          </div>
+        </div>
+
+        <!-- 2. Akarsu ve Nehir Ağları -->
+        <div class="bib-card">
+          <div class="bib-card-header">
+            <div class="bib-card-title">
+              <span>💧</span> 2. Türkiye Akarsu, Irmak ve Drenaj Ağları
+            </div>
+            <span class="bib-card-badge">Vektör Çizgi (GeoJSON)</span>
+          </div>
+          <div class="bib-card-desc">
+            Türkiye genelindeki ana akarsular, nehir kolları, çaylar ve vadi drenaj ağlarının coğrafi akış hatlarını içerir. Havza içindeki akarsu ağlarının harita üzerinde görselleştirilmesi ve vadi tabanlarının tespiti amacıyla entegre edilmiştir.
+          </div>
+          <div class="bib-card-meta">
+            <span>🏛️ <b>Kaynak / Sağlayıcı:</b> DSİ Hidroloji Dairesi & OpenStreetMap (OSM) Waterways Veri Tabanı</span>
+            <span>🌐 <b>Proje Web Sitesi:</b> <a href="https://www.openstreetmap.org" target="_blank" rel="noopener">https://www.openstreetmap.org</a></span>
+            <span>🔗 <b>Kullanılan Doğrudan Veri URL:</b> <a href="https://modernsoruatlasi.com.tr/data/Turkiye_Akarsular_tumu_lite.json" target="_blank" rel="noopener">https://modernsoruatlasi.com.tr/data/Turkiye_Akarsular_tumu_lite.json</a></span>
+          </div>
+        </div>
+
+        <!-- 3. Sayısal Yükseklik Modeli (DEM) -->
+        <div class="bib-card">
+          <div class="bib-card-header">
+            <div class="bib-card-title">
+              <span>🏔️</span> 3. 30 Metre Sayısal Yükseklik Modeli (DEM / SRTM 1-Arc-Second)
+            </div>
+            <span class="bib-card-badge">Raster Yükseklik Karosu (PNG)</span>
+          </div>
+          <div class="bib-card-desc">
+            NASA SRTM (Shuttle Radar Topography Mission), USGS 3DEP ve Mapzen / Nextzen açık veri konsorsiyumu tarafından üretilen Terrarium RGB formatındaki piksel bazlı yükseklik rasterıdır. 3D arazi bloğu, dağ-ova rölyefi, vadi derinlikleri ve STL/OBJ 3D yazıcı modellerinin milimetrik hesaplanmasında kullanılır.
+          </div>
+          <div class="bib-card-meta">
+            <span>🏛️ <b>Veri Sağlayıcı:</b> AWS Open Data Program, NASA & USGS & Mapzen</span>
+            <span>🌐 <b>Bilgi & Dokümantasyon Portalı:</b> <a href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noopener">https://registry.opendata.aws/terrain-tiles/</a></span>
+            <span>🔗 <b>Karo Servis URL Şablonu:</b> <code>https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png</code></span>
+          </div>
+        </div>
+
+        <!-- 4. Uydu Görüntüleri & Ortofoto -->
+        <div class="bib-card">
+          <div class="bib-card-header">
+            <div class="bib-card-title">
+              <span>🛰️</span> 4. ArcGIS World Imagery (Yüksek Çözünürlüklü Küresel Uydu Mozaikleri)
+            </div>
+            <span class="bib-card-badge">Raster Uydu Karosu (JPEG)</span>
+          </div>
+          <div class="bib-card-desc">
+            Esri tarafından derlenen; Maxar, Earthstar Geographics, USDA FSA, USGS, IGN ve küresel CBS topluluğunun yüksek çözünürlüklü optik uydu ve hava fotoğraflarından oluşan güncel dünya altlığıdır. 2D harita ve 3D kabartı bloklarının fotogerçekçi dokusu olarak kaplanmaktadır.
+          </div>
+          <div class="bib-card-meta">
+            <span>🏛️ <b>Sağlayıcı:</b> Esri (Environmental Systems Research Institute) & Uluslararası İş Ortakları</span>
+            <span>🌐 <b>Resmi Ürün Sayfası:</b> <a href="https://www.esri.com/en-us/arcgis/products/arcgis-world-imagery" target="_blank" rel="noopener">https://www.esri.com/en-us/arcgis/products/arcgis-world-imagery</a></span>
+            <span>🔗 <b>Karo Servis URL Şablonu:</b> <code>https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}</code></span>
+          </div>
+        </div>
+
+        <!-- 5. 81 İl Mülki İdare Sınırları -->
+        <div class="bib-card">
+          <div class="bib-card-header">
+            <div class="bib-card-title">
+              <span>🏛️</span> 5. Türkiye 81 İl Mülki İdare Sınırları
+            </div>
+            <span class="bib-card-badge">Vektör İdari Sınır (GeoJSON)</span>
+          </div>
+          <div class="bib-card-desc">
+            Türkiye Cumhuriyeti'nin 81 iline ait mülki idare sınır koordinatlarını içerir. Havzalar ile idari birimlerin çakıştırılması, il bazlı mekânsal kesişim ve beşeri coğrafya analizlerinin gerçekleştirilmesinde kullanılır.
+          </div>
+          <div class="bib-card-meta">
+            <span>🏛️ <b>Kaynak Kurum:</b> Harita Genel Müdürlüğü (HGM) & İçişleri Bakanlığı İller İdaresi Genel Müdürlüğü</span>
+            <span>🌐 <b>Kurum Resmi Web Sitesi:</b> <a href="https://www.harita.gov.tr/" target="_blank" rel="noopener">https://www.harita.gov.tr/</a></span>
+            <span>🔗 <b>Kullanılan Doğrudan Veri URL:</b> <a href="https://cdn.jsdelivr.net/gh/alpers/Turkey-Maps-GeoJSON/tr-cities.json" target="_blank" rel="noopener">https://cdn.jsdelivr.net/gh/alpers/Turkey-Maps-GeoJSON/tr-cities.json</a></span>
+          </div>
+        </div>
+
+        <!-- 6. Demografik Nüfus İstatistikleri -->
+        <div class="bib-card">
+          <div class="bib-card-header">
+            <div class="bib-card-title">
+              <span>👥</span> 6. TÜİK Adrese Dayalı Nüfus Kayıt Sistemi (ADNKS) Demografik Verileri
+            </div>
+            <span class="bib-card-badge">İstatistiki Veri Tabanı</span>
+          </div>
+          <div class="bib-card-desc">
+            81 ilin resmi nüfus sayıları, plaka kodları ve coğrafi merkez koordinatlarıdır. Haritada havza seçildiğinde arka planda çalışan Ray-Casting poligon kesişim algoritmasıyla havzada yaşayan toplam nüfusu hesaplar ve havzanın beşeri su tüketim baskısını (su stresi seviyesini) belirler.
+          </div>
+          <div class="bib-card-meta">
+            <span>🏛️ <b>Kaynak Kurum:</b> T.C. Hazine ve Maliye Bakanlığı &bull; Türkiye İstatistik Kurumu (TÜİK)</span>
+            <span>🌐 <b>Resmi İstatistik Portalı:</b> <a href="https://www.tuik.gov.tr" target="_blank" rel="noopener">https://www.tuik.gov.tr</a></span>
+            <span>📊 <b>Kapsam & Kullanım:</b> 81 İl Resmi Nüfus Verisi &bull; Mekânsal Havza Nüfus Kesişimi &bull; 3D Şehir Pinleri</span>
+          </div>
+        </div>
+
+        <!-- 7. Meteorolojik Yağış & Taşkın Kriterleri -->
+        <div class="bib-card">
+          <div class="bib-card-header">
+            <div class="bib-card-title">
+              <span>🌧️</span> 7. MGM Meteorolojik Yağış Standartları ve Taşkın Kriterleri
+            </div>
+            <span class="bib-card-badge">Hidrometeorolojik Standartlar</span>
+          </div>
+          <div class="bib-card-desc">
+            Meteoroloji Genel Müdürlüğü ve AFAD'ın havza taşkın risk yönetim planlarında kullandığı ekstrem yağış şiddeti (kg/m²/saat) ve yağış süresi eşikleri baz alınmıştır. 3D Stüdyodaki interaktif taşkın simülasyonunda vadi yataklarındaki su yükselme seviyesi bu hidrolojik formülle dinamik olarak modellenmektedir.
+          </div>
+          <div class="bib-card-meta">
+            <span>🏛️ <b>Kaynak Kurum:</b> T.C. Çevre, Şehircilik ve İklim Değişikliği Bakanlığı &bull; Meteoroloji Genel Müdürlüğü (MGM)</span>
+            <span>🌐 <b>Resmi Portal:</b> <a href="https://www.mgm.gov.tr" target="_blank" rel="noopener">https://www.mgm.gov.tr</a></span>
+            <span>🌊 <b>Uygulama Alanı:</b> Dinamik Su Seviyesi Yükseltisi &bull; Yağmur Parçacıkları &bull; Vadi Dolum Simülasyonu</span>
+          </div>
+        </div>
+
+        <!-- 8. CBS & 3D Yazılım Altyapısı -->
+        <div class="bib-card">
+          <div class="bib-card-header">
+            <div class="bib-card-title">
+              <span>💻</span> 8. Açık Kaynak WebGL & CBS Kütüphaneleri
+            </div>
+            <span class="bib-card-badge">Yazılım Kütüphaneleri</span>
+          </div>
+          <div class="bib-card-desc">
+            Uygulamanın 2D vektör harita motoru, 3D arazi renderı, fiziksel gölgelendirmeleri ve STL/OBJ 3D yazıcı model çıktıları açık kaynaklı endüstri standardı CBS kütüphaneleriyle sıfır yerel bağımlılıkla çalışacak şekilde inşa edilmiştir.
+          </div>
+          <div class="bib-card-meta">
+            <span>🗺️ <b>MapLibre GL JS:</b> <a href="https://maplibre.org/" target="_blank" rel="noopener">https://maplibre.org/</a> (Açık kaynak vektör harita motoru v4.7.1)</span>
+            <span>📐 <b>Three.js WebGL:</b> <a href="https://threejs.org/" target="_blank" rel="noopener">https://threejs.org/</a> (3D grafik, gölge, kamera ve STL/OBJ dışa aktarım motoru r128)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bib-footer">
+        <div>
+          ✨ Proje Tasarım ve Geliştirme: <b>Nesretullah SATAR</b>
+        </div>
+        <button class="btn" id="btn-close-bib-footer" style="padding: 6px 18px; font-size: 0.78rem; background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-weight: 600;">
+          Tamam / Kapat
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- META QUEST / WEBXR BİLGİLENDİRME VE YARDIM MODALI -->
+  <div id="ar-info-modal" style="display: none; position: fixed; inset: 0; z-index: 3000; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(14px); align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #0f172a; border: 1px solid rgba(168, 85, 247, 0.5); box-shadow: 0 25px 60px rgba(0,0,0,0.85), 0 0 35px rgba(168, 85, 247, 0.25); border-radius: 18px; width: 100%; max-width: 540px; padding: 24px; display: flex; flex-direction: column; gap: 14px; animation: modalFadeIn 0.25s ease-out;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.12rem; color: #c084fc;">
+          <span>🥽</span> Meta Quest Passthrough (Mixed Reality)
+        </div>
+        <button id="btn-close-ar-info" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: background 0.2s;">✕</button>
+      </div>
+      <div id="ar-info-modal-desc" style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.55;">
+        <!-- Dinamik İçerik Buraya Gelecek -->
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px;">
+        <button id="btn-ar-info-ok" style="padding: 10px 24px; background: linear-gradient(135deg, #9333ea, #7c3aed); border: none; border-radius: 8px; color: #ffffff; font-weight: 700; font-size: 0.84rem; cursor: pointer; box-shadow: 0 4px 14px rgba(147, 51, 234, 0.4);">
+          Tamam / Anladım
+        </button>
+      </div>
+    </div>
+  </div>
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/webxr/ARButton.js"></script>
 
   <script>
     // ==========================================
-    // 1. MAPLIBRE VE ESRI SATELLITE (Sorunsuz Harita)
+    // 1. MAPLIBRE HARİTA BAŞLATMA
     // ==========================================
     const map = new maplibregl.Map({
       container: 'map',
@@ -256,12 +1437,20 @@
         sources: {
           'esri-satellite': {
             type: 'raster',
-            tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+            tiles: [
+              'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+            ],
             tileSize: 256,
             attribution: '&copy; Esri, Maxar'
           }
         },
-        layers: [{ id: 'esri-satellite-layer', type: 'raster', source: 'esri-satellite' }]
+        layers: [
+          {
+            id: 'esri-satellite-layer',
+            type: 'raster',
+            source: 'esri-satellite'
+          }
+        ]
       },
       center: [35.2433, 38.9637],
       zoom: 6.2,
@@ -277,18 +1466,177 @@
     const selectedBasinNameEl = document.getElementById('selected-basin-name');
     const selectedBasinSubEl = document.getElementById('selected-basin-sub');
 
+    // ==========================================
+    // TÜRKİYE 81 İLİ BEŞERİ VE DEMOGRAFİK VERİSİ (TÜİK)
+    // ==========================================
     const TURKEY_CITIES = [
-      { name: "Ankara", plaka: 6, lon: 32.8597, lat: 39.9334, nufus: 5846584 },
-      { name: "İstanbul", plaka: 34, lon: 28.9784, lat: 41.0082, nufus: 15655924 },
-      { name: "İzmir", plaka: 35, lon: 27.1428, lat: 38.4237, nufus: 4479525 },
-      { name: "Antalya", plaka: 7, lon: 30.7133, lat: 36.8969, nufus: 2696249 },
-      { name: "Diyarbakır", plaka: 21, lon: 40.2189, lat: 37.9144, nufus: 1818133 },
-      { name: "Erzurum", plaka: 25, lon: 41.2729, lat: 39.9055, nufus: 749993 }
+      { name: "Adana", plaka: 1, lon: 35.3213, lat: 37.0000, nufus: 2270298, bolge: "Akdeniz" },
+      { name: "Adıyaman", plaka: 2, lon: 38.2786, lat: 37.7648, nufus: 635169, bolge: "Güneydoğu Anadolu" },
+      { name: "Afyonkarahisar", plaka: 3, lon: 30.5433, lat: 38.7507, nufus: 751344, bolge: "Ege" },
+      { name: "Ağrı", plaka: 4, lon: 43.0519, lat: 39.7217, nufus: 510626, bolge: "Doğu Anadolu" },
+      { name: "Amasya", plaka: 5, lon: 35.8373, lat: 40.6534, nufus: 339529, bolge: "Karadeniz" },
+      { name: "Ankara", plaka: 6, lon: 32.8597, lat: 39.9334, nufus: 5846584, bolge: "İç Anadolu" },
+      { name: "Antalya", plaka: 7, lon: 30.7133, lat: 36.8969, nufus: 2696249, bolge: "Akdeniz" },
+      { name: "Artvin", plaka: 8, lon: 41.8183, lat: 41.1828, nufus: 172356, bolge: "Karadeniz" },
+      { name: "Aydın", plaka: 9, lon: 27.8456, lat: 37.8560, nufus: 1161702, bolge: "Ege" },
+      { name: "Balıkesir", plaka: 10, lon: 27.8826, lat: 39.6484, nufus: 1273519, bolge: "Marmara" },
+      { name: "Bilecik", plaka: 11, lon: 29.9793, lat: 40.1451, nufus: 228673, bolge: "Marmara" },
+      { name: "Bingöl", plaka: 12, lon: 40.4983, lat: 38.8853, nufus: 285655, bolge: "Doğu Anadolu" },
+      { name: "Bitlis", plaka: 13, lon: 42.1095, lat: 38.4006, nufus: 359047, bolge: "Doğu Anadolu" },
+      { name: "Bolu", plaka: 14, lon: 31.6061, lat: 40.7350, nufus: 324789, bolge: "Karadeniz" },
+      { name: "Burdur", plaka: 15, lon: 30.2889, lat: 37.7203, nufus: 277452, bolge: "Akdeniz" },
+      { name: "Bursa", plaka: 16, lon: 29.0610, lat: 40.1885, nufus: 3214571, bolge: "Marmara" },
+      { name: "Çanakkale", plaka: 17, lon: 26.4086, lat: 40.1553, nufus: 570776, bolge: "Marmara" },
+      { name: "Çankırı", plaka: 18, lon: 33.6134, lat: 40.6013, nufus: 195766, bolge: "İç Anadolu" },
+      { name: "Çorum", plaka: 19, lon: 34.9556, lat: 40.5506, nufus: 524130, bolge: "Karadeniz" },
+      { name: "Denizli", plaka: 20, lon: 29.0864, lat: 37.7765, nufus: 1059082, bolge: "Ege" },
+      { name: "Diyarbakır", plaka: 21, lon: 40.2189, lat: 37.9144, nufus: 1818133, bolge: "Güneydoğu Anadolu" },
+      { name: "Edirne", plaka: 22, lon: 26.5590, lat: 41.6772, nufus: 419913, bolge: "Marmara" },
+      { name: "Elazığ", plaka: 23, lon: 39.2225, lat: 38.6810, nufus: 604411, bolge: "Doğu Anadolu" },
+      { name: "Erzincan", plaka: 24, lon: 39.4926, lat: 39.7500, nufus: 243399, bolge: "Doğu Anadolu" },
+      { name: "Erzurum", plaka: 25, lon: 41.2729, lat: 39.9055, nufus: 749993, bolge: "Doğu Anadolu" },
+      { name: "Eskişehir", plaka: 26, lon: 30.5256, lat: 39.7767, nufus: 915418, bolge: "İç Anadolu" },
+      { name: "Gaziantep", plaka: 27, lon: 37.3822, lat: 37.0662, nufus: 2199815, bolge: "Güneydoğu Anadolu" },
+      { name: "Giresun", plaka: 28, lon: 38.3895, lat: 40.9128, nufus: 461154, bolge: "Karadeniz" },
+      { name: "Gümüşhane", plaka: 29, lon: 39.4811, lat: 40.4600, nufus: 148539, bolge: "Karadeniz" },
+      { name: "Hakkari", plaka: 30, lon: 43.7408, lat: 37.5833, nufus: 287625, bolge: "Doğu Anadolu" },
+      { name: "Hatay", plaka: 31, lon: 36.1667, lat: 36.2000, nufus: 1544640, bolge: "Akdeniz" },
+      { name: "Isparta", plaka: 32, lon: 30.5537, lat: 37.7648, nufus: 449777, bolge: "Akdeniz" },
+      { name: "Mersin", plaka: 33, lon: 34.6415, lat: 36.8121, nufus: 1938389, bolge: "Akdeniz" },
+      { name: "İstanbul", plaka: 34, lon: 28.9784, lat: 41.0082, nufus: 15655924, bolge: "Marmara" },
+      { name: "İzmir", plaka: 35, lon: 27.1428, lat: 38.4237, nufus: 4479525, bolge: "Ege" },
+      { name: "Kars", plaka: 36, lon: 43.0975, lat: 40.6013, nufus: 278335, bolge: "Doğu Anadolu" },
+      { name: "Kastamonu", plaka: 37, lon: 33.7765, lat: 41.3887, nufus: 388990, bolge: "Karadeniz" },
+      { name: "Kayseri", plaka: 38, lon: 35.4853, lat: 38.7312, nufus: 1445495, bolge: "İç Anadolu" },
+      { name: "Kırklareli", plaka: 39, lon: 27.2244, lat: 41.7333, nufus: 377156, bolge: "Marmara" },
+      { name: "Kırşehir", plaka: 40, lon: 34.1709, lat: 39.1425, nufus: 247179, bolge: "İç Anadolu" },
+      { name: "Kocaeli", plaka: 41, lon: 29.9414, lat: 40.7654, nufus: 2102907, bolge: "Marmara" },
+      { name: "Konya", plaka: 42, lon: 32.4846, lat: 37.8667, nufus: 2320641, bolge: "İç Anadolu" },
+      { name: "Kütahya", plaka: 43, lon: 29.9833, lat: 39.4167, nufus: 575670, bolge: "Ege" },
+      { name: "Malatya", plaka: 44, lon: 38.3552, lat: 38.3552, nufus: 742725, bolge: "Doğu Anadolu" },
+      { name: "Manisa", plaka: 45, lon: 27.4260, lat: 38.6191, nufus: 1475716, bolge: "Ege" },
+      { name: "Kahramanmaraş", plaka: 46, lon: 36.9371, lat: 37.5858, nufus: 1116618, bolge: "Akdeniz" },
+      { name: "Mardin", plaka: 47, lon: 40.7420, lat: 37.3212, nufus: 888874, bolge: "Güneydoğu Anadolu" },
+      { name: "Muğla", plaka: 48, lon: 28.3636, lat: 37.2153, nufus: 1066736, bolge: "Ege" },
+      { name: "Muş", plaka: 49, lon: 41.4910, lat: 38.7432, nufus: 399879, bolge: "Doğu Anadolu" },
+      { name: "Nevşehir", plaka: 50, lon: 34.7142, lat: 38.6244, nufus: 315994, bolge: "İç Anadolu" },
+      { name: "Niğde", plaka: 51, lon: 34.6793, lat: 37.9667, nufus: 377080, bolge: "İç Anadolu" },
+      { name: "Ordu", plaka: 52, lon: 37.8797, lat: 40.9839, nufus: 775800, bolge: "Karadeniz" },
+      { name: "Rize", plaka: 53, lon: 40.5208, lat: 41.0201, nufus: 350506, bolge: "Karadeniz" },
+      { name: "Sakarya", plaka: 54, lon: 30.4060, lat: 40.7569, nufus: 1098115, bolge: "Marmara" },
+      { name: "Samsun", plaka: 55, lon: 36.3361, lat: 41.2867, nufus: 1377546, bolge: "Karadeniz" },
+      { name: "Siirt", plaka: 56, lon: 41.9420, lat: 37.9333, nufus: 347412, bolge: "Güneydoğu Anadolu" },
+      { name: "Sinop", plaka: 57, lon: 35.1554, lat: 42.0231, nufus: 229702, bolge: "Karadeniz" },
+      { name: "Sivas", plaka: 58, lon: 37.0145, lat: 39.7477, nufus: 650401, bolge: "İç Anadolu" },
+      { name: "Tekirdağ", plaka: 59, lon: 27.5110, lat: 40.9833, nufus: 1167059, bolge: "Marmara" },
+      { name: "Tokat", plaka: 60, lon: 36.5544, lat: 40.3167, nufus: 606934, bolge: "Karadeniz" },
+      { name: "Trabzon", plaka: 61, lon: 39.7168, lat: 41.0015, nufus: 824352, bolge: "Karadeniz" },
+      { name: "Tunceli", plaka: 62, lon: 39.5401, lat: 39.1079, nufus: 89317, bolge: "Doğu Anadolu" },
+      { name: "Şanlıurfa", plaka: 63, lon: 38.7955, lat: 37.1674, nufus: 2213964, bolge: "Güneydoğu Anadolu" },
+      { name: "Uşak", plaka: 64, lon: 29.4058, lat: 38.6823, nufus: 377001, bolge: "Ege" },
+      { name: "Van", plaka: 65, lon: 43.3748, lat: 38.4891, nufus: 1127612, bolge: "Doğu Anadolu" },
+      { name: "Yozgat", plaka: 66, lon: 34.8147, lat: 39.8181, nufus: 418442, bolge: "İç Anadolu" },
+      { name: "Zonguldak", plaka: 67, lon: 31.7987, lat: 41.4564, nufus: 591492, bolge: "Karadeniz" },
+      { name: "Aksaray", plaka: 68, lon: 34.0254, lat: 38.3687, nufus: 438504, bolge: "İç Anadolu" },
+      { name: "Bayburt", plaka: 69, lon: 40.2249, lat: 40.2552, nufus: 86047, bolge: "Karadeniz" },
+      { name: "Karaman", plaka: 70, lon: 33.2150, lat: 37.1759, nufus: 263960, bolge: "İç Anadolu" },
+      { name: "Kırıkkale", plaka: 71, lon: 33.5064, lat: 39.8468, nufus: 285744, bolge: "İç Anadolu" },
+      { name: "Batman", plaka: 72, lon: 41.1322, lat: 37.8812, nufus: 647205, bolge: "Güneydoğu Anadolu" },
+      { name: "Şırnak", plaka: 73, lon: 42.4594, lat: 37.5164, nufus: 570745, bolge: "Güneydoğu Anadolu" },
+      { name: "Bartın", plaka: 74, lon: 32.3375, lat: 41.6344, nufus: 207238, bolge: "Karadeniz" },
+      { name: "Ardahan", plaka: 75, lon: 42.7022, lat: 41.1105, nufus: 92819, bolge: "Doğu Anadolu" },
+      { name: "Iğdır", plaka: 76, lon: 44.0450, lat: 39.9196, nufus: 209738, bolge: "Doğu Anadolu" },
+      { name: "Yalova", plaka: 77, lon: 29.2769, lat: 40.6500, nufus: 304780, bolge: "Marmara" },
+      { name: "Karabük", plaka: 78, lon: 32.6277, lat: 41.2061, nufus: 255242, bolge: "Karadeniz" },
+      { name: "Kilis", plaka: 79, lon: 37.1150, lat: 36.7184, nufus: 155179, bolge: "Güneydoğu Anadolu" },
+      { name: "Osmaniye", plaka: 80, lon: 36.2464, lat: 37.0742, nufus: 557666, bolge: "Akdeniz" },
+      { name: "Düzce", plaka: 81, lon: 31.1625, lat: 40.8438, nufus: 409865, bolge: "Karadeniz" }
     ];
 
-    let currentSelectedBasin = null;
+    // Poligon Kesişimi (Ray-Casting Algoritması)
+    function isPointInRing(lon, lat, ring) {
+      let inside = false;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const xi = ring[i][0], yi = ring[i][1];
+        const xj = ring[j][0], yj = ring[j][1];
+        const intersect = ((yi > lat) !== (yj > lat)) && (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    }
+
+    function isPointInBasin(lon, lat, geom) {
+      if (!geom) return false;
+      if (geom.type === 'Polygon') {
+        if (!isPointInRing(lon, lat, geom.coordinates[0])) return false;
+        for (let r = 1; r < geom.coordinates.length; r++) {
+          if (isPointInRing(lon, lat, geom.coordinates[r])) return false;
+        }
+        return true;
+      } else if (geom.type === 'MultiPolygon') {
+        for (let p = 0; p < geom.coordinates.length; p++) {
+          const poly = geom.coordinates[p];
+          if (isPointInRing(lon, lat, poly[0])) {
+            let inHole = false;
+            for (let r = 1; r < poly.length; r++) {
+              if (isPointInRing(lon, lat, poly[r])) {
+                inHole = true;
+                break;
+              }
+            }
+            if (!inHole) return true;
+          }
+        }
+        return false;
+      }
+      return false;
+    }
+
+    function updateBasinHumanGeo(geom) {
+      const card = document.getElementById('basin-human-geo-card');
+      if (!geom) {
+        if (card) card.style.display = 'none';
+        return;
+      }
+      if (card) card.style.display = 'block';
+
+      const basinCities = TURKEY_CITIES.filter(c => isPointInBasin(c.lon, c.lat, geom));
+      const totalPop = basinCities.reduce((sum, c) => sum + c.nufus, 0);
+
+      const popValEl = document.getElementById('basin-pop-val');
+      const citiesListEl = document.getElementById('basin-cities-list');
+      const stressEl = document.getElementById('basin-water-stress');
+
+      if (popValEl) {
+        popValEl.textContent = totalPop > 0 ? (totalPop.toLocaleString('tr-TR') + ' Kişi') : 'Kırsal / Düşük Yerleşim';
+      }
+
+      if (citiesListEl) {
+        if (basinCities.length > 0) {
+          const names = basinCities.map(c => `<b>${c.name}</b> (${c.plaka})`).join(', ');
+          citiesListEl.innerHTML = `<span style="color: #94a3b8;">Havzadaki İller (${basinCities.length}):</span> ${names}`;
+        } else {
+          citiesListEl.innerHTML = `<span style="color: #94a3b8;">Havzadaki İller:</span> Doğrudan il merkezi yok (Akarsu/doğal kaynak alanı)`;
+        }
+      }
+
+      if (stressEl) {
+        if (totalPop > 6000000) {
+          stressEl.innerHTML = `<span style="color:#ef4444; font-weight:700;">🔴 Yüksek Beşeri Su Baskısı</span> (Metropol / Yoğun Sanayi)`;
+        } else if (totalPop > 2000000) {
+          stressEl.innerHTML = `<span style="color:#f59e0b; font-weight:700;">🟡 Orta Düzey Su Tüketimi</span> (Kentsel & Tarımsal Talep)`;
+        } else if (totalPop > 500000) {
+          stressEl.innerHTML = `<span style="color:#38bdf8; font-weight:700;">🔵 Dengeli Su Baskısı</span> (Normal Kentsel Tüketim)`;
+        } else {
+          stressEl.innerHTML = `<span style="color:#10b981; font-weight:700;">🟢 Düşük Beşeri Baskı</span> (Yüksek Doğal Su Potansiyeli)`;
+        }
+      }
+    }
+
+    let currentSelectedBasin = null; // { id, name, bounds: [minLon, minLat, maxLon, maxLat] }
 
     map.on('load', () => {
+      // 3D DEM Kaynağı (AWS Terrarium)
       map.addSource('terrain-dem', {
         type: 'raster-dem',
         tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
@@ -296,15 +1644,15 @@
         tileSize: 256,
         maxzoom: 14
       });
+
       map.setTerrain({ source: 'terrain-dem', exaggeration: 1.0 });
 
-      // HAVZALAR
+      // Havzalar Kaynağı
       map.addSource('havzalar-source', {
         type: 'geojson',
         data: 'https://modernsoruatlasi.com.tr/data/turkiye_havzalar_isimli.json'
       });
 
-      // Görünmez ama tıklanabilir zemin
       map.addLayer({
         id: 'havzalar-fill',
         type: 'fill',
@@ -312,7 +1660,6 @@
         paint: { 'fill-color': '#ffffff', 'fill-opacity': 0.01 }
       });
 
-      // Kırmızı Hover (Üzerine gelince yanma efekti)
       map.addLayer({
         id: 'havzalar-fill-hover',
         type: 'fill',
@@ -321,12 +1668,11 @@
         filter: ['==', ['get', 'id'], -1]
       });
 
-      // Mor Seçim (Tıklanınca sabit kalan renk efekti)
       map.addLayer({
         id: 'havzalar-fill-selected',
         type: 'fill',
         source: 'havzalar-source',
-        paint: { 'fill-color': 'rgba(168, 85, 247, 0.50)' },
+        paint: { 'fill-color': 'rgba(168, 85, 247, 0.45)' },
         filter: ['==', ['get', 'id'], -1]
       });
 
@@ -337,21 +1683,151 @@
         paint: { 'line-color': '#ef4444', 'line-width': 2 }
       });
 
-      // Fare ile üzerine gelince (Hover)
-      map.on('mousemove', 'havzalar-fill', (e) => {
-        if (e.features.length > 0) {
-          map.getCanvas().style.cursor = 'pointer';
-          const props = e.features[0].properties;
-          
-          // Hover rengini sadece tıklanmamış havzalarda göster
-          if (!currentSelectedBasin || currentSelectedBasin.id !== props.id) {
-            map.setFilter('havzalar-fill-hover', ['==', ['get', 'id'], props.id || -1]);
-          }
+      // Akarsular Kaynağı
+      map.addSource('akarsular-source', {
+        type: 'geojson',
+        data: 'https://modernsoruatlasi.com.tr/data/Turkiye_Akarsular_tumu_lite.json'
+      });
 
-          tooltip.innerHTML = `🌊 <b>${props.Havza || 'Bilinmeyen Havza'}</b>`;
+      map.addLayer({
+        id: 'akarsular-line',
+        type: 'line',
+        source: 'akarsular-source',
+        paint: { 'line-color': '#0284c7', 'line-width': 1.6 }
+      });
+
+      // 1. BEŞERİ COĞRAFYA: İL SINIRLARI KAYNAĞI & KATMANI
+      map.addSource('iller-source', {
+        type: 'geojson',
+        data: 'https://cdn.jsdelivr.net/gh/alpers/Turkey-Maps-GeoJSON/tr-cities.json'
+      });
+
+      map.addLayer({
+        id: 'iller-borders',
+        type: 'line',
+        source: 'iller-source',
+        paint: {
+          'line-color': '#f59e0b',
+          'line-width': 1.4,
+          'line-dasharray': [3, 2],
+          'line-opacity': 0.8
+        }
+      });
+
+      // 2. BEŞERİ COĞRAFYA: ŞEHİR MERKEZLERİ & NÜFUS KAYNAĞI & KATMANLARI
+      const sehirlerGeoJSON = {
+        type: 'FeatureCollection',
+        features: TURKEY_CITIES.map(c => ({
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [c.lon, c.lat] },
+          properties: { ...c }
+        }))
+      };
+
+      map.addSource('sehirler-source', {
+        type: 'geojson',
+        data: sehirlerGeoJSON
+      });
+
+      // Şehir Işıma Halesi
+      map.addLayer({
+        id: 'sehirler-glow',
+        type: 'circle',
+        source: 'sehirler-source',
+        paint: {
+          'circle-radius': [
+            'interpolate', ['linear'], ['get', 'nufus'],
+            200000, 6,
+            1000000, 10,
+            5000000, 16,
+            16000000, 22
+          ],
+          'circle-color': '#10b981',
+          'circle-opacity': 0.3,
+          'circle-blur': 0.5
+        }
+      });
+
+      // Şehir Çekirdek Noktası
+      map.addLayer({
+        id: 'sehirler-circle',
+        type: 'circle',
+        source: 'sehirler-source',
+        paint: {
+          'circle-radius': [
+            'interpolate', ['linear'], ['get', 'nufus'],
+            200000, 3.5,
+            1000000, 5.5,
+            5000000, 8.5,
+            16000000, 12
+          ],
+          'circle-color': '#10b981',
+          'circle-stroke-color': '#ffffff',
+          'circle-stroke-width': 1.8
+        }
+      });
+
+      // Şehir İsim Etiketi
+      map.addLayer({
+        id: 'sehirler-label',
+        type: 'symbol',
+        source: 'sehirler-source',
+        layout: {
+          'text-field': '{name}',
+          'text-size': 11,
+          'text-offset': [0, 1.2],
+          'text-anchor': 'top',
+          'text-optional': true
+        },
+        paint: {
+          'text-color': '#ffffff',
+          'text-halo-color': '#0f172a',
+          'text-halo-width': 2.0
+        }
+      });
+
+      // Fare Hareketleri (Hover & Tooltip)
+      map.on('mousemove', (e) => {
+        // Öncelik 1: Şehir Merkezleri
+        const cityFeats = map.queryRenderedFeatures(e.point, { layers: ['sehirler-circle'] });
+        if (cityFeats.length > 0) {
+          map.getCanvas().style.cursor = 'pointer';
+          const p = cityFeats[0].properties;
+          tooltip.innerHTML = `🏛️ <b>${p.name}</b> (Plaka: ${p.plaka})<br><span style="color:#34d399; font-weight:700;">👥 Nüfus: ${Number(p.nufus).toLocaleString('tr-TR')}</span><br><span style="color:#94a3b8; font-size:0.72rem;">Bölge: ${p.bolge}</span>`;
           tooltip.style.display = 'block';
           tooltip.style.left = e.point.x + 'px';
           tooltip.style.top = e.point.y + 'px';
+          return;
+        }
+
+        // Öncelik 2: Havza ve Akarsular
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: ['havzalar-fill', 'akarsular-line']
+        });
+
+        if (features.length > 0) {
+          map.getCanvas().style.cursor = 'pointer';
+          const feat = features[0];
+          const props = feat.properties;
+
+          if (feat.layer.id === 'havzalar-fill') {
+            if (!currentSelectedBasin || currentSelectedBasin.id !== props.id) {
+              map.setFilter('havzalar-fill-hover', ['==', ['get', 'id'], props.id || -1]);
+            }
+            const basinName = props.Havza || 'Bilinmeyen Havza';
+            const subBasin = props.Alt_Havza ? ` (${props.Alt_Havza})` : '';
+            tooltip.innerHTML = `🌊 <b>${basinName}</b>${subBasin}`;
+          } else if (feat.layer.id === 'akarsular-line') {
+            tooltip.innerHTML = `💧 Akarsu: <b>${props.name || 'İsimsiz Akarsu'}</b>`;
+          }
+
+          tooltip.style.display = 'block';
+          tooltip.style.left = e.point.x + 'px';
+          tooltip.style.top = e.point.y + 'px';
+        } else {
+          map.getCanvas().style.cursor = '';
+          map.setFilter('havzalar-fill-hover', ['==', ['get', 'id'], -1]);
+          tooltip.style.display = 'none';
         }
       });
 
@@ -361,18 +1837,21 @@
         tooltip.style.display = 'none';
       });
 
-      // Tıklama (Seçim)
+      // TIKLAMA: Havza Seçimi ve 3D Kartının Açılması
       map.on('click', 'havzalar-fill', (e) => {
         if (!e.features || e.features.length === 0) return;
         const feature = e.features[0];
         const props = feature.properties;
 
+        // Bounding Box Hesapla
         let minX = 180, maxX = -180, minY = 90, maxY = -90;
         const findBounds = (coords) => {
           if (typeof coords[0] === 'number') {
             const [x, y] = coords;
-            if (x < minX) minX = x; if (x > maxX) maxX = x;
-            if (y < minY) minY = y; if (y > maxY) maxY = y;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
           } else {
             coords.forEach(findBounds);
           }
@@ -380,36 +1859,85 @@
         findBounds(feature.geometry.coordinates);
 
         const basinId = props.id || -1;
+        const basinName = props.Havza || 'Seçili Havza';
+        const subName = props.Alt_Havza || 'Türkiye Hidrolojik Havzası';
+
         currentSelectedBasin = {
           id: basinId,
-          name: props.Havza || 'Seçili Havza',
+          name: basinName,
           bounds: [minX, minY, maxX, maxY],
           geometry: feature.geometry
         };
 
-        // Seçilen havzayı Mor renge boya ve Hover'ı temizle
+        // Seçilen Havzayı Mor Renkle Vurgula
         map.setFilter('havzalar-fill-selected', ['==', ['get', 'id'], basinId]);
-        map.setFilter('havzalar-fill-hover', ['==', ['get', 'id'], -1]);
 
-        selectedBasinNameEl.textContent = currentSelectedBasin.name;
-        selectedBasinSubEl.textContent = props.Alt_Havza || 'Türkiye Hidrolojik Havzası';
+        // Kartı Göster & Beşeri Coğrafya Analizini Çalıştır
+        selectedBasinNameEl.textContent = basinName;
+        selectedBasinSubEl.textContent = subName;
         selectionCard.style.display = 'block';
+        updateBasinHumanGeo(feature.geometry);
 
-        map.fitBounds([[minX, minY], [maxX, maxY]], { padding: 80, pitch: 65, duration: 1500 });
+        // Oraya Uç (FlyTo)
+        map.fitBounds([[minX, minY], [maxX, maxY]], {
+          padding: 80,
+          pitch: 65,
+          duration: 1600
+        });
       });
     });
 
+    // Seçim İptali
     document.getElementById('btn-clear-selection').addEventListener('click', () => {
       currentSelectedBasin = null;
       selectionCard.style.display = 'none';
+      updateBasinHumanGeo(null);
       map.setFilter('havzalar-fill-selected', ['==', ['get', 'id'], -1]);
     });
 
+    // Harita Kontrol Paneli Olayları
     document.getElementById('chk-basins').addEventListener('change', (e) => {
       const v = e.target.checked ? 'visible' : 'none';
       ['havzalar-fill', 'havzalar-fill-hover', 'havzalar-fill-selected', 'havzalar-borders'].forEach(id => {
         if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', v);
       });
+    });
+
+    document.getElementById('chk-rivers').addEventListener('change', (e) => {
+      const v = e.target.checked ? 'visible' : 'none';
+      if (map.getLayer('akarsular-line')) map.setLayoutProperty('akarsular-line', 'visibility', v);
+    });
+
+    document.getElementById('chk-provinces').addEventListener('change', (e) => {
+      const v = e.target.checked ? 'visible' : 'none';
+      if (map.getLayer('iller-borders')) map.setLayoutProperty('iller-borders', 'visibility', v);
+    });
+
+    document.getElementById('chk-cities').addEventListener('change', (e) => {
+      const v = e.target.checked ? 'visible' : 'none';
+      ['sehirler-glow', 'sehirler-circle', 'sehirler-label'].forEach(id => {
+        if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', v);
+      });
+    });
+
+    document.getElementById('chk-terrain').addEventListener('change', (e) => {
+      const sliderBox = document.getElementById('exaggeration-box');
+      if (e.target.checked) {
+        sliderBox.style.opacity = '1';
+        const val = parseFloat(document.getElementById('slider-exaggeration').value);
+        map.setTerrain({ source: 'terrain-dem', exaggeration: val });
+      } else {
+        sliderBox.style.opacity = '0.4';
+        map.setTerrain(null);
+      }
+    });
+
+    document.getElementById('slider-exaggeration').addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      document.getElementById('exaggeration-val').textContent = val.toFixed(1) + (val === 1.0 ? 'x (Orijinal)' : 'x');
+      if (document.getElementById('chk-terrain').checked) {
+        map.setTerrain({ source: 'terrain-dem', exaggeration: val });
+      }
     });
 
     document.getElementById('btn-reset-view').addEventListener('click', () => {
@@ -423,35 +1951,58 @@
     });
 
     // ========================================================
-    // 2. 3D MODEL & DOKU HESAPLAMA (ESRI SATELLITE KULLANARAK)
+    // 2. 3D MODEL HESAPLAMA MOTORU (DEM + SATELLITE TO THREE.JS)
     // ========================================================
     const statusOverlay = document.getElementById('status-overlay');
     const statusText = document.getElementById('status-text');
 
-    function showStatus(msg) { statusText.textContent = msg; statusOverlay.style.display = 'flex'; }
-    function hideStatus() { statusOverlay.style.display = 'none'; }
+    function showStatus(msg) {
+      statusText.textContent = msg;
+      statusOverlay.style.display = 'flex';
+    }
+
+    function hideStatus() {
+      statusOverlay.style.display = 'none';
+    }
 
     const lon2tile = (lon, zoom) => (lon + 180) / 360 * Math.pow(2, zoom);
     const lat2tile = (lat, zoom) => (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom);
 
+    // Kırmızı havza sınırını uydu dokusuna işleme fonksiyonu
     function drawGeometryOnCanvas(ctx, geom, canvasW, canvasH, minX, minY, maxX, maxY) {
       if (!geom) return;
       const lonSpan = maxX - minX || 0.0001;
       const latSpan = maxY - minY || 0.0001;
+
       const project = (coord) => {
-        return [((coord[0] - minX) / lonSpan) * canvasW, ((maxY - coord[1]) / latSpan) * canvasH];
+        const px = ((coord[0] - minX) / lonSpan) * canvasW;
+        const py = ((maxY - coord[1]) / latSpan) * canvasH; // Y ekseni ters (kuzey üstte)
+        return [px, py];
       };
+
       const drawRing = (ring) => {
         if (!ring || ring.length < 2) return;
         ctx.beginPath();
-        ctx.moveTo(...project(ring[0]));
-        for (let i = 1; i < ring.length; i++) ctx.lineTo(...project(ring[i]));
+        const [startX, startY] = project(ring[0]);
+        ctx.moveTo(startX, startY);
+        for (let i = 1; i < ring.length; i++) {
+          const [px, py] = project(ring[i]);
+          ctx.lineTo(px, py);
+        }
         ctx.stroke();
       };
+
       ctx.save();
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.9)'; ctx.lineWidth = 3.5;
-      if (geom.type === 'Polygon') geom.coordinates.forEach(drawRing);
-      else if (geom.type === 'MultiPolygon') geom.coordinates.forEach(poly => poly.forEach(drawRing));
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.9)'; // Kırmızı havza sınırı
+      ctx.lineWidth = 3.5;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      if (geom.type === 'Polygon') {
+        geom.coordinates.forEach(drawRing);
+      } else if (geom.type === 'MultiPolygon') {
+        geom.coordinates.forEach(poly => poly.forEach(drawRing));
+      }
       ctx.restore();
     }
 
@@ -460,356 +2011,1740 @@
       const [minX, minY, maxX, maxY] = currentSelectedBasin.bounds;
 
       try {
-        showStatus('1/3: DEM ve Esri Uydu Haritası hesaplanıyor...');
-        const o = 111000 * Math.abs(maxY - minY);
-        const a = 111000 * Math.abs(maxX - minX) * Math.cos(((minY + maxY) / 2) * Math.PI / 180);
-        const l = Math.max(a, o);
-        const s = Math.max(4, Math.min(Math.round(Math.log2(40075016 / l)) + 1, 10)); // Sabit zoom
+        showStatus('1/4: Arazi sınırları ve 30m DEM çözünürlüğü hesaplanıyor...');
 
-        let u = lon2tile(minX, s), c = lon2tile(maxX, s);
-        let d = lat2tile(maxY, s), p = lat2tile(minY, s);
-        let f = Math.floor(u), g = Math.floor(c), x = Math.floor(d), v = Math.floor(p);
-        let b = g - f + 1, w = v - x + 1;
+        // modernsoruatlasi.com.tr matematiksel metrik formülü (40.075.016m Dünya çevresi)
+        const earthCircumference = 40075016;
+        const o = 111000 * Math.abs(maxY - minY); // Derinlik / Boy (metre)
+        const a = 111000 * Math.abs(maxX - minX) * Math.cos(((minY + maxY) / 2) * Math.PI / 180); // Genişlik (metre)
+        const l = Math.max(a, o); // En uzun kenar (metre)
 
-        showStatus(`2/3: Veriler indiriliyor...`);
-        const demCanvas = document.createElement('canvas'); demCanvas.width = b * 256; demCanvas.height = w * 256;
+        if (l < 500) {
+          throw new Error('Seçtiğiniz alan çok küçük! Lütfen haritadan geçerli bir havza seçin.');
+        }
+
+        // Büyüklüğe göre dinamik ve optimal DEM zoom seviyesi hesabı
+        const idealLog = Math.round(Math.log2(earthCircumference / l));
+        let s = Math.max(4, Math.min(idealLog + 1, 13));
+
+        // 30M ULTRA HD MODU:
+        // Eğer havza 160 km'den küçükse, doğrudan Zoom 12 (Türkiye için ~29.7m / piksel) zorlanır!
+        if (selectedDemQuality === '30m') {
+          if (l <= 160000) {
+            s = Math.max(s, 12); // Birebir 30m SRTM çözünürlüğü
+          } else if (l <= 320000) {
+            s = Math.max(s, 10);
+          }
+        }
+
+        // Karo sınırlarını hesapla
+        let u = lon2tile(minX, s);
+        let c = lon2tile(maxX, s);
+        let d = lat2tile(maxY, s);
+        let p = lat2tile(minY, s);
+
+        let f = Math.floor(u);
+        let g = Math.floor(c);
+        let x = Math.floor(d);
+        let v = Math.floor(p);
+
+        let b = g - f + 1; // Yatay DEM karo sayısı
+        let w = v - x + 1; // Düşey DEM karo sayısı
+
+        // Emniyet döngüsü (30m modunda 48 karoya kadar güvenli paralel çekim yapılır)
+        const maxAllowedTiles = selectedDemQuality === '30m' ? 48 : 36;
+        while (b * w > maxAllowedTiles && s > 4) {
+          s--;
+          u = lon2tile(minX, s);
+          c = lon2tile(maxX, s);
+          d = lat2tile(maxY, s);
+          p = lat2tile(minY, s);
+          f = Math.floor(u);
+          g = Math.floor(c);
+          x = Math.floor(d);
+          v = Math.floor(p);
+          b = g - f + 1;
+          w = v - x + 1;
+        }
+
+        // Uydu çözünürlüğü seviyesi (DEM'e göre 1 basamak daha detaylı)
+        let L = Math.min(s + 1, 14);
+        let A = Math.pow(2, L - s);
+        let O = Math.floor(u * A);
+        let U = Math.floor(c * A);
+        let I = Math.floor(d * A);
+        let D = Math.floor(p * A);
+
+        let satTileCount = (U - O + 1) * (D - I + 1);
+        if (satTileCount > 48) {
+          L = s;
+          A = 1;
+          O = f;
+          U = g;
+          I = x;
+          D = v;
+          satTileCount = b * w;
+        }
+
+        // Metre/piksel hesapla (Türkiye ~39° enlem için)
+        const approxResolutionMeters = (earthCircumference * 0.777) / (256 * Math.pow(2, s));
+        const resText = s >= 12 ? '29.7 Metre (Birebir 30m SRTM)' : `~${approxResolutionMeters.toFixed(1)} Metre / Piksel`;
+
+        showStatus(`2/4: DEM (${resText}) ve Uydu indiriliyor (${b * w} DEM + ${satTileCount} Uydu)...`);
+
+        const demCanvas = document.createElement('canvas');
+        demCanvas.width = b * 256;
+        demCanvas.height = w * 256;
         const demCtx = demCanvas.getContext('2d', { willReadFrequently: true });
-        const satCanvas = document.createElement('canvas'); satCanvas.width = b * 256; satCanvas.height = w * 256;
+
+        const satCanvas = document.createElement('canvas');
+        satCanvas.width = (U - O + 1) * 256;
+        satCanvas.height = (D - I + 1) * 256;
         const satCtx = satCanvas.getContext('2d', { willReadFrequently: true });
 
-        const loadImage = (url) => new Promise((res) => {
-          const img = new Image(); img.crossOrigin = 'anonymous';
-          img.onload = () => res(img);
-          img.onerror = () => { const dc = document.createElement('canvas'); dc.width=256; dc.height=256; res(dc); };
+        const loadImage = (url) => new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = () => {
+            const dummy = document.createElement('canvas');
+            dummy.width = 256; dummy.height = 256;
+            const dummyImg = new Image();
+            dummyImg.src = dummy.toDataURL();
+            resolve(dummyImg);
+          };
           img.src = url;
         });
 
-        const promises = [];
+        const loadPromises = [];
+
+        // DEM Karoları
         for (let ty = x; ty <= v; ty++) {
           for (let tx = f; tx <= g; tx++) {
-            const px = (tx - f) * 256, py = (ty - x) * 256;
-            promises.push(
-              loadImage(`https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${s}/${tx}/${ty}.png`).then(img => demCtx.drawImage(img, px, py, 256, 256)),
-              loadImage(`https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${s}/${ty}/${tx}`).then(img => satCtx.drawImage(img, px, py, 256, 256))
+            const posX = (tx - f) * 256;
+            const posY = (ty - x) * 256;
+            const demUrl = `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${s}/${tx}/${ty}.png`;
+            loadPromises.push(
+              loadImage(demUrl).then(img => demCtx.drawImage(img, posX, posY, 256, 256))
             );
           }
         }
-        await Promise.all(promises);
 
-        showStatus('3/3: 3D Stüdyo hazırlanıyor...');
-        const gridW = 128, gridH = 128;
-        const demSampleCanvas = document.createElement('canvas'); demSampleCanvas.width = gridW; demSampleCanvas.height = gridH;
+        // Uydu Karoları
+        for (let ty = I; ty <= D; ty++) {
+          for (let tx = O; tx <= U; tx++) {
+            const posX = (tx - O) * 256;
+            const posY = (ty - I) * 256;
+            const satUrl = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${L}/${ty}/${tx}`;
+            loadPromises.push(
+              loadImage(satUrl).then(img => satCtx.drawImage(img, posX, posY, 256, 256))
+            );
+          }
+        }
+
+        await Promise.all(loadPromises);
+
+        showStatus('3/4: 3D Geometri ve yükseklik ağı çözümleniyor...');
+
+        // 30M ULTRA HD MODUNDA 256x256 (65.536 YÜZEY NOKTASI), STANDARTTA 128x128
+        const gridW = selectedDemQuality === '30m' ? 256 : 128;
+        const gridH = selectedDemQuality === '30m' ? 256 : 128;
+
+        const demSampleCanvas = document.createElement('canvas');
+        demSampleCanvas.width = gridW;
+        demSampleCanvas.height = gridH;
         const demSampleCtx = demSampleCanvas.getContext('2d', { willReadFrequently: true });
 
-        const cropX = (u - f) * 256, cropY = (d - x) * 256, cropW = (c - u) * 256, cropH = (p - d) * 256;
-        demSampleCtx.drawImage(demCanvas, cropX, cropY, cropW, cropH, 0, 0, gridW, gridH);
+        const demCropX = (u - f) * 256;
+        const demCropY = (d - x) * 256;
+        const demCropW = (c - u) * 256;
+        const demCropH = (p - d) * 256;
+
+        demSampleCtx.drawImage(demCanvas, demCropX, demCropY, demCropW, demCropH, 0, 0, gridW, gridH);
         const demData = demSampleCtx.getImageData(0, 0, gridW, gridH).data;
 
+        // Terrarium Yükseklik Çözümü: (R * 256 + G + B / 256) - 32768
         const elevationGrid = new Float32Array(gridW * gridH);
         let minElev = 99999, maxElev = -99999;
+
         for (let i = 0; i < gridW * gridH; i++) {
-          const r = demData[4 * i], gr = demData[4 * i + 1], bv = demData[4 * i + 2];
-          const elev = (r * 256 + gr + bv / 256) - 32768;
+          const r = demData[4 * i];
+          const g = demData[4 * i + 1];
+          const bVal = demData[4 * i + 2];
+          const elev = (r * 256 + g + bVal / 256) - 32768;
           elevationGrid[i] = elev;
           if (elev < minElev && elev > -500) minElev = elev;
           if (elev > maxElev) maxElev = elev;
         }
 
-        const satCropCanvas = document.createElement('canvas'); satCropCanvas.width = 1024; satCropCanvas.height = 1024;
-        const satCropCtx = satCropCanvas.getContext('2d');
-        satCropCtx.drawImage(satCanvas, cropX, cropY, cropW, cropH, 0, 0, 1024, 1024);
-        drawGeometryOnCanvas(satCropCtx, currentSelectedBasin.geometry, 1024, 1024, minX, minY, maxX, maxY);
+        showStatus('4/4: 3D Stüdyo hazırlanıyor...');
 
+        // Uydu görüntüsünü tam havza sınırından 1024x1024 kırp
+        const satCropCanvas = document.createElement('canvas');
+        satCropCanvas.width = 1024;
+        satCropCanvas.height = 1024;
+        const satCropCtx = satCropCanvas.getContext('2d');
+
+        const satCropX = (u * A - O) * 256;
+        const satCropY = (d * A - I) * 256;
+        const satCropW = (c * A - u * A) * 256;
+        const satCropH = (p * A - d * A) * 256;
+
+        satCropCtx.drawImage(satCanvas, satCropX, satCropY, satCropW, satCropH, 0, 0, 1024, 1024);
+
+        // Kırmızı havza sınırını uydu dokusu üzerine çiz
+        if (currentSelectedBasin.geometry) {
+          drawGeometryOnCanvas(satCropCtx, currentSelectedBasin.geometry, 1024, 1024, minX, minY, maxX, maxY);
+        }
+
+        const satTextureUrl = satCropCanvas.toDataURL('image/jpeg', 0.88);
+
+        // Gerçek coğrafi oranları hesapla (Genişlik / Derinlik)
+        const dimensions = {
+          width: (a / l) * 100,
+          depth: (o / l) * 100
+        };
+
+        // 3D Stüdyoyu Aç
         open3DStudio({
-          elevationGrid, gridW, gridH, minElev, maxElev,
-          satTextureUrl: satCropCanvas.toDataURL('image/jpeg', 0.88),
-          dimensions: { width: (a / l) * 100, depth: (o / l) * 100 },
+          elevationGrid,
+          gridW,
+          gridH,
+          minElev,
+          maxElev,
+          satTextureUrl,
+          dimensions,
           basinName: currentSelectedBasin.name,
+          resolutionText: resText,
           geometry: currentSelectedBasin.geometry,
           bounds: currentSelectedBasin.bounds
         });
 
       } catch (err) {
-        alert('Hata: ' + err.message);
+        console.error(err);
+        alert(err.message || '3D model oluşturulurken bir hata oluştu.');
       } finally {
         hideStatus();
       }
     });
 
     // ========================================================
-    // 3. THREE.JS VE META QUEST AR PASSTHROUGH MOTORU
+    // 3. THREE.JS 3D HARİTA STÜDYOSU (PREVIEW & EXPORT)
     // ========================================================
     const studioModal = document.getElementById('studio-modal');
     const container = document.getElementById('three-canvas-container');
 
-    let scene, camera, renderer, controls;
-    let solidBlockGroup = null;
-    let currentModelData = null;
+    let scene, camera, renderer, controls, dirLight;
     let terrainMesh = null;
     let waterMesh = null;
     let rainParticles = null;
+    let solidBlockGroup = null;
+    let currentModelData = null;
+    let satelliteTexture = null;
+    let strataTexture = null;
+    const clock = new THREE.Clock();
 
-    // WebXR AR Değişkenleri
+    // Simülasyon Durum Değişkenleri
+    let floodSimActive = false;
+    let rainParticlesActive = false;
+    let rainIntensity = 50; // 0-100 arası (0 - 50 kg/m²/sa)
+    let rainDuration = 12; // 1 - 72 saat
+    let sunHour = 14;
+    let currentTexMode = 'satellite';
+    let waterOpacity = 0.88; // Zengin ve net su görünürlüğü
+    let waterColorHex = 0x0284c7; // Canlı okyanus mavisi
+    let waterEmissiveHex = 0x0369a1; // Vadilerde belirgin ışıma
+    let selectedDemQuality = '30m'; // '30m' (Ultra HD, 256x256 grid) veya 'std' (Standart, 128x128 grid)
+    let currentClipMode = 'organic'; // 'organic' (tam havza sınırı) veya 'box' (dikdörtgen blok)
+
+    // ==========================================
+    // META QUEST WEBXR PASSTHROUGH DEĞİŞKENLERİ
+    // ==========================================
+    let xrSession = null;
     let xrHitTestSource = null;
     let xrHitTestSourceRequested = false;
     let reticle = null;
     let xrPlaced = false;
-    let xrCurrentScale = 0.005; // 50cm Maket Boyutu
+    let xrController0 = null;
+    let xrController1 = null;
+    let xrCurrentScale = 0.006; // 100 birim * 0.006 = 0.60m (60 cm masaüstü maketi)
+    let xrModelRotationY = 0;
 
-    function getBasinMask(geometry, bounds, gridW, gridH) {
-      if (!geometry || !bounds) return null;
-      const [minX, minY, maxX, maxY] = bounds;
-      const maskCanvas = document.createElement('canvas'); maskCanvas.width = gridW - 1; maskCanvas.height = gridH - 1;
-      const ctx = maskCanvas.getContext('2d', { willReadFrequently: true });
-      ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, gridW - 1, gridH - 1);
-      ctx.fillStyle = '#ffffff';
-      const project = (c) => [((c[0] - minX) / (maxX - minX)) * (gridW - 1), ((maxY - c[1]) / (maxY - minY)) * (gridH - 1)];
-      const drawRing = (ring) => {
-        ctx.beginPath(); ctx.moveTo(...project(ring[0]));
-        for (let i = 1; i < ring.length; i++) ctx.lineTo(...project(ring[i]));
-        ctx.closePath();
-      };
-      if (geometry.type === 'Polygon') geometry.coordinates.forEach(drawRing);
-      else if (geometry.type === 'MultiPolygon') geometry.coordinates.forEach(p => p.forEach(drawRing));
-      ctx.fill('evenodd');
-      const imgData = ctx.getImageData(0, 0, gridW - 1, gridH - 1).data;
-      const isInside = new Uint8Array((gridW - 1) * (gridH - 1));
-      for (let i = 0; i < (gridW - 1) * (gridH - 1); i++) isInside[i] = imgData[i * 4] > 110 ? 1 : 0;
-      return isInside;
+    // 1. Jeolojik Katmanlı Taban Dokusu Üretici (Sedimentary Geological Strata)
+    function createStrataTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      // Doğal Sedimanter Jeolojik Katman Gradyanı
+      const grad = ctx.createLinearGradient(0, 0, 0, 512);
+      grad.addColorStop(0.00, "#8a7355"); // Üst toprak katmanı (Humus/topsoil)
+      grad.addColorStop(0.12, "#7a6345");
+      grad.addColorStop(0.13, "#b59b7c"); // Kumtaşı tabakası (Sandstone)
+      grad.addColorStop(0.28, "#c4ab8c");
+      grad.addColorStop(0.29, "#544b41"); // Koyu killi şist (Dark shale)
+      grad.addColorStop(0.48, "#63584c");
+      grad.addColorStop(0.49, "#a06820"); // Demir oksit / mineral tortusu
+      grad.addColorStop(0.53, "#8a7d6d");
+      grad.addColorStop(0.70, "#7a7065"); // Kireçtaşı (Limestone)
+      grad.addColorStop(0.71, "#4b5563"); // Bazaltik volkanik katman
+      grad.addColorStop(0.88, "#374151");
+      grad.addColorStop(1.00, "#1e293b"); // Temel ana kayaç (Bedrock)
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 128, 512);
+
+      // Gerçekçi tortul tabaka çizgileri ve tanecikler
+      for (let i = 0; i < 70; i++) {
+        const y = Math.random() * 512;
+        ctx.strokeStyle = Math.random() > 0.5 ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.18)";
+        ctx.lineWidth = 1 + Math.random() * 2;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(128, y + (Math.random() - 0.5) * 8);
+        ctx.stroke();
+      }
+      for (let i = 0; i < 3500; i++) {
+        ctx.fillStyle = Math.random() > 0.5 ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.14)";
+        ctx.fillRect(Math.random() * 128, Math.random() * 512, Math.random() * 3, Math.random() * 2);
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      return tex;
     }
 
     function initThreeScene() {
       if (renderer) return;
 
       scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b14);
+
       camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 2000);
       camera.position.set(0, 75, 115);
 
-      // AR için alpha: true zorunludur (Şeffaf zemin sağlar)
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(container.clientWidth, container.clientHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.xr.enabled = true; // WebXR Motorunu Açar
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.xr.enabled = true;
       container.appendChild(renderer.domElement);
 
       controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxPolarAngle = Math.PI / 2 - 0.04; // Yerin altına geçişi engelle
+      controls.target.set(0, 5, 0);
 
-      scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-      const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
-      dirLight.position.set(50, 100, 50);
+      // Işıklandırma
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+      scene.add(ambientLight);
+
+      dirLight = new THREE.DirectionalLight(0xffffff, 0.95);
+      dirLight.castShadow = true;
+      dirLight.shadow.mapSize.width = 2048;
+      dirLight.shadow.mapSize.height = 2048;
+      dirLight.shadow.camera.near = 10;
+      dirLight.shadow.camera.far = 400;
+      dirLight.shadow.camera.left = -90;
+      dirLight.shadow.camera.right = 90;
+      dirLight.shadow.camera.top = 90;
+      dirLight.shadow.camera.bottom = -90;
       scene.add(dirLight);
 
-      // WebXR Yüzey Tespit Halkası (Reticle)
-      const ringGeom = new THREE.RingGeometry(0.12, 0.15, 32).rotateX(-Math.PI / 2);
-      const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide });
-      reticle = new THREE.Mesh(ringGeom, ringMat);
-      reticle.matrixAutoUpdate = false;
-      reticle.visible = false;
-      scene.add(reticle);
-
-      // Quest 3 Kumanda Tetik Dinleyicisi
-      const controller = renderer.xr.getController(0);
-      controller.addEventListener('select', () => {
-        if (reticle.visible && solidBlockGroup) {
-          solidBlockGroup.position.setFromMatrixPosition(reticle.matrix);
-          solidBlockGroup.quaternion.setFromRotationMatrix(reticle.matrix);
-          solidBlockGroup.scale.set(xrCurrentScale, xrCurrentScale, xrCurrentScale);
-          solidBlockGroup.visible = true;
-          xrPlaced = true;
-        }
-      });
-      scene.add(controller);
+      updateSunPosition(sunHour);
+      initWebXR();
 
       window.addEventListener('resize', () => {
+        if (!studioModal.style.display || studioModal.style.display === 'none') return;
         camera.aspect = container.clientWidth / container.clientHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(container.clientWidth, container.clientHeight);
       });
 
-      // WebXR Animasyon Döngüsü
-      renderer.setAnimationLoop((timestamp, frame) => {
-        if (renderer.xr.isPresenting && frame) {
+      // Animasyon & WebXR Render Döngüsü
+      function animate(timestamp, frame) {
+        const elapsedTime = clock.getElapsedTime();
+
+        // 1. WEBXR KARMA GERÇEKLİK (PASSTHROUGH AR) MODU
+        if (renderer.xr.isPresenting) {
           const session = renderer.xr.getSession();
-          const refSpace = renderer.xr.getReferenceSpace();
+          if (frame && session) {
+            // Hit Test kaynağını talep et
+            if (!xrHitTestSourceRequested) {
+              session.requestReferenceSpace('viewer').then((referenceSpace) => {
+                session.requestHitTestSource({ space: referenceSpace }).then((source) => {
+                  xrHitTestSource = source;
+                }).catch((e) => console.warn('Hit test source error:', e));
+              }).catch((e) => console.warn('Reference space error:', e));
 
-          if (!xrHitTestSourceRequested) {
-            session.requestReferenceSpace('viewer').then(vSpace => {
-              session.requestHitTestSource({ space: vSpace }).then(src => { xrHitTestSource = src; });
-            });
-            session.addEventListener('end', () => {
-              xrHitTestSourceRequested = false;
-              xrHitTestSource = null;
-              reticle.visible = false;
-              scene.background = new THREE.Color(0x020617);
-            });
-            xrHitTestSourceRequested = true;
-          }
+              session.addEventListener('end', () => {
+                xrHitTestSourceRequested = false;
+                xrHitTestSource = null;
+                onXRSessionEnd();
+              });
 
-          if (xrHitTestSource && !xrPlaced) {
-            const hitResults = frame.getHitTestResults(xrHitTestSource);
-            if (hitResults.length > 0) {
-              const pose = hitResults[0].getPose(refSpace);
-              reticle.visible = true;
-              reticle.matrix.fromArray(pose.transform.matrix);
-            } else {
-              reticle.visible = false;
+              xrHitTestSourceRequested = true;
             }
-          } else {
-            reticle.visible = false;
-          }
 
-          // Thumbstick ile Boyut Değiştirme
-          if (session.inputSources && session.inputSources[0] && session.inputSources[0].gamepad) {
-            const axes = session.inputSources[0].gamepad.axes;
-            if (axes.length >= 4 && Math.abs(axes[3]) > 0.15 && solidBlockGroup) {
-              xrCurrentScale -= axes[3] * 0.0002;
-              xrCurrentScale = Math.max(0.001, Math.min(0.03, xrCurrentScale));
-              solidBlockGroup.scale.set(xrCurrentScale, xrCurrentScale, xrCurrentScale);
+            if (xrHitTestSource) {
+              const referenceSpace = renderer.xr.getReferenceSpace();
+              const hitTestResults = frame.getHitTestResults(xrHitTestSource);
+              if (hitTestResults.length > 0) {
+                const hit = hitTestResults[0];
+                const pose = hit.getPose(referenceSpace);
+                if (reticle && !xrPlaced) {
+                  reticle.visible = true;
+                  reticle.matrix.fromArray(pose.transform.matrix);
+                }
+              } else {
+                if (reticle && !xrPlaced) {
+                  reticle.visible = false;
+                }
+              }
             }
+
+            handleXRThumbsticks(session);
           }
         } else {
-          controls.update(); // Masaüstü için
+          // Normal Masaüstü OrbitControls
+          controls.update();
         }
-        
-        // Simülasyon Animasyonları
+
+        // Taşkın Suyu Dalgalanması
         if (waterMesh && waterMesh.visible) {
-          waterMesh.position.y = waterMesh.userData.baseY + Math.sin(Date.now() * 0.002) * 0.2;
+          waterMesh.position.y = waterMesh.userData.baseY + Math.sin(elapsedTime * 2.2) * 0.16;
+          if (waterMesh.material) {
+            waterMesh.material.opacity = Math.min(1.0, waterOpacity + Math.sin(elapsedTime * 1.8) * 0.03);
+          }
+        }
+
+        // Yağmur Damlalarının Yağışı
+        if (rainParticles && rainParticles.visible) {
+          const posArr = rainParticles.geometry.attributes.position.array;
+          const speeds = rainParticles.userData.speeds;
+          const count = speeds.length;
+          const curW = currentModelData && currentModelData.dimensions ? currentModelData.dimensions.width : 100;
+          const curD = currentModelData && currentModelData.dimensions ? currentModelData.dimensions.depth : 100;
+          for (let i = 0; i < count; i++) {
+            posArr[i * 3 + 1] -= speeds[i];
+            if (posArr[i * 3 + 1] < 1) {
+              posArr[i * 3 + 1] = 30 + Math.random() * 35;
+              posArr[i * 3] = (Math.random() - 0.5) * curW;
+              posArr[i * 3 + 2] = (Math.random() - 0.5) * curD;
+            }
+          }
+          rainParticles.geometry.attributes.position.needsUpdate = true;
         }
 
         renderer.render(scene, camera);
-      });
+      }
+      renderer.setAnimationLoop(animate);
     }
 
-    function open3DStudio(data) {
-      currentModelData = data;
-      studioModal.style.display = 'flex';
-      initThreeScene();
+    function updateSunPosition(hour) {
+      if (!dirLight) return;
+      const angle = Math.PI * (hour - 6) / 12; // 06:00 doğu, 12:00 tepe, 18:00 batı
+      const posX = 130 * Math.cos(angle);
+      const posY = Math.max(20, 160 * Math.sin(angle));
+      const posZ = 80 * Math.sin(angle);
+      dirLight.position.set(posX, posY, posZ);
+    }
 
-      if (solidBlockGroup) scene.remove(solidBlockGroup);
-      solidBlockGroup = new THREE.Group();
+    // ========================================================
+    // ORGANİK HAVZA MASKELEME VE GEOMETRİ ÜRETİCİSİ
+    // ========================================================
+    function getBasinMask(geometry, bounds, gridW, gridH) {
+      if (!geometry || !bounds) return null;
+      const [minX, minY, maxX, maxY] = bounds;
+      const lonSpan = maxX - minX || 0.0001;
+      const latSpan = maxY - minY || 0.0001;
 
-      const { elevationGrid, gridW, gridH, minElev, maxElev, satTextureUrl, dimensions, geometry, bounds } = data;
-      const bW = dimensions.width || 100, bD = dimensions.depth || 100;
+      const qw = gridW - 1;
+      const qh = gridH - 1;
+
+      const maskCanvas = document.createElement('canvas');
+      maskCanvas.width = qw;
+      maskCanvas.height = qh;
+      const ctx = maskCanvas.getContext('2d', { willReadFrequently: true });
+
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, qw, qh);
+
+      ctx.fillStyle = '#ffffff';
+
+      const project = (coord) => {
+        const px = ((coord[0] - minX) / lonSpan) * qw;
+        const py = ((maxY - coord[1]) / latSpan) * qh;
+        return [px, py];
+      };
+
+      const drawRing = (ring) => {
+        if (!ring || ring.length < 2) return;
+        const [sx, sy] = project(ring[0]);
+        ctx.moveTo(sx, sy);
+        for (let i = 1; i < ring.length; i++) {
+          const [px, py] = project(ring[i]);
+          ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+      };
+
+      ctx.beginPath();
+      if (geometry.type === 'Polygon') {
+        geometry.coordinates.forEach(drawRing);
+      } else if (geometry.type === 'MultiPolygon') {
+        geometry.coordinates.forEach(poly => poly.forEach(drawRing));
+      }
+      ctx.fill('evenodd');
+
+      const imgData = ctx.getImageData(0, 0, qw, qh).data;
+      const isInside = new Uint8Array(qw * qh);
+      for (let i = 0; i < qw * qh; i++) {
+        isInside[i] = imgData[i * 4] > 110 ? 1 : 0;
+      }
+      return isInside;
+    }
+
+    function buildOrganicBasinGeometry(elevationGrid, gridW, gridH, minElev, maxElev, dimensions, exaggeration, isInside) {
+      const blockWidth = (dimensions && dimensions.width) ? dimensions.width : 100;
+      const blockDepth = (dimensions && dimensions.depth) ? dimensions.depth : 100;
       const elevRange = Math.max(1, maxElev - minElev);
+      const baseBottomY = -8;
 
-      const isInside = getBasinMask(geometry, bounds, gridW, gridH);
+      const qw = gridW - 1;
+      const qh = gridH - 1;
+
       const topPositions = [];
       const topUvs = [];
 
-      // Sadece Organik Üst Yüzeyi Oluşturan Basit Geometri
-      for (let y = 0; y < gridH - 1; y++) {
-        for (let x = 0; x < gridW - 1; x++) {
-          if (!isInside[y * (gridW - 1) + x]) continue;
+      const bottomPositions = [];
+      const bottomUvs = [];
 
-          const getP = (gx, gy) => {
-            const px = ((gx / (gridW - 1)) - 0.5) * bW;
-            const pz = ((gy / (gridH - 1)) - 0.5) * bD;
-            const el = elevationGrid[gy * gridW + gx];
-            const py = (Math.max(0, (el - minElev) / elevRange) * 16) + 3;
-            return [px, py, pz];
-          };
-          const getU = (gx, gy) => [gx / (gridW - 1), 1 - (gy / (gridH - 1))];
+      const wallPositions = [];
+      const wallUvs = [];
 
-          const pNW = getP(x, y), pNE = getP(x + 1, y), pSW = getP(x, y + 1), pSE = getP(x + 1, y + 1);
-          const uNW = getU(x, y), uNE = getU(x + 1, y), uSW = getU(x, y + 1), uSE = getU(x + 1, y + 1);
+      const getVertexPos = (gx, gy) => {
+        const px = ((gx / qw) - 0.5) * blockWidth;
+        const pz = ((gy / qh) - 0.5) * blockDepth;
+        const elev = elevationGrid[gy * gridW + gx];
+        const normalized = Math.max(0, (elev - minElev) / elevRange);
+        const py = (normalized * 16 * exaggeration) + 3;
+        return [px, py, pz];
+      };
 
-          topPositions.push(...pNW, ...pSW, ...pNE, ...pNE, ...pSW, ...pSE);
-          topUvs.push(...uNW, ...uSW, ...uNE, ...uNE, ...uSW, ...uSE);
+      const getUv = (gx, gy) => {
+        return [gx / qw, 1 - (gy / qh)];
+      };
+
+      for (let y = 0; y < qh; y++) {
+        for (let x = 0; x < qw; x++) {
+          const idx = y * qw + x;
+          if (!isInside[idx]) continue; // Havza dışındaki hücreleri doğrudan ele
+
+          const pNW = getVertexPos(x, y);
+          const pNE = getVertexPos(x + 1, y);
+          const pSW = getVertexPos(x, y + 1);
+          const pSE = getVertexPos(x + 1, y + 1);
+
+          const uvNW = getUv(x, y);
+          const uvNE = getUv(x + 1, y);
+          const uvSW = getUv(x, y + 1);
+          const uvSE = getUv(x + 1, y + 1);
+
+          // 1. Üst Arazi Yüzeyi (2 Üçgen)
+          topPositions.push(...pNW, ...pSW, ...pNE);
+          topUvs.push(...uvNW, ...uvSW, ...uvNE);
+
+          topPositions.push(...pNE, ...pSW, ...pSE);
+          topUvs.push(...uvNE, ...uvSW, ...uvSE);
+
+          // 2. Alt Düz Kaide (y = baseBottomY, normal aşağı bakar)
+          const bNW = [pNW[0], baseBottomY, pNW[2]];
+          const bNE = [pNE[0], baseBottomY, pNE[2]];
+          const bSW = [pSW[0], baseBottomY, pSW[2]];
+          const bSE = [pSE[0], baseBottomY, pSE[2]];
+
+          bottomPositions.push(...bNW, ...bNE, ...bSW);
+          bottomUvs.push(...uvNW, ...uvNE, ...uvSW);
+
+          bottomPositions.push(...bNE, ...bSE, ...bSW);
+          bottomUvs.push(...uvNE, ...uvSE, ...uvSW);
+
+          // 3. Organik Yan Duvarlar (Sınır kenarlarından tabana inen dik jeolojik yarlar)
+          // Kuzey Kenar
+          if (y === 0 || !isInside[(y - 1) * qw + x]) {
+            wallPositions.push(...pNW, ...pNE, ...bNW);
+            wallUvs.push(0, 1,  1, 1,  0, 0);
+            wallPositions.push(...pNE, ...bNE, ...bNW);
+            wallUvs.push(1, 1,  1, 0,  0, 0);
+          }
+
+          // Güney Kenar
+          if (y === qh - 1 || !isInside[(y + 1) * qw + x]) {
+            wallPositions.push(...pSE, ...pSW, ...bSE);
+            wallUvs.push(0, 1,  1, 1,  0, 0);
+            wallPositions.push(...pSW, ...bSW, ...bSE);
+            wallUvs.push(1, 1,  1, 0,  0, 0);
+          }
+
+          // Doğu Kenar
+          if (x === qw - 1 || !isInside[y * qw + (x + 1)]) {
+            wallPositions.push(...pNE, ...pSE, ...bNE);
+            wallUvs.push(0, 1,  1, 1,  0, 0);
+            wallPositions.push(...pSE, ...bSE, ...bNE);
+            wallUvs.push(1, 1,  1, 0,  0, 0);
+          }
+
+          // Batı Kenar
+          if (x === 0 || !isInside[y * qw + (x - 1)]) {
+            wallPositions.push(...pSW, ...pNW, ...bSW);
+            wallUvs.push(0, 1,  1, 1,  0, 0);
+            wallPositions.push(...pNW, ...bNW, ...bSW);
+            wallUvs.push(1, 1,  1, 0,  0, 0);
+          }
+        }
+      }
+
+      const allPositions = new Float32Array([...topPositions, ...bottomPositions, ...wallPositions]);
+      const allUvs = new Float32Array([...topUvs, ...bottomUvs, ...wallUvs]);
+
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.BufferAttribute(allPositions, 3));
+      geom.setAttribute('uv', new THREE.BufferAttribute(allUvs, 2));
+
+      const topVertCount = topPositions.length / 3;
+      const bottomVertCount = bottomPositions.length / 3;
+      const wallVertCount = wallPositions.length / 3;
+
+      geom.addGroup(0, topVertCount, 0); // 0: Üst Arazi (topMaterial)
+      geom.addGroup(topVertCount, bottomVertCount, 1); // 1: Alt Kaide (bottomMaterial)
+      geom.addGroup(topVertCount + bottomVertCount, wallVertCount, 2); // 2: Katmanlı Yan Duvarlar (wallMaterial)
+
+      geom.computeVertexNormals();
+      return { geom, isInside, topPositions };
+    }
+
+    function buildOrganicWaterGeometry(isInside, gridW, gridH, dimensions) {
+      const blockWidth = (dimensions && dimensions.width) ? dimensions.width : 100;
+      const blockDepth = (dimensions && dimensions.depth) ? dimensions.depth : 100;
+      const qw = gridW - 1;
+      const qh = gridH - 1;
+      const positions = [];
+
+      for (let y = 0; y < qh; y++) {
+        for (let x = 0; x < qw; x++) {
+          if (!isInside[y * qw + x]) continue;
+          const x0 = ((x / qw) - 0.5) * blockWidth;
+          const x1 = (((x + 1) / qw) - 0.5) * blockWidth;
+          const z0 = ((y / qh) - 0.5) * blockDepth;
+          const z1 = (((y + 1) / qh) - 0.5) * blockDepth;
+
+          positions.push(
+            x0, 0, z0,
+            x0, 0, z1,
+            x1, 0, z0,
+            x1, 0, z0,
+            x0, 0, z1,
+            x1, 0, z1
+          );
         }
       }
 
       const geom = new THREE.BufferGeometry();
-      geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(topPositions), 3));
-      geom.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(topUvs), 2));
+      geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
       geom.computeVertexNormals();
+      return geom;
+    }
 
-      const texture = new THREE.TextureLoader().load(satTextureUrl);
-      const mat = new THREE.MeshStandardMaterial({ map: texture, roughness: 0.8, side: THREE.DoubleSide });
+    function open3DStudio(data) {
+      currentModelData = data;
+      satelliteTexture = null; // Yeni seçilen havzanın dokusunun yüklenmesi için sıfırla
+      rainParticlesActive = false;
+      const chkRain = document.getElementById('chk-rain-particles');
+      if (chkRain) chkRain.checked = false;
 
-      terrainMesh = new THREE.Mesh(geom, mat);
-      solidBlockGroup.add(terrainMesh);
+      studioModal.style.display = 'flex';
+      initThreeScene();
 
-      // Su Düzlemi
-      const wGeom = new THREE.PlaneGeometry(bW, bD).rotateX(-Math.PI / 2);
-      const wMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, transparent: true, opacity: 0.8 });
-      waterMesh = new THREE.Mesh(wGeom, wMat);
-      waterMesh.userData.baseY = 5;
-      waterMesh.position.y = 5;
-      waterMesh.visible = false;
+      // Topoğrafya ve DEM Çözünürlük Kartını Güncelle
+      if (document.getElementById('stat-dem-resolution')) {
+        document.getElementById('stat-dem-resolution').textContent = data.resolutionText || '29.7 Metre (30m SRTM)';
+        document.getElementById('stat-dem-grid').textContent = `${data.gridW}x${data.gridH} (${(data.gridW * data.gridH).toLocaleString('tr-TR')} Nokta)`;
+        document.getElementById('stat-dem-range').textContent = `${Math.round(data.minElev)} m - ${Math.round(data.maxElev)} m (Fark: ${Math.round(data.maxElev - data.minElev)} m)`;
+      }
+
+      // Eğer geometri yoksa (özel yerel DEM) organik kesimi devre dışı bırak
+      const btnOrg = document.getElementById('btn-clip-organic');
+      if (btnOrg) {
+        if (!data.geometry) {
+          btnOrg.disabled = true;
+          btnOrg.style.opacity = '0.35';
+          currentClipMode = 'box';
+        } else {
+          btnOrg.disabled = false;
+          btnOrg.style.opacity = '1';
+        }
+      }
+
+      // Eski modelleri temizle
+      if (solidBlockGroup) {
+        scene.remove(solidBlockGroup);
+        solidBlockGroup = null;
+      }
+
+      build3DTerrainBlock();
+      setTextureMode(currentTexMode);
+    }
+
+    // ========================================================
+    // KATI VE KATMANLI JEOLOJİK ARAZİ BLOĞU OLUŞTURUCU
+    // ========================================================
+    function build3DTerrainBlock() {
+      if (solidBlockGroup) scene.remove(solidBlockGroup);
+      solidBlockGroup = new THREE.Group();
+
+      const { elevationGrid, gridW, gridH, minElev, maxElev, satTextureUrl, dimensions, geometry, bounds } = currentModelData;
+      const exaggeration = parseFloat(document.getElementById('three-slider-exaggeration').value);
+
+      const blockWidth = (dimensions && dimensions.width) ? dimensions.width : 100;
+      const blockDepth = (dimensions && dimensions.depth) ? dimensions.depth : 100;
+      const blockBaseThickness = 12;
+      const elevRange = Math.max(1, maxElev - minElev);
+
+      // Jeolojik taban dokusu oluştur
+      if (!strataTexture) {
+        strataTexture = createStrataTexture();
+      }
+
+      // Dokular ve Malzemeler
+      if (!satelliteTexture) {
+        const textureLoader = new THREE.TextureLoader();
+        satelliteTexture = textureLoader.load(satTextureUrl);
+        satelliteTexture.generateMipmaps = true;
+      }
+
+      const wallMaterial = new THREE.MeshStandardMaterial({
+        map: strataTexture,
+        roughness: 0.9,
+        metalness: 0.08
+      });
+
+      const topMaterial = new THREE.MeshStandardMaterial({
+        map: satelliteTexture,
+        roughness: 0.8,
+        metalness: 0.1
+      });
+
+      const bottomMaterial = new THREE.MeshStandardMaterial({
+        color: 0x1e293b,
+        roughness: 0.95
+      });
+
+      let organicBuilt = false;
+      let activeInsideMask = null;
+      let modelCenterX = 0;
+      let modelCenterZ = 0;
+
+      // 1. ORGANİK HAVZA KESİMİ SEÇİLİ İSE
+      if (currentClipMode === 'organic' && geometry && bounds) {
+        const mask = getBasinMask(geometry, bounds, gridW, gridH);
+        if (mask) {
+          const { geom, isInside, topPositions } = buildOrganicBasinGeometry(elevationGrid, gridW, gridH, minElev, maxElev, dimensions, exaggeration, mask);
+          activeInsideMask = isInside;
+
+          // Model ağırlık merkezini hesapla
+          if (topPositions && topPositions.length > 0) {
+            let sx = 0, sz = 0, cnt = 0;
+            for (let i = 0; i < topPositions.length; i += 9) { // Her üçgenin ilk noktası
+              sx += topPositions[i];
+              sz += topPositions[i + 2];
+              cnt++;
+            }
+            if (cnt > 0) {
+              modelCenterX = sx / cnt;
+              modelCenterZ = sz / cnt;
+            }
+          }
+
+          const materials = [topMaterial, bottomMaterial, wallMaterial];
+          terrainMesh = new THREE.Mesh(geom, materials);
+          terrainMesh.castShadow = true;
+          terrainMesh.receiveShadow = true;
+          terrainMesh.name = 'OrganicClippedTerrainBlock';
+          solidBlockGroup.add(terrainMesh);
+          organicBuilt = true;
+        }
+      }
+
+      // 2. DİKDÖRTGEN BLOK SEÇİLİ VEYA GEOMETRİ YOKSA
+      if (!organicBuilt) {
+        // BoxGeometry ile üstü rölyefli, altı katmanlı jeolojik pasta bloğu
+        const boxGeom = new THREE.BoxGeometry(blockWidth, blockBaseThickness, blockDepth, gridW - 1, 1, gridH - 1);
+        const pos = boxGeom.attributes.position;
+
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const y = pos.getY(i);
+          const z = pos.getZ(i);
+
+          if (y > 0) {
+            let gx = Math.round(((x + blockWidth / 2) / blockWidth) * (gridW - 1));
+            let gy = Math.round(((z + blockDepth / 2) / blockDepth) * (gridH - 1));
+            gx = Math.max(0, Math.min(gridW - 1, gx));
+            gy = Math.max(0, Math.min(gridH - 1, gy));
+
+            const elev = elevationGrid[gy * gridW + gx];
+            const normalized = Math.max(0, (elev - minElev) / elevRange);
+            const height = (normalized * 16 * exaggeration) + 3;
+            pos.setY(i, height);
+          } else {
+            pos.setY(i, -8);
+          }
+        }
+        boxGeom.computeVertexNormals();
+
+        const materials = [
+          wallMaterial,
+          wallMaterial,
+          topMaterial,
+          bottomMaterial,
+          wallMaterial,
+          wallMaterial
+        ];
+
+        terrainMesh = new THREE.Mesh(boxGeom, materials);
+        terrainMesh.castShadow = true;
+        terrainMesh.receiveShadow = true;
+        terrainMesh.name = 'StratifiedTerrainBlock';
+        solidBlockGroup.add(terrainMesh);
+      }
+
+      // TAŞKIN SUYU KATMANI
+      let waterGeom;
+      if (organicBuilt && activeInsideMask) {
+        waterGeom = buildOrganicWaterGeometry(activeInsideMask, gridW, gridH, dimensions);
+      } else {
+        waterGeom = new THREE.PlaneGeometry(blockWidth, blockDepth, 64, 64);
+        waterGeom.rotateX(-Math.PI / 2);
+      }
+
+      const waterMat = new THREE.MeshStandardMaterial({
+        color: waterColorHex,
+        emissive: waterEmissiveHex,
+        emissiveIntensity: 0.38,
+        roughness: 0.12,
+        metalness: 0.12,
+        transparent: true,
+        opacity: waterOpacity,
+        depthWrite: false
+      });
+      waterMesh = new THREE.Mesh(waterGeom, waterMat);
+      waterMesh.userData.baseY = 2;
+      waterMesh.position.y = 2;
+      waterMesh.visible = floodSimActive;
       solidBlockGroup.add(waterMesh);
 
+      // YAĞMUR PARÇACIKLARI SİSTEMİ
+      const rainCount = 2000;
+      const rainPositions = new Float32Array(rainCount * 3);
+      const rainSpeeds = new Float32Array(rainCount);
+      for (let i = 0; i < rainCount; i++) {
+        rainPositions[i * 3] = (Math.random() - 0.5) * blockWidth;
+        rainPositions[i * 3 + 1] = 10 + Math.random() * 40;
+        rainPositions[i * 3 + 2] = (Math.random() - 0.5) * blockDepth;
+        rainSpeeds[i] = 0.9 + Math.random() * 1.6;
+      }
+      const rainGeom = new THREE.BufferGeometry();
+      rainGeom.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
+      const rainMat = new THREE.PointsMaterial({
+        color: 0x38bdf8,
+        size: 0.6,
+        transparent: true,
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending
+      });
+      rainParticles = new THREE.Points(rainGeom, rainMat);
+      rainParticles.userData.speeds = rainSpeeds;
+      rainParticles.visible = rainParticlesActive;
+      solidBlockGroup.add(rainParticles);
+
+      // 3D ŞEHİR PİNLERİ VE BEŞERİ MERKEZLER
+      const cityPinsGroup = new THREE.Group();
+      cityPinsGroup.name = 'CityPinsGroup';
+
+      if (bounds && geometry) {
+        const [bMinX, bMinY, bMaxX, bMaxY] = bounds;
+        const insideCities = TURKEY_CITIES.filter(c => {
+          const inBox = c.lon >= bMinX && c.lon <= bMaxX && c.lat >= bMinY && c.lat <= bMaxY;
+          if (!inBox) return false;
+          if (currentClipMode === 'organic') {
+            return isPointInBasin(c.lon, c.lat, geometry);
+          }
+          return true;
+        });
+
+        insideCities.forEach(city => {
+          let gx = Math.round(((city.lon - bMinX) / (bMaxX - bMinX)) * (gridW - 1));
+          let gy = Math.round(((bMaxY - city.lat) / (bMaxY - bMinY)) * (gridH - 1));
+          gx = Math.max(0, Math.min(gridW - 1, gx));
+          gy = Math.max(0, Math.min(gridH - 1, gy));
+
+          const elev = elevationGrid[gy * gridW + gx];
+          const normalized = Math.max(0, (elev - minElev) / elevRange);
+          const py = (normalized * 16 * exaggeration) + 3;
+
+          const px = ((gx / (gridW - 1)) - 0.5) * blockWidth;
+          const pz = ((gy / (gridH - 1)) - 0.5) * blockDepth;
+
+          const pin = new THREE.Group();
+          pin.position.set(px, py, pz);
+
+          // Metalik İğne Sapı
+          const stemGeom = new THREE.CylinderGeometry(0.2, 0.2, 3.8, 8);
+          const stemMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.8, roughness: 0.2 });
+          const stemMesh = new THREE.Mesh(stemGeom, stemMat);
+          stemMesh.position.y = 1.9;
+          pin.add(stemMesh);
+
+          // Zümrüt Yeşili Işıldayan Başlık
+          const sphereGeom = new THREE.SphereGeometry(1.0, 16, 16);
+          const sphereMat = new THREE.MeshStandardMaterial({
+            color: 0x10b981,
+            emissive: 0x059669,
+            emissiveIntensity: 0.7,
+            roughness: 0.2
+          });
+          const sphereMesh = new THREE.Mesh(sphereGeom, sphereMat);
+          sphereMesh.position.y = 4.0;
+          pin.add(sphereMesh);
+
+          // Şehir İsim & Nüfus Etiketi (Billboard Sprite)
+          const labelCanvas = document.createElement('canvas');
+          labelCanvas.width = 256;
+          labelCanvas.height = 76;
+          const lCtx = labelCanvas.getContext('2d');
+          lCtx.fillStyle = 'rgba(15, 23, 42, 0.90)';
+          lCtx.strokeStyle = 'rgba(16, 185, 129, 0.95)';
+          lCtx.lineWidth = 3;
+          lCtx.beginPath();
+          if (lCtx.roundRect) {
+            lCtx.roundRect(4, 4, 248, 68, 12);
+          } else {
+            lCtx.rect(4, 4, 248, 68);
+          }
+          lCtx.fill();
+          lCtx.stroke();
+
+          lCtx.fillStyle = '#ffffff';
+          lCtx.font = 'bold 22px system-ui, sans-serif';
+          lCtx.textAlign = 'center';
+          lCtx.fillText(city.name, 128, 32);
+
+          lCtx.fillStyle = '#34d399';
+          lCtx.font = '600 16px system-ui, sans-serif';
+          const popStr = city.nufus >= 1000000 ? (city.nufus / 1000000).toFixed(1) + 'M Nüfus' : Math.round(city.nufus / 1000) + 'K Nüfus';
+          lCtx.fillText(popStr, 128, 56);
+
+          const spriteTexture = new THREE.CanvasTexture(labelCanvas);
+          const spriteMat = new THREE.SpriteMaterial({ map: spriteTexture, depthTest: false });
+          const sprite = new THREE.Sprite(spriteMat);
+          sprite.position.y = 6.6;
+          sprite.scale.set(9.5, 2.8, 1);
+          pin.add(sprite);
+
+          cityPinsGroup.add(pin);
+        });
+      }
+
+      const show3DCities = document.getElementById('chk-3d-cities') ? document.getElementById('chk-3d-cities').checked : true;
+      cityPinsGroup.visible = show3DCities;
+      solidBlockGroup.add(cityPinsGroup);
+
       scene.add(solidBlockGroup);
-      
-      // AR Modu Hazırlığı
-      solidBlockGroup.position.set(0, 0, 0);
-      solidBlockGroup.scale.set(1, 1, 1);
-      solidBlockGroup.visible = true; // Masaüstünde direkt görünsün
-      xrPlaced = false;
-      
-      // Kamerayı merkeze hizala
-      controls.target.set(0, 5, 0);
-      camera.position.set(0, 75, 115);
+
+      // Güncel taşkın seviyesini güncelle
+      updateFloodLevel();
+
+      // Kamera odaklaması (Havza merkezine odaklan)
+      controls.target.set(modelCenterX, 5, modelCenterZ);
       controls.update();
     }
 
-    // ==========================================
-    // META QUEST PASSTHROUGH (AR) BAŞLATMA
-    // ==========================================
-    document.getElementById('btn-enter-ar').addEventListener('click', async () => {
-      if (!navigator.xr) {
-        alert('WebXR motoru desteklenmiyor. Lütfen Meta Quest 3 başlığınızı takın ve menüdeki kendi internet tarayıcısı (Meta Quest Browser) üzerinden bu siteye girin.');
-        return;
-      }
-      try {
-        const session = await navigator.xr.requestSession('immersive-ar', {
-          requiredFeatures: ['hit-test'],
-          optionalFeatures: ['local-floor']
-        });
-        
-        // Masaüstü arka planını sil, odanın kamerasını aç
-        scene.background = null; 
-        renderer.xr.setReferenceSpaceType('local-floor');
-        await renderer.xr.setSession(session);
-        
-        // Modeli gizle, tetik tuşuna basınca çıkacak
-        solidBlockGroup.visible = false;
-        xrPlaced = false;
-      } catch (e) {
-        alert('Passthrough oturumu başlatılamadı: Cihazınız Karma Gerçeklik (AR) modunu desteklemiyor veya izin verilmedi.');
-      }
-    });
+    // Taşkın Seviyesi ve Su Düzlemi Hesabı
+    function updateFloodLevel() {
+      if (!waterMesh) return;
+      const exaggeration = parseFloat(document.getElementById('three-slider-exaggeration').value);
+      const intensityKg = Math.round(rainIntensity / 100 * 50);
+      const totalWater = intensityKg * rainDuration; // kg/m²
 
+      document.getElementById('rain-intensity-val').textContent = intensityKg + ' kg/m²/sa';
+      document.getElementById('rain-duration-val').textContent = rainDuration + ' Saat';
+      document.getElementById('total-water-val').textContent = totalWater + ' kg/m²';
+
+      if (floodSimActive && totalWater > 0) {
+        waterMesh.visible = true;
+        // Biriken suya göre su seviyesini vadi yataklarından yukarı yükselt
+        const floodRatio = Math.min(1.0, totalWater / 2400); // 2400 kg/m² max taşkın eşiği
+        const targetY = 2 + (floodRatio * 13 * exaggeration);
+        waterMesh.userData.baseY = targetY;
+        waterMesh.position.y = targetY;
+      } else {
+        waterMesh.visible = false;
+      }
+    }
+
+    // ==========================================
+    // STÜDYO ETKİLEŞİMLERİ VE OLAY DİNLEYİCİLERİ
+    // ==========================================
+    // Sekme Geçişleri (Görünüm / Araçlar / Çıktı)
+    const tabBtns = {
+      view: document.getElementById('tab-btn-view'),
+      tools: document.getElementById('tab-btn-tools'),
+      export: document.getElementById('tab-btn-export')
+    };
+
+    const tabContents = {
+      view: document.getElementById('tab-content-view'),
+      tools: document.getElementById('tab-content-tools'),
+      export: document.getElementById('tab-content-export')
+    };
+
+    function switchStudioTab(tabKey) {
+      Object.keys(tabBtns).forEach(key => {
+        tabBtns[key].classList.toggle('active', key === tabKey);
+        tabContents[key].classList.toggle('active', key === tabKey);
+      });
+    }
+
+    document.getElementById('tab-btn-view').addEventListener('click', () => switchStudioTab('view'));
+    document.getElementById('tab-btn-tools').addEventListener('click', () => switchStudioTab('tools'));
+    document.getElementById('tab-btn-export').addEventListener('click', () => switchStudioTab('export'));
+
+    // Modal Kapatma
     document.getElementById('btn-close-studio').addEventListener('click', () => {
-      if (renderer && renderer.xr.isPresenting) renderer.xr.getSession().end();
       studioModal.style.display = 'none';
+      if (waterMesh) waterMesh.visible = false;
+      if (rainParticles) rainParticles.visible = false;
+      rainParticlesActive = false;
+      const chkRain = document.getElementById('chk-rain-particles');
+      if (chkRain) chkRain.checked = false;
     });
 
+    // Modeli Ortala / Karşıdan Bak
     document.getElementById('btn-reset-studio-cam').addEventListener('click', () => {
       controls.target.set(0, 5, 0);
       camera.position.set(0, 75, 115);
       controls.update();
     });
 
-    document.getElementById('tab-btn-view').addEventListener('click', () => {
-      document.getElementById('tab-btn-view').classList.add('active');
-      document.getElementById('tab-btn-tools').classList.remove('active');
-      document.getElementById('tab-content-view').classList.add('active');
-      document.getElementById('tab-content-tools').classList.remove('active');
+    // Güneş Açısı / Saat Sürgüsü
+    document.getElementById('slider-sun-hour').addEventListener('input', (e) => {
+      sunHour = parseInt(e.target.value);
+      document.getElementById('sun-hour-val').textContent = (sunHour < 10 ? '0' + sunHour : sunHour) + ':00';
+      updateSunPosition(sunHour);
     });
 
-    document.getElementById('tab-btn-tools').addEventListener('click', () => {
-      document.getElementById('tab-btn-tools').classList.add('active');
-      document.getElementById('tab-btn-view').classList.remove('active');
-      document.getElementById('tab-content-tools').classList.add('active');
-      document.getElementById('tab-content-view').classList.remove('active');
+    // 3D Stüdyo Yükselti Abartısı Slider
+    document.getElementById('three-slider-exaggeration').addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      document.getElementById('three-exaggeration-val').textContent = val.toFixed(1) + (val === 1.0 ? 'x (Orijinal)' : 'x');
+      if (currentModelData) {
+        build3DTerrainBlock();
+        setTextureMode(currentTexMode);
+      }
     });
 
-    document.getElementById('chk-flood-sim').addEventListener('change', (e) => {
-      if (waterMesh) waterMesh.visible = e.target.checked;
-      document.getElementById('flood-controls').style.opacity = e.target.checked ? '1' : '0.4';
+    // Taşkın Simülasyonu Checkbox Toggle
+    const chkFlood = document.getElementById('chk-flood-sim');
+    const floodControls = document.getElementById('flood-controls');
+    chkFlood.addEventListener('change', (e) => {
+      floodSimActive = e.target.checked;
+      floodControls.style.opacity = floodSimActive ? '1' : '0.4';
+      floodControls.style.pointerEvents = floodSimActive ? 'auto' : 'none';
+      updateFloodLevel();
     });
 
+    // Yağış Şiddeti Stepper & Slider
+    const sliderIntensity = document.getElementById('slider-rain-intensity');
+    sliderIntensity.addEventListener('input', (e) => {
+      rainIntensity = parseInt(e.target.value);
+      updateFloodLevel();
+    });
+    document.getElementById('btn-rain-intensity-minus').addEventListener('click', () => {
+      rainIntensity = Math.max(0, rainIntensity - 5);
+      sliderIntensity.value = rainIntensity;
+      updateFloodLevel();
+    });
+    document.getElementById('btn-rain-intensity-plus').addEventListener('click', () => {
+      rainIntensity = Math.min(100, rainIntensity + 5);
+      sliderIntensity.value = rainIntensity;
+      updateFloodLevel();
+    });
+
+    // Yağış Süresi Stepper & Slider
+    const sliderDuration = document.getElementById('slider-rain-duration');
+    sliderDuration.addEventListener('input', (e) => {
+      rainDuration = parseInt(e.target.value);
+      updateFloodLevel();
+    });
+    document.getElementById('btn-rain-duration-minus').addEventListener('click', () => {
+      rainDuration = Math.max(1, rainDuration - 1);
+      sliderDuration.value = rainDuration;
+      updateFloodLevel();
+    });
+    document.getElementById('btn-rain-duration-plus').addEventListener('click', () => {
+      rainDuration = Math.min(72, rainDuration + 1);
+      sliderDuration.value = rainDuration;
+      updateFloodLevel();
+    });
+
+    // Yağmur Parçacıkları Toggle
+    document.getElementById('chk-rain-particles').addEventListener('change', (e) => {
+      rainParticlesActive = e.target.checked;
+      if (rainParticles) rainParticles.visible = rainParticlesActive;
+    });
+
+    // Su Görünürlüğü (Opaklık) Slider Dinleyicisi
+    const sliderWaterOpacity = document.getElementById('slider-water-opacity');
+    if (sliderWaterOpacity) {
+      sliderWaterOpacity.addEventListener('input', (e) => {
+        waterOpacity = parseInt(e.target.value) / 100;
+        document.getElementById('water-opacity-val').textContent = '%' + e.target.value + (waterOpacity >= 0.8 ? ' (Net)' : '');
+        if (waterMesh && waterMesh.material) {
+          waterMesh.material.opacity = waterOpacity;
+        }
+      });
+    }
+
+    // Su Rengi Butonları Dinleyicisi
+    const waterColorBtns = {
+      ocean: document.getElementById('btn-water-color-ocean'),
+      deep: document.getElementById('btn-water-color-deep'),
+      cyan: document.getElementById('btn-water-color-cyan')
+    };
+
+    function setWaterColor(type) {
+      Object.keys(waterColorBtns).forEach(k => {
+        if (waterColorBtns[k]) waterColorBtns[k].classList.toggle('active', k === type);
+      });
+      if (type === 'ocean') {
+        waterColorHex = 0x0284c7;
+        waterEmissiveHex = 0x0369a1;
+      } else if (type === 'deep') {
+        waterColorHex = 0x1d4ed8;
+        waterEmissiveHex = 0x1e3a8a;
+      } else if (type === 'cyan') {
+        waterColorHex = 0x00b4d8;
+        waterEmissiveHex = 0x0077b6;
+      }
+      if (waterMesh && waterMesh.material) {
+        waterMesh.material.color.setHex(waterColorHex);
+        waterMesh.material.emissive.setHex(waterEmissiveHex);
+      }
+    }
+
+    if (waterColorBtns.ocean) waterColorBtns.ocean.addEventListener('click', () => setWaterColor('ocean'));
+    if (waterColorBtns.deep) waterColorBtns.deep.addEventListener('click', () => setWaterColor('deep'));
+    if (waterColorBtns.cyan) waterColorBtns.cyan.addEventListener('click', () => setWaterColor('cyan'));
+
+    // DEM Çözünürlük Kalite Modu Seçici Butonları
+    const btnModeStd = document.getElementById('btn-mode-std');
+    const btnMode30m = document.getElementById('btn-mode-30m');
+    const demModeIndicator = document.getElementById('dem-mode-indicator');
+
+    if (btnModeStd && btnMode30m) {
+      btnModeStd.addEventListener('click', () => {
+        selectedDemQuality = 'std';
+        btnModeStd.classList.add('active');
+        btnModeStd.style.borderColor = '#38bdf8';
+        btnModeStd.style.color = '#38bdf8';
+        btnMode30m.classList.remove('active');
+        btnMode30m.style.borderColor = '';
+        btnMode30m.style.color = '';
+        if (demModeIndicator) demModeIndicator.textContent = 'Standart (60m)';
+      });
+
+      btnMode30m.addEventListener('click', () => {
+        selectedDemQuality = '30m';
+        btnMode30m.classList.add('active');
+        btnMode30m.style.borderColor = '#38bdf8';
+        btnMode30m.style.color = '#38bdf8';
+        btnModeStd.classList.remove('active');
+        btnModeStd.style.borderColor = '';
+        btnModeStd.style.color = '';
+        if (demModeIndicator) demModeIndicator.textContent = '⚡ 30m Ultra HD';
+      });
+    }
+
+    // Özel Yerel DEM / Raster Yükleyici (.tif, .png, .jpg)
+    const localDemInput = document.getElementById('local-dem-file-input');
+    const btnTriggerLocalDem = document.getElementById('btn-trigger-local-dem');
+    if (btnTriggerLocalDem && localDemInput) {
+      btnTriggerLocalDem.addEventListener('click', () => localDemInput.click());
+      localDemInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        showStatus('Özel Yerel DEM Dosyası Okunuyor...');
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const gridW = 256;
+            const gridH = 256;
+            const c = document.createElement('canvas');
+            c.width = gridW;
+            c.height = gridH;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(img, 0, 0, gridW, gridH);
+            const imgData = ctx.getImageData(0, 0, gridW, gridH).data;
+
+            const elevationGrid = new Float32Array(gridW * gridH);
+            let minElev = 99999, maxElev = -99999;
+            for (let i = 0; i < gridW * gridH; i++) {
+              const r = imgData[4 * i];
+              const g = imgData[4 * i + 1];
+              const b = imgData[4 * i + 2];
+              let elev = (r + g + b) / 3 * 10; // Varsayılan grayscale yükselti ölçeği
+              if (r > 0 && (g > 0 || b > 0) && r !== g) {
+                // Terrarium RGB formatı ise:
+                elev = (r * 256 + g + b / 256) - 32768;
+              }
+              elevationGrid[i] = elev;
+              if (elev < minElev) minElev = elev;
+              if (elev > maxElev) maxElev = elev;
+            }
+
+            open3DStudio({
+              elevationGrid,
+              gridW,
+              gridH,
+              minElev,
+              maxElev,
+              satTextureUrl: c.toDataURL(),
+              dimensions: { width: 100, depth: 100 },
+              basinName: file.name.replace(/\.[^/.]+$/, ""),
+              resolutionText: 'Özel Yerel DEM Raster'
+            });
+            hideStatus();
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Model Kesim Biçimi Seçici (Organik vs Dikdörtgen Blok)
+    const btnClipOrganic = document.getElementById('btn-clip-organic');
+    const btnClipBox = document.getElementById('btn-clip-box');
+
+    function setClipMode(mode) {
+      currentClipMode = mode;
+      if (btnClipOrganic && btnClipBox) {
+        btnClipOrganic.classList.toggle('active', mode === 'organic');
+        btnClipBox.classList.toggle('active', mode === 'box');
+      }
+
+      // Çıktı sekmesindeki etiketleri güncelle
+      const expLabel = document.getElementById('export-mode-label');
+      const expDesc = document.getElementById('export-mode-desc');
+      const stlSub = document.getElementById('stl-subtext');
+      const objSub = document.getElementById('obj-subtext');
+
+      if (mode === 'organic') {
+        if (expLabel) expLabel.textContent = '✂️ Organik Havza Kesimi';
+        if (expDesc) expDesc.textContent = 'Havza sınırlarına göre kırpılmış, altı düz kaideli ve katı (manifold) 3D yazıcı bloğu.';
+        if (stlSub) stlSub.textContent = '3D Yazıcı (Organik Havza)';
+        if (objSub) objSub.textContent = 'Blender / CAD (Havza)';
+      } else {
+        if (expLabel) expLabel.textContent = '🔲 Dikdörtgen Kaideli Blok';
+        if (expDesc) expDesc.textContent = 'Masaüstü maket formatında, çevresi jeolojik tortul tabakalı dikdörtgen blok.';
+        if (stlSub) stlSub.textContent = '3D Yazıcı (Dikdörtgen Blok)';
+        if (objSub) objSub.textContent = 'Blender / CAD (Blok)';
+      }
+
+      if (currentModelData) {
+        build3DTerrainBlock();
+        setTextureMode(currentTexMode);
+      }
+    }
+
+    if (btnClipOrganic && btnClipBox) {
+      btnClipOrganic.addEventListener('click', () => setClipMode('organic'));
+      btnClipBox.addEventListener('click', () => setClipMode('box'));
+    }
+
+    // 3D Şehir Pinleri Toggle Dinleyicisi
+    const chk3DCities = document.getElementById('chk-3d-cities');
+    if (chk3DCities) {
+      chk3DCities.addEventListener('change', (e) => {
+        if (solidBlockGroup) {
+          const g = solidBlockGroup.getObjectByName('CityPinsGroup');
+          if (g) g.visible = e.target.checked;
+        }
+      });
+    }
+
+    // Doku / Kaplama Seçimi
+    const texButtons = [
+      document.getElementById('btn-tex-satellite'),
+      document.getElementById('btn-tex-relief'),
+      document.getElementById('btn-tex-clay'),
+      document.getElementById('btn-tex-wireframe')
+    ];
+
+    function setTextureMode(mode) {
+      texButtons.forEach(b => { if (b) b.classList.remove('active'); });
+      if (!terrainMesh || !terrainMesh.material) return;
+      currentTexMode = mode;
+
+      let topMat, wallMat, bottomMat;
+
+      if (mode === 'satellite') {
+        if (document.getElementById('btn-tex-satellite')) document.getElementById('btn-tex-satellite').classList.add('active');
+        topMat = new THREE.MeshStandardMaterial({
+          map: satelliteTexture,
+          roughness: 0.8,
+          metalness: 0.1
+        });
+        wallMat = new THREE.MeshStandardMaterial({
+          map: strataTexture || (typeof createStrataTexture === 'function' ? createStrataTexture() : null),
+          roughness: 0.9,
+          metalness: 0.08
+        });
+        bottomMat = new THREE.MeshStandardMaterial({
+          color: 0x1e293b,
+          roughness: 0.95
+        });
+      } else if (mode === 'clay') {
+        if (document.getElementById('btn-tex-clay')) document.getElementById('btn-tex-clay').classList.add('active');
+        topMat = new THREE.MeshStandardMaterial({
+          color: 0xf1f5f9,
+          roughness: 0.6,
+          metalness: 0.05
+        });
+        wallMat = new THREE.MeshStandardMaterial({
+          map: strataTexture || (typeof createStrataTexture === 'function' ? createStrataTexture() : null),
+          roughness: 0.9,
+          metalness: 0.08
+        });
+        bottomMat = new THREE.MeshStandardMaterial({
+          color: 0x1e293b,
+          roughness: 0.95
+        });
+      } else if (mode === 'wireframe') {
+        if (document.getElementById('btn-tex-wireframe')) document.getElementById('btn-tex-wireframe').classList.add('active');
+        // Üst Arazi Yüzeyi: Parlak camgöbeği mavi tel kafes
+        topMat = new THREE.MeshStandardMaterial({
+          color: 0x38bdf8,
+          wireframe: true
+        });
+        // Jeolojik Yan Duvarlar: Mavi kafes (kanyon ve dik yarları belirginleştiren tel kafes)
+        wallMat = new THREE.MeshStandardMaterial({
+          color: 0x0284c7,
+          wireframe: true
+        });
+        // Alt Kaide: Koyu mavi tel kafes taban
+        bottomMat = new THREE.MeshStandardMaterial({
+          color: 0x0369a1,
+          wireframe: true
+        });
+      } else if (mode === 'relief') {
+        if (document.getElementById('btn-tex-relief')) document.getElementById('btn-tex-relief').classList.add('active');
+        topMat = new THREE.MeshStandardMaterial({
+          color: 0x22c55e,
+          roughness: 0.7
+        });
+        wallMat = new THREE.MeshStandardMaterial({
+          map: strataTexture || (typeof createStrataTexture === 'function' ? createStrataTexture() : null),
+          roughness: 0.9,
+          metalness: 0.08
+        });
+        bottomMat = new THREE.MeshStandardMaterial({
+          color: 0x1e293b,
+          roughness: 0.95
+        });
+      }
+
+      if (Array.isArray(terrainMesh.material)) {
+        if (currentClipMode === 'organic') {
+          // Organik Havza: [0: Üst Arazi, 1: Alt Kaide, 2: Yan Duvarlar]
+          terrainMesh.material[0] = topMat;
+          terrainMesh.material[1] = bottomMat;
+          terrainMesh.material[2] = wallMat;
+        } else {
+          // Dikdörtgen Blok: [0: +X, 1: -X, 2: Üst, 3: Alt, 4: +Z, 5: -Z]
+          terrainMesh.material[0] = wallMat;
+          terrainMesh.material[1] = wallMat;
+          terrainMesh.material[2] = topMat;
+          terrainMesh.material[3] = bottomMat;
+          terrainMesh.material[4] = wallMat;
+          terrainMesh.material[5] = wallMat;
+        }
+        terrainMesh.material.forEach(m => { if (m) m.needsUpdate = true; });
+      } else {
+        terrainMesh.material = topMat;
+        terrainMesh.material.needsUpdate = true;
+      }
+    }
+
+    document.getElementById('btn-tex-satellite').addEventListener('click', () => setTextureMode('satellite'));
+    document.getElementById('btn-tex-clay').addEventListener('click', () => setTextureMode('clay'));
+    document.getElementById('btn-tex-wireframe').addEventListener('click', () => setTextureMode('wireframe'));
+    document.getElementById('btn-tex-relief').addEventListener('click', () => setTextureMode('relief'));
+
+    // ==========================================
+    // STL VE OBJ İNDİRME İŞLEMLERİ
+    // ==========================================
+    function saveFile(blob, filename) {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    }
+
+    // STL İndir (3D Yazıcılar İçin Katı Blok STL)
+    document.getElementById('btn-export-stl').addEventListener('click', () => {
+      if (!solidBlockGroup || !terrainMesh) return;
+      try {
+        const modeTitle = currentClipMode === 'organic' ? 'Organik Havza STL' : 'Katı Blok STL';
+        showStatus(`${modeTitle} 3D Yazıcı Dosyası Hazırlanıyor...`);
+        setTimeout(() => {
+          const exporter = new THREE.STLExporter();
+          const result = exporter.parse(terrainMesh, { binary: true });
+          const blob = new Blob([result], { type: 'application/octet-stream' });
+          const safeName = (currentModelData.basinName || 'havza-3d').replace(/\s+/g, '_');
+          const clipTag = currentClipMode === 'organic' ? 'organik_havza' : 'kati_blok';
+          saveFile(blob, `${safeName}_${clipTag}_3d.stl`);
+          hideStatus();
+        }, 120);
+      } catch (err) {
+        hideStatus();
+        alert('STL dışa aktarma hatası: ' + err.message);
+      }
+    });
+
+    // OBJ İndir (Blender, Unity, CAD vb. İçin)
+    document.getElementById('btn-export-obj').addEventListener('click', () => {
+      if (!solidBlockGroup || !terrainMesh) return;
+      try {
+        const modeTitle = currentClipMode === 'organic' ? 'Organik Havza OBJ' : 'Katı Blok OBJ';
+        showStatus(`${modeTitle} 3D Model Dosyası Hazırlanıyor...`);
+        setTimeout(() => {
+          const exporter = new THREE.OBJExporter();
+          const result = exporter.parse(terrainMesh);
+          const blob = new Blob([result], { type: 'text/plain' });
+          const safeName = (currentModelData.basinName || 'havza-3d').replace(/\s+/g, '_');
+          const clipTag = currentClipMode === 'organic' ? 'organik_havza' : 'kati_blok';
+          saveFile(blob, `${safeName}_${clipTag}_3d.obj`);
+          hideStatus();
+        }, 120);
+      } catch (err) {
+        hideStatus();
+        alert('OBJ dışa aktarma hatası: ' + err.message);
+      }
+    });
+
+    // ==========================================
+    // KAYNAKÇA & VERİ KAYNAKLARI PENCERESİ
+    // ==========================================
+    const bibModal = document.getElementById('bibliography-modal');
+    const btnOpenBib = document.getElementById('btn-open-bibliography');
+    const linkOpenBibFooter = document.getElementById('link-open-bib-footer');
+    const btnStudioBib = document.getElementById('btn-studio-bibliography');
+    const btnCloseBib = document.getElementById('btn-close-bib');
+    const btnCloseBibFooter = document.getElementById('btn-close-bib-footer');
+
+    function openBibliography() {
+      if (bibModal) {
+        bibModal.style.display = 'flex';
+      }
+    }
+
+    function closeBibliography() {
+      if (bibModal) {
+        bibModal.style.display = 'none';
+      }
+    }
+
+    if (btnOpenBib) btnOpenBib.addEventListener('click', openBibliography);
+    if (linkOpenBibFooter) linkOpenBibFooter.addEventListener('click', (e) => { e.preventDefault(); openBibliography(); });
+    if (btnStudioBib) btnStudioBib.addEventListener('click', openBibliography);
+    if (btnCloseBib) btnCloseBib.addEventListener('click', closeBibliography);
+    if (btnCloseBibFooter) btnCloseBibFooter.addEventListener('click', closeBibliography);
+
+    // Modal dışına tıklayınca kapat
+    if (bibModal) {
+      bibModal.addEventListener('click', (e) => {
+        if (e.target === bibModal) closeBibliography();
+      });
+    }
+
+    // ESC tuşuna basınca kapat
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && bibModal && bibModal.style.display === 'flex') {
+        closeBibliography();
+      }
+      if (e.key === 'Escape' && document.getElementById('ar-info-modal') && document.getElementById('ar-info-modal').style.display === 'flex') {
+        closeARInfoModal();
+      }
+    });
+
+    // ==========================================
+    // 4. META QUEST WEBXR PASSTHROUGH (AR) MODÜLÜ
+    // ==========================================
+    function initWebXR() {
+      if (!renderer || !renderer.xr) return;
+
+      // 1. Zemin / Masa Hedef Göstergesi (Reticle)
+      const reticleGroup = new THREE.Group();
+      const ringGeom = new THREE.RingGeometry(0.18, 0.22, 32).rotateX(-Math.PI / 2);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, opacity: 0.9, transparent: true });
+      const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+      reticleGroup.add(ringMesh);
+
+      // Merkez Işıldayan Noktası
+      const dotGeom = new THREE.CircleGeometry(0.04, 16).rotateX(-Math.PI / 2);
+      const dotMat = new THREE.MeshBasicMaterial({ color: 0xc084fc });
+      const dotMesh = new THREE.Mesh(dotGeom, dotMat);
+      reticleGroup.add(dotMesh);
+
+      reticleGroup.matrixAutoUpdate = false;
+      reticleGroup.visible = false;
+      scene.add(reticleGroup);
+      reticle = reticleGroup;
+
+      // 2. Quest Kumanda & El Tetik Dinleyicisi
+      function onSelect() {
+        if (reticle && reticle.visible && solidBlockGroup) {
+          // Reticle pozisyonunu modele aktar
+          const pos = new THREE.Vector3();
+          const quat = new THREE.Quaternion();
+          const scl = new THREE.Vector3();
+          reticle.matrix.decompose(pos, quat, scl);
+
+          solidBlockGroup.position.copy(pos);
+          solidBlockGroup.rotation.y = xrModelRotationY;
+          solidBlockGroup.scale.set(xrCurrentScale, xrCurrentScale, xrCurrentScale);
+          solidBlockGroup.visible = true;
+          xrPlaced = true;
+          reticle.visible = false;
+          updateXRHudText('✅ Masaya yerleştirildi! Joystick ile döndürebilir / ölçekleyebilirsiniz. Taşımak için tetiğe basın.');
+        } else if (xrPlaced && solidBlockGroup) {
+          // Kullanıcı tekrar tetiğe basarsa başka masaya taşımaya izin ver
+          xrPlaced = false;
+          updateXRHudText('🎯 Modeli taşımak için yeni bir yüzeye tutun ve kumanda tetiğine basın.');
+        }
+      }
+
+      xrController0 = renderer.xr.getController(0);
+      xrController0.addEventListener('select', onSelect);
+      scene.add(xrController0);
+
+      xrController1 = renderer.xr.getController(1);
+      xrController1.addEventListener('select', onSelect);
+      scene.add(xrController1);
+    }
+
+    function handleXRThumbsticks(session) {
+      if (!solidBlockGroup || !xrPlaced) return;
+      if (!session || !session.inputSources) return;
+
+      for (const source of session.inputSources) {
+        if (source.gamepad && source.gamepad.axes && source.gamepad.axes.length >= 4) {
+          const axes = source.gamepad.axes;
+          const x = axes[2] !== undefined ? axes[2] : axes[0];
+          const y = axes[3] !== undefined ? axes[3] : axes[1];
+
+          // Joystick Sağa/Sola: Modeli döndür
+          if (Math.abs(x) > 0.15) {
+            xrModelRotationY += x * 0.03;
+            solidBlockGroup.rotation.y = xrModelRotationY;
+          }
+
+          // Joystick Yukarı/Aşağı: Boyutu ayarla (Masaüstü minyatüründen oda boyutuna)
+          if (Math.abs(y) > 0.15) {
+            xrCurrentScale = Math.max(0.0015, Math.min(0.035, xrCurrentScale - (y * 0.0003)));
+            solidBlockGroup.scale.set(xrCurrentScale, xrCurrentScale, xrCurrentScale);
+          }
+        }
+      }
+    }
+
+    async function toggleWebXRPassthrough() {
+      // Eğer 3D stüdyo açık değilse kullanıcıyı uyar
+      if (!studioModal || studioModal.style.display !== 'flex') {
+        alert('Lütfen önce haritadan bir havza seçip sağ üstteki "3D Önizleme Oluştur" butonuna tıklayın.');
+        return;
+      }
+
+      if (!solidBlockGroup) {
+        alert('Lütfen 3D arazinin indirilip sahnede oluşturulmasını bekleyin.');
+        return;
+      }
+
+      if (renderer && renderer.xr.isPresenting) {
+        const session = renderer.xr.getSession();
+        if (session) session.end();
+        return;
+      }
+
+      if (!navigator.xr) {
+        showARInfoModal(
+          'WebXR Desteği Bulunamadı',
+          'Mevcut masaüstü tarayıcınızda WebXR motoru bulunamadı.<br><br>' +
+          '<b>Meta Quest ile Nasıl Kullanılır?</b><br>' +
+          '1. Bu sayfayı HTTPS üzerinden yayınlayın (örn. GitHub Pages, Vercel, Netlify veya yerel HTTPS ağı).<br>' +
+          '2. <b>Meta Quest 2, Quest 3, Quest 3S veya Quest Pro</b> başlığınızı takın.<br>' +
+          '3. Dahili <b>Meta Quest Browser</b> ile site adresinize girin.<br>' +
+          '4. <b>"Masada Gör (Passthrough AR)"</b> butonuna bastığınızda odanızın renkli kameraları açılacak ve havza modeli masanızın üzerine yerleşecektir.'
+        );
+        return;
+      }
+
+      let isSupported = false;
+      try {
+        isSupported = await navigator.xr.isSessionSupported('immersive-ar');
+      } catch (e) {
+        isSupported = false;
+      }
+
+      if (!isSupported) {
+        showARInfoModal(
+          'WebXR Passthrough (AR) Desteklenmiyor',
+          'Mevcut tarayıcınızda <b>immersive-ar (Passthrough)</b> oturumu desteklenmiyor.<br><br>' +
+          '<b>Neden?</b> Bu özellik doğrudan Meta Quest başlığının renkli oda kameralarını kullanarak havza modelini fiziksel masanızın veya zemininizin üzerine yerleştirir.<br><br>' +
+          '<b>Çözüm:</b> Sayfayı Meta Quest gözlüğünüzün içindeki <b>Meta Quest Browser</b> ile açın.'
+        );
+        return;
+      }
+
+      try {
+        const session = await navigator.xr.requestSession('immersive-ar', {
+          requiredFeatures: ['hit-test'],
+          optionalFeatures: ['dom-overlay', 'local-floor', 'hand-tracking'],
+          domOverlay: { root: document.getElementById('studio-modal') }
+        });
+
+        onXRSessionStart(session);
+      } catch (err) {
+        console.error('AR oturumu başlatılamadı:', err);
+        alert('AR oturumu başlatılırken hata oluştu: ' + err.message);
+      }
+    }
+
+    function onXRSessionStart(session) {
+      renderer.xr.setSession(session);
+      scene.background = null;
+      renderer.setClearColor(0x000000, 0); // Passthrough renkli oda kameraları için şeffaf zemin
+      studioModal.classList.add('in-webxr');
+      xrPlaced = false;
+      xrCurrentScale = 0.006; // 60cm masaüstü maketi
+      xrModelRotationY = 0;
+
+      if (solidBlockGroup) {
+        solidBlockGroup.visible = false; // Kullanıcı masayı tıklayana kadar gizle
+      }
+
+      updateXRHudText('🎯 Hedef çemberi masaya veya zemine tutun, yerleştirmek için tetiğe basın.');
+
+      const btn = document.getElementById('btn-enter-ar');
+      if (btn) {
+        btn.innerHTML = '<span>❌</span> Passthrough AR\'dan Çık';
+        btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+      }
+      const expBtn = document.getElementById('btn-export-ar');
+      if (expBtn) {
+        expBtn.innerHTML = '<span>❌</span> Passthrough AR\'dan Çık';
+        expBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+      }
+    }
+
+    function onXRSessionEnd() {
+      studioModal.classList.remove('in-webxr');
+      scene.background = new THREE.Color(0x070b14);
+      renderer.setClearColor(0x070b14, 1);
+      if (solidBlockGroup) {
+        solidBlockGroup.position.set(0, 0, 0);
+        solidBlockGroup.rotation.set(0, 0, 0);
+        solidBlockGroup.scale.set(1, 1, 1);
+        solidBlockGroup.visible = true;
+      }
+      if (reticle) reticle.visible = false;
+      xrPlaced = false;
+      xrHitTestSourceRequested = false;
+      xrHitTestSource = null;
+
+      const btn = document.getElementById('btn-enter-ar');
+      if (btn) {
+        btn.innerHTML = '<span>🕶️</span> Masada Gör (Passthrough AR)';
+        btn.style.background = 'linear-gradient(135deg, #9333ea, #3b82f6)';
+      }
+      const expBtn = document.getElementById('btn-export-ar');
+      if (expBtn) {
+        expBtn.innerHTML = '<span>🥽 Meta Quest AR ile Masada Gör</span>';
+        expBtn.style.background = 'linear-gradient(135deg, #9333ea, #3b82f6)';
+      }
+    }
+
+    function updateXRHudText(text) {
+      const hudText = document.getElementById('xr-hud-text');
+      if (hudText) hudText.textContent = text;
+    }
+
+    function showARInfoModal(title, contentHtml) {
+      const modal = document.getElementById('ar-info-modal');
+      const desc = document.getElementById('ar-info-modal-desc');
+      if (modal && desc) {
+        desc.innerHTML = `
+          <div style="font-size: 0.95rem; font-weight: 700; color: #f8fafc; margin-bottom: 8px;">${title}</div>
+          <div style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.55;">${contentHtml}</div>
+        `;
+        modal.style.display = 'flex';
+      } else {
+        alert(title + '\n\n' + contentHtml.replace(/<[^>]*>?/gm, ''));
+      }
+    }
+
+    function closeARInfoModal() {
+      const modal = document.getElementById('ar-info-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    const btnEnterAr = document.getElementById('btn-enter-ar');
+    if (btnEnterAr) btnEnterAr.addEventListener('click', toggleWebXRPassthrough);
+
+    const btnExportAr = document.getElementById('btn-export-ar');
+    if (btnExportAr) btnExportAr.addEventListener('click', toggleWebXRPassthrough);
+
+    const btnXrHudExit = document.getElementById('btn-xr-hud-exit');
+    if (btnXrHudExit) {
+      btnXrHudExit.addEventListener('click', () => {
+        if (renderer && renderer.xr.isPresenting) {
+          const session = renderer.xr.getSession();
+          if (session) session.end();
+        }
+      });
+    }
+
+    const btnCloseArInfo = document.getElementById('btn-close-ar-info');
+    if (btnCloseArInfo) btnCloseArInfo.addEventListener('click', closeARInfoModal);
+
+    const btnArInfoOk = document.getElementById('btn-ar-info-ok');
+    if (btnArInfoOk) btnArInfoOk.addEventListener('click', closeARInfoModal);
+
+    const arInfoModalEl = document.getElementById('ar-info-modal');
+    if (arInfoModalEl) {
+      arInfoModalEl.addEventListener('click', (e) => {
+        if (e.target === arInfoModalEl) closeARInfoModal();
+      });
+    }
   </script>
 </body>
 </html>
