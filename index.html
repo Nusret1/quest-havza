@@ -1966,6 +1966,73 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
     let provincesGeoJSONData = null;
     let districtsGeoJSONData = null;
 
+    // 2B / 3B Harita ve 3B Analiz Stüdyosu Ortak Durum Değişkenleri (TDZ Hatasını Önlemek İçin En Üstte Tanımlı)
+    const studioModal = document.getElementById('studio-modal');
+    const container = document.getElementById('three-canvas-container');
+    let scene, camera, renderer, controls, dirLight;
+    let terrainMesh = null;
+    let waterMesh = null;
+    let rainParticles = null;
+    let solidBlockGroup = null;
+    let currentModelData = null;
+    let satelliteTexture = null;
+    let strataTexture = null;
+    let reliefTexture = null;
+    let clayTexture = null;
+    const clock = new THREE.Clock();
+
+    let show3DRivers = true;
+    let riverBranchDensity = 2; // 0: Kapalı, 1: Ana Nehirler, 2: Standart, 3: Yoğun Kollar, 4: Vadi Dereleri, 5: Maks. Kılcal Ağ
+    let lastActiveRiverDensity = 2;
+    let show3DCitiesPins = true;
+    let is3D = true;
+
+    let floodSimActive = false;
+    let rainParticlesActive = false;
+    let rainIntensity = 50; // 0-100 arası (0 - 50 kg/m²/sa)
+    let rainDuration = 12; // 1 - 72 saat
+    let sunHour = 14;
+    let currentTexMode = 'satellite';
+    let waterOpacity = 0.60; // Varsayılan %60 su görünürlüğü (Opaklık)
+    let waterColorHex = 0x0284c7; // Canlı okyanus mavisi
+    let waterEmissiveHex = 0x0369a1; // Vadilerde belirgin ışıma
+    let selectedDemQuality = '30m'; // '30m' (Ultra HD, 256x256 grid) veya 'std' (Standart, 128x128 grid)
+    let currentClipMode = 'organic'; // 'organic' (tam havza sınırı) veya 'box' (dikdörtgen blok)
+    let active3DBoundaryMode = 'basin'; // 'basin' | 'province' | 'district' | 'none'
+
+    // Meta Quest WebXR Passthrough Durum Değişkenleri
+    let xrSession = null;
+    let xrHitTestSource = null;
+    let xrHitTestSourceRequested = false;
+    let reticle = null;
+    let xrPlaced = false;
+    let xrNeedsInitialPlacement = false;
+    let xrController0 = null;
+    let xrController1 = null;
+    let xrCurrentScale = 0.006; // 100 birim * 0.006 = 0.60m (60 cm masaüstü maketi)
+    let xrModelRotationY = 0;
+    let xrPlacedPos = new THREE.Vector3(0, -0.32, -0.82);
+    let xrMenuCanvas = null;
+    let xrMenuTexture = null;
+    let xrMenuMesh = null;
+    let xrMenuGroup = null;
+    let xrCursorDot = null;
+    let xrRaycaster = new THREE.Raycaster();
+    let xrHoveredBtnId = null;
+    let xrHoveredSliderId = null;
+    let xrExitButtonCooldown = false;
+    let xrRecenterButtonCooldown = false;
+    let xrSurfacePlacementMode = true;
+    let xrMenuAnchorMode = 'top'; // 'top' | 'left' | 'right' | 'custom'
+    let xrMenuCustomPos = new THREE.Vector3(0, 0.15, -0.78);
+    let xrMenuMoveMode = false;
+    let xrDraggingMenuCtrl = null;
+    let xrDraggingMenuDist = 0.80;
+    let xrActiveDragSlider = null;
+    let xrActiveDragCtrl = null;
+    let xrLastTerrainRebuildTime = 0;
+    let latestScientificReport = null;
+
     const selectBasinEl = document.getElementById('select-basin');
     const selectProvinceEl = document.getElementById('select-province');
     const selectDistrictEl = document.getElementById('select-district');
@@ -2765,11 +2832,6 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
     });
 
     // Harita ve 3B Stüdyo Ortak Akarsu, Kol Yoğunluğu, Şehir ve Dinamik Lejant Senkronizasyonu
-    let show3DRivers = true;
-    let riverBranchDensity = 2; // 0: Kapalı, 1: Ana Nehirler, 2: Standart, 3: Yoğun Kollar, 4: Vadi Dereleri, 5: Maks. Kılcal Ağ
-    let lastActiveRiverDensity = 2;
-    let show3DCitiesPins = true;
-
     function getRiverDensityLabel(lvl) {
       const k = Math.max(0, Math.min(5, Math.round(lvl)));
       if (k === 0) return 'Kapalı (Gizli)';
@@ -3010,26 +3072,53 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       btn3dCitiesToggle.addEventListener('click', () => syncCitiesVisibility(!show3DCitiesPins));
     }
 
-    document.getElementById('chk-terrain').addEventListener('change', (e) => {
-      if (e.target.checked) {
-        map.setTerrain({ source: 'terrain-dem', exaggeration: 1.0 });
-      } else {
-        map.setTerrain(null);
+    function applyMap2D3DMode(enable3D, animateCam = true) {
+      is3D = !!enable3D;
+      const chkTerrainEl = document.getElementById('chk-terrain');
+      if (chkTerrainEl) chkTerrainEl.checked = is3D;
+
+      const btnToggle2d = document.getElementById('btn-toggle-2d');
+      if (btnToggle2d) {
+        btnToggle2d.textContent = is3D ? '2B / 3B (3B Açık)' : '2B / 3B (2B Düz)';
+        btnToggle2d.style.borderColor = is3D ? 'rgba(56, 189, 248, 0.55)' : 'rgba(255, 255, 255, 0.18)';
+        btnToggle2d.style.color = is3D ? '#38bdf8' : '#e2e8f0';
       }
+
+      if (map && map.getSource && map.getSource('terrain-dem')) {
+        try {
+          if (is3D) {
+            map.setTerrain({ source: 'terrain-dem', exaggeration: 1.15 });
+          } else {
+            map.setTerrain(null);
+          }
+        } catch (e) {}
+      }
+
+      if (animateCam && map && typeof map.easeTo === 'function') {
+        map.easeTo({
+          pitch: is3D ? 60 : 0,
+          bearing: is3D ? -10 : 0,
+          duration: 950
+        });
+      }
+
       updateAllLegends();
+    }
+
+    document.getElementById('chk-terrain').addEventListener('change', (e) => {
+      applyMap2D3DMode(e.target.checked, true);
     });
 
-    updateAllLegends();
-
     document.getElementById('btn-reset-view').addEventListener('click', () => {
+      applyMap2D3DMode(true, false);
       map.flyTo({ center: [35.2433, 38.9637], zoom: 6.2, pitch: 60, bearing: -10, duration: 1500 });
     });
 
-    let is3D = true;
     document.getElementById('btn-toggle-2d').addEventListener('click', () => {
-      is3D = !is3D;
-      map.easeTo({ pitch: is3D ? 60 : 0, bearing: is3D ? -10 : 0, duration: 1200 });
+      applyMap2D3DMode(!is3D, true);
     });
+
+    updateAllLegends();
 
     // ========================================================
     // 2. 3D MODEL HESAPLAMA MOTORU (30m DEM + 4K ULTRA HD GERÇEK UYDU)
@@ -3487,53 +3576,6 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
     // ========================================================
     // 3. THREE.JS 3D HARİTA STÜDYOSU (PREVIEW & EXPORT)
     // ========================================================
-    const studioModal = document.getElementById('studio-modal');
-    const container = document.getElementById('three-canvas-container');
-
-    let scene, camera, renderer, controls, dirLight;
-    let terrainMesh = null;
-    let waterMesh = null;
-    let rainParticles = null;
-    let solidBlockGroup = null;
-    let currentModelData = null;
-    let satelliteTexture = null;
-    let strataTexture = null;
-    const clock = new THREE.Clock();
-
-    // Simülasyon Durum Değişkenleri
-    let floodSimActive = false;
-    let rainParticlesActive = false;
-    let rainIntensity = 50; // 0-100 arası (0 - 50 kg/m²/sa)
-    let rainDuration = 12; // 1 - 72 saat
-    let sunHour = 14;
-    let currentTexMode = 'satellite';
-    let waterOpacity = 0.60; // Varsayılan %60 su görünürlüğü (Opaklık)
-    let waterColorHex = 0x0284c7; // Canlı okyanus mavisi
-    let waterEmissiveHex = 0x0369a1; // Vadilerde belirgin ışıma
-    let selectedDemQuality = '30m'; // '30m' (Ultra HD, 256x256 grid) veya 'std' (Standart, 128x128 grid)
-    let currentClipMode = 'organic'; // 'organic' (tam havza sınırı) veya 'box' (dikdörtgen blok)
-    let active3DBoundaryMode = 'basin'; // 'basin' | 'province' | 'district' | 'none'
-
-    // ==========================================
-    // META QUEST WEBXR PASSTHROUGH DEĞİŞKENLERİ
-    // ==========================================
-    let xrSession = null;
-    let xrHitTestSource = null;
-    let xrHitTestSourceRequested = false;
-    let reticle = null;
-    let xrPlaced = false;
-    let xrNeedsInitialPlacement = false;
-    let xrController0 = null;
-    let xrController1 = null;
-    let xrCurrentScale = 0.006; // 100 birim * 0.006 = 0.60m (60 cm masaüstü maketi)
-    let xrModelRotationY = 0;
-    let xrPlacedPos = new THREE.Vector3(0, -0.32, -0.82);
-    let xrMenuCanvas = null;
-    let xrMenuTexture = null;
-    let xrMenuMesh = null;
-    let xrMenuGroup = null;
-    let xrCursorDot = null;
-
     // 1. Jeolojik Katmanlı Taban Dokusu Üretici (Sedimentary Geological Strata)
     function createStrataTexture() {
       const canvas = document.createElement('canvas');
@@ -3911,9 +3953,6 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
     }
 
     // Fiziki Harita (Hipsometrik Yükselti Kademeleri + Hillshade) ve 3B Baskı (Heykelsi Mat Kil + Hillshade) Dokusu Üreticileri
-    let reliefTexture = null;
-    let clayTexture = null;
-
     function createSculptedClayTexture(elevationGrid, gridW, gridH, minElev, maxElev) {
       const w = Math.max(128, gridW || 256);
       const h = Math.max(128, gridH || 256);
@@ -5355,8 +5394,6 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       if (typeof updateAllLegends === 'function') updateAllLegends();
     }
 
-    let latestScientificReport = null;
-
     function computeAndRenderScientificStats(floodRatio = 0, totalWaterKg = 0) {
       if (!currentModelData || !currentModelData.elevationGrid) return;
       const { elevationGrid, gridW, gridH, bounds, dimensions, basinName, activeInsideMask } = currentModelData;
@@ -6560,22 +6597,6 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
     // 4. META QUEST WEBXR PASSTHROUGH (AR) MODÜLÜ
     //    + ULTRA-HD (2K), TİTREMEZ, İKONSUZ, BÜYÜK YAZILI & SÜRGÜLÜ 3B KONTROL PANELİ
     // ==========================================
-    let xrRaycaster = new THREE.Raycaster();
-    let xrHoveredBtnId = null;
-    let xrHoveredSliderId = null;
-    let xrExitButtonCooldown = false;
-    let xrRecenterButtonCooldown = false;
-    let xrSurfacePlacementMode = true;
-
-    // 3B Kontrol Paneli Sabitleme (World-Locked) Değişkenleri (Kafa hareketiyle titremeyi %100 engeller)
-    let xrMenuAnchorMode = 'top'; // 'top' | 'left' | 'right' | 'custom'
-    let xrMenuCustomPos = new THREE.Vector3(0, 0.15, -0.78);
-    let xrMenuMoveMode = false;
-    let xrDraggingMenuCtrl = null;
-    let xrDraggingMenuDist = 0.80;
-    let xrActiveDragSlider = null;
-    let xrActiveDragCtrl = null;
-    let xrLastTerrainRebuildTime = 0;
 
     // 6 Adet Büyük ve Net Sürgü Çubuğu (Slider Bar) Tanımı (Sıfır İkon, Büyük Okunaklı Türkçe Yazı)
     const XR_MENU_SLIDERS = [
