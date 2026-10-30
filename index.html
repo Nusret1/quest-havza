@@ -954,6 +954,15 @@
     TERRASKOP XR: Haritadan veya sol listeden Havza (25), İl (81) ya da İlçe (973) seçerek 3B topoğrafik-hidrolojik analizi başlatın.
   </div>
 
+  <!-- 2B HARİTA AKTİF LEJANT KUTUSU (SAĞ ALT) -->
+  <div id="map-2d-legend" style="position: absolute; bottom: 20px; right: 20px; z-index: 12; background: rgba(10, 16, 29, 0.90); backdrop-filter: blur(12px); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 12px; padding: 10px 14px; min-width: 220px; color: #f8fafc; box-shadow: 0 8px 24px rgba(0,0,0,0.55); font-size: 0.74rem;">
+    <div style="font-weight: 800; color: #38bdf8; font-size: 0.75rem; letter-spacing: 0.4px; margin-bottom: 7px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+      <span>AKTİF HARİTA LEJANTI</span>
+      <span style="font-size: 0.66rem; color: #94a3b8; font-weight: 600;">2B / CBS</span>
+    </div>
+    <div id="map-2d-legend-items" style="display: flex; flex-direction: column; gap: 5px;"></div>
+  </div>
+
   <!-- Yükleniyor / İşlem Durum Katmanı -->
   <div id="status-overlay">
     <div class="status-box">
@@ -970,6 +979,15 @@
       <div class="studio-instructions">
         Sol Tık: Döndür | Sağ Tık: Kaydır | Tekerlek: Yaklaş / Uzaklaş
       </div>
+
+      <!-- 3B STÜDYO AKTİF MODEL LEJANTI (SAĞ ALT) -->
+      <div id="studio-3d-legend" style="position: absolute; bottom: 18px; right: 18px; z-index: 25; background: rgba(8, 13, 25, 0.92); backdrop-filter: blur(12px); border: 1px solid rgba(56, 189, 248, 0.42); border-radius: 12px; padding: 11px 14px; min-width: 245px; max-width: 295px; color: #f8fafc; box-shadow: 0 10px 28px rgba(0,0,0,0.65); font-size: 0.73rem;">
+        <div style="font-weight: 800; color: #38bdf8; font-size: 0.75rem; letter-spacing: 0.4px; margin-bottom: 7px; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+          <span>AKTİF 3B MODEL LEJANTI</span>
+          <span id="studio-3d-legend-mode" style="font-size: 0.66rem; color: #fde047; font-weight: 700;">Sınır Kesimi</span>
+        </div>
+        <div id="studio-3d-legend-items" style="display: flex; flex-direction: column; gap: 5px;"></div>
+      </div>
     </div>
 
     <!-- WEBXR AR ALT BİLGİ VE PASSTHROUGH HIZLI KONTROL PANELİ (HUD) -->
@@ -980,14 +998,14 @@
       <button id="btn-xr-hud-recenter" style="background: rgba(14, 165, 233, 0.25); border: 1px solid #38bdf8; color: #e0f2fe; padding: 6px 12px; border-radius: 16px; font-weight: 700; font-size: 0.75rem; cursor: pointer;">
         Haritayı & Menüyü Önüme Getir
       </button>
-      <button id="btn-xr-hud-bound-basin" style="background: rgba(34, 211, 238, 0.22); border: 1px solid #22d3ee; color: #a5f3fc; padding: 6px 11px; border-radius: 16px; font-weight: 700; font-size: 0.74rem; cursor: pointer;">
-        Havza Sınırı
+      <button id="btn-xr-hud-bound-basin" style="background: rgba(244, 63, 94, 0.24); border: 1px solid #f43f5e; color: #ffe4e6; padding: 6px 11px; border-radius: 16px; font-weight: 700; font-size: 0.74rem; cursor: pointer;">
+        Havza Sınırı (Kırmızı)
       </button>
       <button id="btn-xr-hud-bound-prov" style="background: rgba(251, 191, 36, 0.20); border: 1px solid #fbbf24; color: #fde68a; padding: 6px 11px; border-radius: 16px; font-weight: 700; font-size: 0.74rem; cursor: pointer;">
-        İl Sınırı
+        İl Sınırı (Sarı)
       </button>
-      <button id="btn-xr-hud-bound-dist" style="background: rgba(165, 180, 252, 0.22); border: 1px solid #a5b4fc; color: #e0e7ff; padding: 6px 11px; border-radius: 16px; font-weight: 700; font-size: 0.74rem; cursor: pointer;">
-        İlçe Sınırı
+      <button id="btn-xr-hud-bound-dist" style="background: rgba(192, 132, 252, 0.22); border: 1px solid #c084fc; color: #f3e8ff; padding: 6px 11px; border-radius: 16px; font-weight: 700; font-size: 0.74rem; cursor: pointer;">
+        İlçe Sınırı (Mor)
       </button>
       <button id="btn-xr-hud-rivers" style="background: rgba(14, 165, 233, 0.28); border: 1px solid #38bdf8; color: #e0f2fe; padding: 6px 11px; border-radius: 16px; font-weight: 700; font-size: 0.74rem; cursor: pointer;">
         Akarsu Ağı: AÇIK
@@ -1114,25 +1132,36 @@
           <div>
             <div class="section-title">3B Arazi Üzerinde Sınır Çizimi</div>
             <div class="option-btn-grid">
-              <button class="opt-btn active" id="btn-3d-bound-basin" style="border-color: rgba(34, 211, 238, 0.45);">Havza Sınırları</button>
-              <button class="opt-btn" id="btn-3d-bound-province" style="border-color: rgba(251, 191, 36, 0.35);">İl Sınırları</button>
-              <button class="opt-btn" id="btn-3d-bound-district" style="border-color: rgba(165, 180, 252, 0.35);">İlçe Sınırları</button>
+              <button class="opt-btn active" id="btn-3d-bound-basin" style="border-color: rgba(244, 63, 94, 0.55);">Havza Sınırı (Kırmızı)</button>
+              <button class="opt-btn" id="btn-3d-bound-province" style="border-color: rgba(251, 191, 36, 0.45);">İl Sınırı (Sarı)</button>
+              <button class="opt-btn" id="btn-3d-bound-district" style="border-color: rgba(192, 132, 252, 0.45);">İlçe Sınırı (Mor)</button>
               <button class="opt-btn" id="btn-3d-bound-none">Sınırları Gizle</button>
             </div>
             <p style="font-size: 0.71rem; color: #94a3b8; margin-top: 4px;">
-              Seçilen sınır çizgilerini 3B topoğrafik arazi rölyefi üzerine kabartmalı vektör hat olarak çizer.
+              Havza su bölümü sınırı (mercan kırmızısı) ile mavi akarsu ağları birbirinden tamamen ayrılmıştır.
             </p>
           </div>
 
-          <!-- 3B Arazi Üzerinde Akarsu Ağı & Yerleşim Katmanları -->
+          <!-- 3B Arazi Üzerinde Akarsu Ağı, Kol Yoğunluğu & Yerleşim Katmanları -->
           <div>
-            <div class="section-title">3B Hidrolojik & Beşeri Katmanlar</div>
+            <div class="section-title">3B Hidrolojik Akarsu Ağı & Kol Yoğunluğu</div>
             <div class="option-btn-grid">
-              <button class="opt-btn active" id="btn-3d-rivers-toggle" style="border-color: rgba(56, 189, 248, 0.45);">Akarsu Ağı: AÇIK</button>
+              <button class="opt-btn active" id="btn-3d-rivers-toggle" style="border-color: rgba(56, 189, 248, 0.55);">Akarsu Ağı: AÇIK</button>
               <button class="opt-btn active" id="btn-3d-cities-toggle" style="border-color: rgba(16, 185, 129, 0.45);">Şehir Merkezleri: AÇIK</button>
             </div>
+            <div class="slider-container" style="margin-top: 8px;">
+              <div class="slider-header">
+                <span>Akarsu Kol Yoğunluğu</span>
+                <span id="river-density-val" style="color: #38bdf8; font-weight: 700;">Kademe 2 (Standart)</span>
+              </div>
+              <div class="stepper-row">
+                <button class="stepper-btn" id="btn-river-density-minus">−</button>
+                <input type="range" id="slider-river-density" min="0" max="5" step="1" value="2" style="flex: 1; accent-color: #38bdf8;" />
+                <button class="stepper-btn" id="btn-river-density-plus">+</button>
+              </div>
+            </div>
             <p style="font-size: 0.71rem; color: #94a3b8; margin-top: 4px;">
-              Resmi CBS akarsu yataklarını ve DEM D8 vadi drenaj kollarını doğrudan 3B topoğrafya üzerine yerleştirir.
+              Kademeyi artırarak ana nehirlerin yanına vadi içi yan kolları ve kılcal dereleri ekleyebilir veya 0 ile tamamen kaldırabilirsiniz.
             </p>
           </div>
 
@@ -2278,9 +2307,9 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       if (badgeEl) {
         if (mode === 'basin') {
           badgeEl.textContent = 'Doğal Havza';
-          badgeEl.style.color = '#e0f2fe';
-          badgeEl.style.background = 'rgba(34, 211, 238, 0.22)';
-          badgeEl.style.borderColor = 'rgba(34, 211, 238, 0.55)';
+          badgeEl.style.color = '#ffe4e6';
+          badgeEl.style.background = 'rgba(244, 63, 94, 0.24)';
+          badgeEl.style.borderColor = 'rgba(244, 63, 94, 0.65)';
         } else if (mode === 'province') {
           badgeEl.textContent = 'İl İdari Sınırı';
           badgeEl.style.color = '#fef3c7';
@@ -2288,13 +2317,14 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
           badgeEl.style.borderColor = 'rgba(251, 191, 36, 0.55)';
         } else {
           badgeEl.textContent = 'İlçe İdari Sınırı';
-          badgeEl.style.color = '#e0e7ff';
-          badgeEl.style.background = 'rgba(165, 180, 252, 0.24)';
-          badgeEl.style.borderColor = 'rgba(165, 180, 252, 0.55)';
+          badgeEl.style.color = '#f3e8ff';
+          badgeEl.style.background = 'rgba(192, 132, 252, 0.24)';
+          badgeEl.style.borderColor = 'rgba(192, 132, 252, 0.55)';
         }
       }
 
       applyBoundaryLayerVisibility(mode);
+      if (typeof updateAllLegends === 'function') updateAllLegends();
     }
 
     document.getElementById('btn-selmode-basin').addEventListener('click', () => setSelectionMode('basin'));
@@ -2378,7 +2408,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         id: 'havzalar-fill-hover',
         type: 'fill',
         source: 'havzalar-source',
-        paint: { 'fill-color': 'rgba(34, 211, 238, 0.22)' },
+        paint: { 'fill-color': 'rgba(244, 63, 94, 0.20)' },
         filter: ['==', ['get', 'id'], -1]
       });
 
@@ -2386,7 +2416,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         id: 'havzalar-fill-selected',
         type: 'fill',
         source: 'havzalar-source',
-        paint: { 'fill-color': 'rgba(34, 211, 238, 0.36)' },
+        paint: { 'fill-color': 'rgba(244, 63, 94, 0.34)' },
         filter: ['==', ['get', 'id'], -1]
       });
 
@@ -2395,7 +2425,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         type: 'line',
         source: 'havzalar-source',
         layout: { 'line-join': 'round', 'line-cap': 'round' },
-        paint: { 'line-color': '#042f2e', 'line-width': 4.2, 'line-opacity': 0.65 }
+        paint: { 'line-color': '#3b0714', 'line-width': 4.4, 'line-opacity': 0.72 }
       });
 
       map.addLayer({
@@ -2403,7 +2433,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         type: 'line',
         source: 'havzalar-source',
         layout: { 'line-join': 'round', 'line-cap': 'round' },
-        paint: { 'line-color': '#22d3ee', 'line-width': 2.0, 'line-opacity': 0.92 }
+        paint: { 'line-color': '#f43f5e', 'line-width': 2.2, 'line-opacity': 0.95 }
       });
 
       // Akarsular Kaynağı (Yerel Resmi Türkiye Akarsular.shp Veri Paketi)
@@ -2517,7 +2547,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         type: 'line',
         source: 'ilceler-source',
         layout: { visibility: 'none', 'line-join': 'round', 'line-cap': 'round' },
-        paint: { 'line-color': '#0f172a', 'line-width': 2.4, 'line-opacity': 0.62 }
+        paint: { 'line-color': '#2e1065', 'line-width': 2.5, 'line-opacity': 0.68 }
       });
 
       map.addLayer({
@@ -2526,9 +2556,9 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         source: 'ilceler-source',
         layout: { visibility: 'none', 'line-join': 'round', 'line-cap': 'round' },
         paint: {
-          'line-color': '#a5b4fc',
-          'line-width': 1.15,
-          'line-opacity': 0.88
+          'line-color': '#c084fc',
+          'line-width': 1.25,
+          'line-opacity': 0.92
         }
       });
 
@@ -2734,12 +2764,144 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       if (selectDistrictEl) populateDistrictDropdown('');
     });
 
-    // Harita ve 3B Stüdyo Ortak Akarsu & Şehir Katman Senkronizasyonu
+    // Harita ve 3B Stüdyo Ortak Akarsu, Kol Yoğunluğu, Şehir ve Dinamik Lejant Senkronizasyonu
     let show3DRivers = true;
+    let riverBranchDensity = 2; // 0: Kapalı, 1: Ana Nehirler, 2: Standart, 3: Yoğun Kollar, 4: Vadi Dereleri, 5: Maks. Kılcal Ağ
+    let lastActiveRiverDensity = 2;
     let show3DCitiesPins = true;
 
-    function syncRiversVisibility(enabled) {
-      show3DRivers = !!enabled;
+    function getRiverDensityLabel(lvl) {
+      const k = Math.max(0, Math.min(5, Math.round(lvl)));
+      if (k === 0) return 'Kapalı (Gizli)';
+      if (k === 1) return 'Kademe 1 (Ana Nehirler)';
+      if (k === 2) return 'Kademe 2 (Standart)';
+      if (k === 3) return 'Kademe 3 (Yoğun Kollar)';
+      if (k === 4) return 'Kademe 4 (Vadi Dereleri)';
+      return 'Kademe 5 (Maks. Kılcal Ağ)';
+    }
+
+    function updateAllLegends() {
+      // 1. 2B Harita Aktif Lejantı
+      const leg2dEl = document.getElementById('map-2d-legend-items');
+      if (leg2dEl) {
+        const bMode = activeSelectionMode || 'basin';
+        const bRow = bMode === 'basin'
+          ? { color: '#f43f5e', name: 'Havza Sınırı (Su Bölümü)', state: 'AÇIK' }
+          : (bMode === 'province'
+              ? { color: '#fbbf24', name: 'İl İdari Sınırı (81 İl)', state: 'AÇIK' }
+              : { color: '#c084fc', name: 'İlçe İdari Sınırı (973 İlçe)', state: 'AÇIK' });
+
+        const chkTerrainEl = document.getElementById('chk-terrain');
+        const terrainOn = chkTerrainEl ? chkTerrainEl.checked : true;
+
+        const rows2d = [
+          `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+             <span style="display:flex; align-items:center; gap:7px;"><span style="width:14px; height:4px; border-radius:2px; background:${bRow.color}; display:inline-block;"></span><b>${bRow.name}</b></span>
+             <span style="color:#34d399; font-weight:700; font-size:0.66rem;">${bRow.state}</span>
+           </div>`,
+          `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; opacity:${show3DRivers ? '1' : '0.45'};">
+             <span style="display:flex; align-items:center; gap:7px;"><span style="width:14px; height:4px; border-radius:2px; background:#38bdf8; display:inline-block;"></span>Akarsu Yatakları (CBS)</span>
+             <span style="color:${show3DRivers ? '#38bdf8' : '#94a3b8'}; font-weight:700; font-size:0.66rem;">${show3DRivers ? 'AÇIK' : 'GİZLİ'}</span>
+           </div>`,
+          `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; opacity:${show3DCitiesPins ? '1' : '0.45'};">
+             <span style="display:flex; align-items:center; gap:7px;"><span style="width:10px; height:10px; border-radius:50%; background:#10b981; border:1.5px solid #fff; display:inline-block; margin-left:2px; margin-right:2px;"></span>İl Merkezleri & Nüfus</span>
+             <span style="color:${show3DCitiesPins ? '#34d399' : '#94a3b8'}; font-weight:700; font-size:0.66rem;">${show3DCitiesPins ? 'AÇIK' : 'GİZLİ'}</span>
+           </div>`,
+          `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; opacity:${terrainOn ? '1' : '0.45'};">
+             <span style="display:flex; align-items:center; gap:7px;"><span style="width:14px; height:8px; border-radius:2px; background:linear-gradient(90deg,#2e9e5b,#e6da86,#a66844); display:inline-block;"></span>3B Topoğrafik DEM</span>
+             <span style="color:${terrainOn ? '#fde047' : '#94a3b8'}; font-weight:700; font-size:0.66rem;">${terrainOn ? 'AÇIK' : '2B DÜZ'}</span>
+           </div>`
+        ];
+        leg2dEl.innerHTML = rows2d.join('');
+      }
+
+      // 2. 3B Analiz Stüdyosu Aktif Model Lejantı
+      const leg3dEl = document.getElementById('studio-3d-legend-items');
+      const leg3dModeEl = document.getElementById('studio-3d-legend-mode');
+      if (leg3dModeEl) {
+        leg3dModeEl.textContent = (typeof currentClipMode !== 'undefined' && currentClipMode === 'box') ? 'Dikdörtgen Blok' : 'Sınır Kesimi';
+      }
+      if (leg3dEl) {
+        const b3d = (typeof active3DBoundaryMode !== 'undefined') ? active3DBoundaryMode : 'basin';
+        let boundHtml = '';
+        if (b3d === 'basin') {
+          boundHtml = `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <span style="display:flex; align-items:center; gap:7px;"><span style="width:15px; height:4px; border-radius:2px; background:#f43f5e; display:inline-block;"></span><b>Havza Sınırı (Su Bölümü)</b></span>
+            <span style="color:#fda4af; font-weight:700; font-size:0.65rem;">KIRMIZI</span>
+          </div>`;
+        } else if (b3d === 'province') {
+          boundHtml = `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <span style="display:flex; align-items:center; gap:7px;"><span style="width:15px; height:4px; border-radius:2px; background:#fbbf24; display:inline-block;"></span><b>İl Mülki Sınırı</b></span>
+            <span style="color:#fde68a; font-weight:700; font-size:0.65rem;">ALTIN SARISI</span>
+          </div>`;
+        } else if (b3d === 'district') {
+          boundHtml = `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <span style="display:flex; align-items:center; gap:7px;"><span style="width:15px; height:4px; border-radius:2px; background:#c084fc; display:inline-block;"></span><b>İlçe Mülki Sınırı</b></span>
+            <span style="color:#e9d5ff; font-weight:700; font-size:0.65rem;">MOR</span>
+          </div>`;
+        } else {
+          boundHtml = `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; opacity:0.45;">
+            <span style="display:flex; align-items:center; gap:7px;"><span style="width:15px; height:4px; border-radius:2px; background:#64748b; display:inline-block;"></span>Sınır Çizgisi</span>
+            <span style="color:#94a3b8; font-weight:700; font-size:0.65rem;">GİZLİ</span>
+          </div>`;
+        }
+
+        const tMode = (typeof currentTexMode !== 'undefined') ? currentTexMode : 'satellite';
+        const texLabel = tMode === 'relief'
+          ? 'Hipsometrik (Yeşil→Sarı→Kahve→Beyaz)'
+          : (tMode === 'clay' ? '3B Baskı Mat Kil + Gölge' : (tMode === 'wireframe' ? 'Jeodezik Tel Kafes' : 'Gerçek Uydu Dokusu'));
+
+        const fOn = (typeof floodSimActive !== 'undefined') && floodSimActive;
+        const rOn = (typeof rainParticlesActive !== 'undefined') && rainParticlesActive;
+
+        const rows3d = [
+          boundHtml,
+          `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; opacity:${show3DRivers ? '1' : '0.42'};">
+             <span style="display:flex; align-items:center; gap:7px;"><span style="width:15px; height:4px; border-radius:2px; background:#00b4d8; display:inline-block;"></span><b>Ana Akarsu Yatağı (CBS)</b></span>
+             <span style="color:${show3DRivers ? '#38bdf8' : '#94a3b8'}; font-weight:700; font-size:0.65rem;">${show3DRivers ? 'MAVİ' : 'GİZLİ'}</span>
+           </div>`,
+          `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; opacity:${(show3DRivers && riverBranchDensity >= 2) ? '1' : '0.42'};">
+             <span style="display:flex; align-items:center; gap:7px;"><span style="width:15px; height:3px; border-radius:2px; background:#7dd3fc; display:inline-block;"></span>Yan Drenaj Kolları (D8)</span>
+             <span style="color:${(show3DRivers && riverBranchDensity >= 2) ? '#bae6fd' : '#94a3b8'}; font-weight:700; font-size:0.65rem;">${show3DRivers ? `Kademe ${riverBranchDensity}/5` : 'KAPALI'}</span>
+           </div>`,
+          `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; opacity:${show3DCitiesPins ? '1' : '0.42'};">
+             <span style="display:flex; align-items:center; gap:7px;"><span style="width:10px; height:10px; border-radius:50%; background:#10b981; border:1.5px solid #fff; display:inline-block; margin-left:2px; margin-right:3px;"></span>Şehir Merkezi & Nüfus Pini</span>
+             <span style="color:${show3DCitiesPins ? '#34d399' : '#94a3b8'}; font-weight:700; font-size:0.65rem;">${show3DCitiesPins ? 'YEŞİL' : 'GİZLİ'}</span>
+           </div>`,
+          `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+             <span style="display:flex; align-items:center; gap:7px;"><span style="width:15px; height:8px; border-radius:2px; background:linear-gradient(90deg,#2e9e5b,#e6da86,#a66844,#f8fafc); display:inline-block;"></span>Yüzey: ${texLabel}</span>
+           </div>`
+        ];
+
+        if (fOn || rOn) {
+          rows3d.push(
+            `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+               <span style="display:flex; align-items:center; gap:7px;"><span style="width:15px; height:6px; border-radius:2px; background:#0284c7; border:1px solid #7dd3fc; display:inline-block;"></span>${fOn ? 'Taşkın Suyu' : ''}${fOn && rOn ? ' + ' : ''}${rOn ? 'Yüzey Akışı' : ''}</span>
+               <span style="color:#38bdf8; font-weight:700; font-size:0.65rem;">AKTİF</span>
+             </div>`
+          );
+        }
+
+        leg3dEl.innerHTML = rows3d.join('');
+      }
+    }
+
+    function setRiverBranchDensity(level, rebuildNow = true) {
+      const clamped = Math.max(0, Math.min(5, Math.round(level)));
+      riverBranchDensity = clamped;
+      if (clamped > 0) {
+        lastActiveRiverDensity = clamped;
+        show3DRivers = true;
+      } else {
+        show3DRivers = false;
+      }
+
+      const sEl = document.getElementById('slider-river-density');
+      if (sEl) sEl.value = String(riverBranchDensity);
+
+      const vEl = document.getElementById('river-density-val');
+      if (vEl) vEl.textContent = getRiverDensityLabel(riverBranchDensity);
+
       const chkRiv = document.getElementById('chk-rivers');
       if (chkRiv) chkRiv.checked = show3DRivers;
 
@@ -2751,25 +2913,36 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       const btn3dRiv = document.getElementById('btn-3d-rivers-toggle');
       if (btn3dRiv) {
         btn3dRiv.classList.toggle('active', show3DRivers);
-        btn3dRiv.textContent = show3DRivers ? 'Akarsu Ağı: AÇIK' : 'Akarsu Ağı: KAPALI';
+        btn3dRiv.textContent = show3DRivers ? `Akarsu Ağı: AÇIK (Kademe ${riverBranchDensity})` : 'Akarsu Ağı: KAPALI';
       }
 
       const btnHudRiv = document.getElementById('btn-xr-hud-rivers');
       if (btnHudRiv) {
-        btnHudRiv.textContent = show3DRivers ? 'Akarsu Ağı: AÇIK' : 'Akarsu Ağı: KAPALI';
+        btnHudRiv.textContent = show3DRivers ? `Akarsu Ağı: AÇIK (${riverBranchDensity}/5)` : 'Akarsu Ağı: KAPALI';
         btnHudRiv.style.opacity = show3DRivers ? '1' : '0.55';
       }
 
       if (solidBlockGroup) {
-        let g = solidBlockGroup.getObjectByName('Rivers3DGroup');
-        if (show3DRivers && !g && typeof rebuild3DRiversOnTerrain === 'function') {
+        if (rebuildNow && typeof rebuild3DRiversOnTerrain === 'function') {
           rebuild3DRiversOnTerrain();
-          g = solidBlockGroup.getObjectByName('Rivers3DGroup');
+          if (typeof updateFloodLevel === 'function') updateFloodLevel();
         }
+        const g = solidBlockGroup.getObjectByName('Rivers3DGroup');
         if (g) g.visible = show3DRivers;
       }
 
+      updateAllLegends();
+      if (typeof updateAllLegends === 'function') updateAllLegends();
       if (typeof redrawXRSpatialMenu === 'function') redrawXRSpatialMenu();
+    }
+
+    function syncRiversVisibility(enabled) {
+      if (enabled) {
+        const restoreLvl = riverBranchDensity > 0 ? riverBranchDensity : (lastActiveRiverDensity || 2);
+        setRiverBranchDensity(restoreLvl, true);
+      } else {
+        setRiverBranchDensity(0, false);
+      }
     }
 
     function syncCitiesVisibility(enabled) {
@@ -2793,6 +2966,8 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         if (g) g.visible = show3DCitiesPins;
       }
 
+      updateAllLegends();
+      if (typeof updateAllLegends === 'function') updateAllLegends();
       if (typeof redrawXRSpatialMenu === 'function') redrawXRSpatialMenu();
     }
 
@@ -2809,6 +2984,27 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       btn3dRiversToggle.addEventListener('click', () => syncRiversVisibility(!show3DRivers));
     }
 
+    const sliderRiverDensityEl = document.getElementById('slider-river-density');
+    if (sliderRiverDensityEl) {
+      sliderRiverDensityEl.addEventListener('input', (e) => {
+        setRiverBranchDensity(parseInt(e.target.value, 10), true);
+      });
+    }
+
+    const btnRiverDensityMinus = document.getElementById('btn-river-density-minus');
+    if (btnRiverDensityMinus) {
+      btnRiverDensityMinus.addEventListener('click', () => {
+        setRiverBranchDensity(riverBranchDensity - 1, true);
+      });
+    }
+
+    const btnRiverDensityPlus = document.getElementById('btn-river-density-plus');
+    if (btnRiverDensityPlus) {
+      btnRiverDensityPlus.addEventListener('click', () => {
+        setRiverBranchDensity(riverBranchDensity + 1, true);
+      });
+    }
+
     const btn3dCitiesToggle = document.getElementById('btn-3d-cities-toggle');
     if (btn3dCitiesToggle) {
       btn3dCitiesToggle.addEventListener('click', () => syncCitiesVisibility(!show3DCitiesPins));
@@ -2820,7 +3016,10 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       } else {
         map.setTerrain(null);
       }
+      updateAllLegends();
     });
+
+    updateAllLegends();
 
     document.getElementById('btn-reset-view').addEventListener('click', () => {
       map.flyTo({ center: [35.2433, 38.9637], zoom: 6.2, pitch: 60, bearing: -10, duration: 1500 });
@@ -4500,6 +4699,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         controls.target.set(modelCenterX, 5, modelCenterZ);
         controls.update();
       }
+      if (typeof updateAllLegends === 'function') updateAllLegends();
       if (typeof redrawXRSpatialMenu === 'function') redrawXRSpatialMenu();
     }
 
@@ -4532,21 +4732,21 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       const qh = Math.max(1, gridH - 1);
 
       let sourceItems = [];
-      let mainColorHex = 0x22d3ee;
-      let casingColorHex = 0x042f2e;
+      let mainColorHex = 0xf43f5e;
+      let casingColorHex = 0x3b0714;
 
       if (active3DBoundaryMode === 'basin') {
         sourceItems = allBasinItems || [];
-        mainColorHex = 0x22d3ee;   // Hidrolojik Camgöbeği
-        casingColorHex = 0x042f2e; // Koyu Kontur
+        mainColorHex = 0xf43f5e;   // Mercan Kırmızısı (Su Bölümü Sınırı - Mavi Akarsulardan Tamamen Ayrı!)
+        casingColorHex = 0x3b0714; // Koyu Bordo Kontur
       } else if (active3DBoundaryMode === 'province') {
         sourceItems = allProvinceItems || [];
         mainColorHex = 0xfbbf24;   // Altın Kehribar
         casingColorHex = 0x1c1917; // Koyu Kontur
       } else if (active3DBoundaryMode === 'district') {
         sourceItems = allDistrictItems || [];
-        mainColorHex = 0xa5b4fc;   // İndigo Buz Mavisi
-        casingColorHex = 0x0f172a; // Koyu Kontur
+        mainColorHex = 0xc084fc;   // Eflatun / Mor
+        casingColorHex = 0x2e1065; // Koyu Mor Kontur
       }
 
       // Model sınır kutusuyla kesişen birimleri filtrele
@@ -4713,12 +4913,14 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         if (btnMap[k]) btnMap[k].classList.toggle('active', k === mode);
       });
       rebuild3DBoundaryLinesOnTerrain();
+      if (typeof updateAllLegends === 'function') updateAllLegends();
+      if (typeof updateAllLegends === 'function') updateAllLegends();
       if (typeof redrawXRSpatialMenu === 'function') redrawXRSpatialMenu();
     }
 
     // =========================================================
     // 3B ARAZİ RÖLYEFİ ÜZERİNDE AKARSU VE DRENAJ AĞLARI MOTORU
-    // (1. Resmi CBS Akarsular.shp Yatakları + 2. DEM D8 Vadi Drenaj Kolları + 3. Yüzey Akışı)
+    // (1. Resmi CBS Akarsular.shp Yatakları + 2. Kademeli DEM D8 Vadi Drenaj Kolları + 3. Yüzey Akışı)
     // =========================================================
     function rebuild3DRiversOnTerrain() {
       if (!solidBlockGroup || !currentModelData || !currentModelData.elevationGrid) return;
@@ -4728,6 +4930,8 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
 
       const oldRunoff = solidBlockGroup.getObjectByName('SurfaceRunoff3DGroup');
       if (oldRunoff) solidBlockGroup.remove(oldRunoff);
+
+      const activeDensity = show3DRivers ? Math.max(1, riverBranchDensity || 2) : 0;
 
       const { elevationGrid, gridW, gridH, minElev, maxElev, dimensions, bounds, activeInsideMask } = currentModelData;
       const qw = Math.max(1, gridW - 1);
@@ -4781,6 +4985,9 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       if (bounds && allRiverItems && allRiverItems.length > 0) {
         const addRiverLine = (coords, rName) => {
           if (!coords || coords.length < 2) return;
+          // Kademe 1'de yalnızca isimli ana akarsuları çiz; Kademe 2-5'te tüm resmi akarsu kollarını çiz
+          if (activeDensity === 1 && !rName) return;
+
           for (let i = 0; i < coords.length - 1; i++) {
             const lon0 = coords[i][0], lat0 = coords[i][1];
             const lon1 = coords[i + 1][0], lat1 = coords[i + 1][1];
@@ -4833,7 +5040,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
               riverCoreVerts.push(xA + nx, yA + 0.29, zA + nz, xB + nx, yB + 0.29, zB + nz);
               riverCoreVerts.push(xA - nx, yA + 0.29, zA - nz, xB - nx, yB + 0.29, zB - nz);
 
-              // Akarsu yatağı koyu konturu (3B Baskı Kil ve Uydu üzerinde yüksek kontrast)
+              // Akarsu yatağı koyu lacivert konturu (3B Baskı Kil ve Uydu üzerinde yüksek kontrast)
               riverCasingVerts.push(xA + nx * 1.85, yA + 0.21, zA + nz * 1.85, xB + nx * 1.85, yB + 0.21, zB + nz * 1.85);
               riverCasingVerts.push(xA - nx * 1.85, yA + 0.21, zA - nz * 1.85, xB - nx * 1.85, yB + 0.21, zB - nz * 1.85);
 
@@ -4876,9 +5083,10 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         }
       }
 
-      // 2. OTOMATİK DEM D8 TOPOĞRAFİK VADİ DRENAJ KOLLARI (Akış Birikimi Thalweg Ağı)
+      // 2. KADEMELİ DEM D8 TOPOĞRAFİK VADİ DRENAJ KOLLARI (Akarsu Kol Yoğunluğu: Kademe 1..5)
       let demDrainageKm = 0;
-      const step = Math.max(1, Math.floor(Math.max(gridW, gridH) / 88));
+      const gridDivisor = activeDensity >= 4 ? 112 : 90;
+      const step = Math.max(1, Math.floor(Math.max(gridW, gridH) / gridDivisor));
       const hw = Math.max(4, Math.floor(gridW / step));
       const hh = Math.max(4, Math.floor(gridH / step));
       const totalHCells = hw * hh;
@@ -4910,7 +5118,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
           if (!isUVInside(u, v)) continue;
 
           const e0 = cellElevs[idx];
-          let bestDrop = 0.05; // Deniz/düzlük gürültüsünü süzmek için minimum eğim eşiği
+          let bestDrop = 0.04;
           let bestTarget = -1;
 
           for (let d = 0; d < 8; d++) {
@@ -4938,43 +5146,66 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         }
       }
 
-      // Eşik değeri: Resmi akarsu azsa (ör. küçük ilçe) vadi drenaj kollarını daha sık göster
-      const accThreshold = officialRiverKm > 25 ? Math.max(14, totalHCells * 0.0055) : Math.max(8, totalHCells * 0.0032);
+      // Akarsu Kol Yoğunluğu kademesine (1..5) göre vadi kolu eşiği (Threshold küçüldükçe yan kollar ve kılcal dereler artar)
+      let accThreshold = Infinity;
+      if (activeDensity === 1) {
+        // Kademe 1'de eğer resmi akarsu hiç yoksa sadece en büyük ana vadiyi göster
+        accThreshold = officialRiverKm > 5 ? Infinity : Math.max(18, totalHCells * 0.010);
+      } else if (activeDensity === 2) {
+        accThreshold = officialRiverKm > 25 ? Math.max(15, totalHCells * 0.0065) : Math.max(9, totalHCells * 0.0040);
+      } else if (activeDensity === 3) {
+        accThreshold = Math.max(8, totalHCells * 0.0030);
+      } else if (activeDensity === 4) {
+        accThreshold = Math.max(5, totalHCells * 0.0015);
+      } else if (activeDensity >= 5) {
+        accThreshold = Math.max(3, totalHCells * 0.00075);
+      }
+
       const spanKmX = lonSpan * kmPerLon;
       const spanKmY = latSpan * kmPerLat;
       const cellKmX = spanKmX / Math.max(1, hw - 1);
       const cellKmY = spanKmY / Math.max(1, hh - 1);
 
-      for (let hy = 1; hy < hh - 1; hy++) {
-        for (let hx = 1; hx < hw - 1; hx++) {
-          const idx = hy * hw + hx;
-          if (flowAcc[idx] < accThreshold) continue;
-          const target = downIdx[idx];
-          if (target < 0) continue;
+      if (Number.isFinite(accThreshold)) {
+        for (let hy = 1; hy < hh - 1; hy++) {
+          for (let hx = 1; hx < hw - 1; hx++) {
+            const idx = hy * hw + hx;
+            if (flowAcc[idx] < accThreshold) continue;
+            const target = downIdx[idx];
+            if (target < 0) continue;
 
-          const tx = target % hw;
-          const ty = Math.floor(target / hw);
+            const tx = target % hw;
+            const ty = Math.floor(target / hw);
 
-          const uA = hx / Math.max(1, hw - 1);
-          const vA = hy / Math.max(1, hh - 1);
-          const uB = tx / Math.max(1, hw - 1);
-          const vB = ty / Math.max(1, hh - 1);
+            const uA = hx / Math.max(1, hw - 1);
+            const vA = hy / Math.max(1, hh - 1);
+            const uB = tx / Math.max(1, hw - 1);
+            const vB = ty / Math.max(1, hh - 1);
 
-          if (!isUVInside(uA, vA) || !isUVInside(uB, vB)) continue;
+            if (!isUVInside(uA, vA) || !isUVInside(uB, vB)) continue;
 
-          const xA = (uA - 0.5) * blockWidth;
-          const zA = (vA - 0.5) * blockDepth;
-          const yA = sampleHeightAtUV(uA, vA);
+            const xA = (uA - 0.5) * blockWidth;
+            const zA = (vA - 0.5) * blockDepth;
+            const yA = sampleHeightAtUV(uA, vA);
 
-          const xB = (uB - 0.5) * blockWidth;
-          const zB = (vB - 0.5) * blockDepth;
-          const yB = sampleHeightAtUV(uB, vB);
+            const xB = (uB - 0.5) * blockWidth;
+            const zB = (vB - 0.5) * blockDepth;
+            const yB = sampleHeightAtUV(uB, vB);
 
-          demStreamVerts.push(xA, yA + 0.25, zA, xB, yB + 0.25, zB);
-          demDrainageKm += Math.hypot((tx - hx) * cellKmX, (ty - hy) * cellKmY);
+            demStreamVerts.push(xA, yA + 0.25, zA, xB, yB + 0.25, zB);
+            // Büyük yan kolları çift şeritli çizerek belirginleştir
+            if (flowAcc[idx] >= accThreshold * 2.5) {
+              const dx = xB - xA, dz = zB - zA;
+              const sL = Math.hypot(dx, dz) || 1;
+              const nx = (-dz / sL) * 0.11, nz = (dx / sL) * 0.11;
+              demStreamVerts.push(xA + nx, yA + 0.25, zA + nz, xB + nx, yB + 0.25, zB + nz);
+            }
 
-          if (flowAcc[idx] >= accThreshold * 1.4) {
-            flowSegments3D.push({ x0: xA, y0: yA, z0: zA, x1: xB, y1: yB, z1: zB });
+            demDrainageKm += Math.hypot((tx - hx) * cellKmX, (ty - hy) * cellKmY);
+
+            if (flowAcc[idx] >= accThreshold * 1.3) {
+              flowSegments3D.push({ x0: xA, y0: yA, z0: zA, x1: xB, y1: yB, z1: zB });
+            }
           }
         }
       }
@@ -4987,9 +5218,9 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         const rCasGeom = new THREE.BufferGeometry();
         rCasGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(riverCasingVerts), 3));
         const rCasMat = new THREE.LineBasicMaterial({
-          color: 0x06283d,
+          color: 0x041e3a,
           transparent: true,
-          opacity: 0.88
+          opacity: 0.90
         });
         riversGroup.add(new THREE.LineSegments(rCasGeom, rCasMat));
       }
@@ -4998,9 +5229,9 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         const dGeom = new THREE.BufferGeometry();
         dGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(demStreamVerts), 3));
         const dMat = new THREE.LineBasicMaterial({
-          color: 0x38bdf8,
+          color: 0x7dd3fc,
           transparent: true,
-          opacity: 0.72
+          opacity: 0.82
         });
         riversGroup.add(new THREE.LineSegments(dGeom, dMat));
       }
@@ -5009,7 +5240,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         const rCoreGeom = new THREE.BufferGeometry();
         rCoreGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(riverCoreVerts), 3));
         const rCoreMat = new THREE.LineBasicMaterial({
-          color: 0x00e5ff,
+          color: 0x00b4d8,
           transparent: true,
           opacity: 0.98
         });
@@ -5031,8 +5262,8 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         rCanvas.width = 256;
         rCanvas.height = 60;
         const rCtx = rCanvas.getContext('2d');
-        rCtx.fillStyle = 'rgba(7, 24, 44, 0.90)';
-        rCtx.strokeStyle = '#00e5ff';
+        rCtx.fillStyle = 'rgba(7, 24, 44, 0.92)';
+        rCtx.strokeStyle = '#38bdf8';
         rCtx.lineWidth = 3;
         rCtx.beginPath();
         if (rCtx.roundRect) rCtx.roundRect(4, 4, 248, 52, 12);
@@ -5055,7 +5286,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         riversGroup.add(rSprite);
       });
 
-      riversGroup.visible = show3DRivers;
+      riversGroup.visible = show3DRivers && riverBranchDensity > 0;
       solidBlockGroup.add(riversGroup);
 
       // 4. YÜZEY AKIŞI (SURFACE RUNOFF) ANİMASYON KATMANI (Yağış Açıldığında Vadilerden Aşağı Akan Su Akımları)
@@ -5111,7 +5342,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       }
 
       // 5. HİDROLOJİK DRENAJ İSTATİSTİKLERİNİ KAYDET (Bilimsel Analiz Sekmesi ve CSV Raporu İçin)
-      const totalDrainageKm = officialRiverKm + demDrainageKm * 0.45;
+      const totalDrainageKm = show3DRivers ? (officialRiverKm + demDrainageKm * 0.55) : 0;
       const mainRiversNames = sortedRivers.slice(0, 6).map(([n, st]) => `${n} (${Math.round(st.km)} km)`);
       currentModelData.hydroStats = {
         officialRiverKm,
@@ -5121,6 +5352,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
           ? mainRiversNames.join(', ')
           : 'Topoğrafik D8 Vadi Drenaj Kolları (Yan Dereler)'
       };
+      if (typeof updateAllLegends === 'function') updateAllLegends();
     }
 
     let latestScientificReport = null;
@@ -5338,6 +5570,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       }
 
       computeAndRenderScientificStats(floodRatio, totalWater);
+      if (typeof updateAllLegends === 'function') updateAllLegends();
     }
 
     // ==========================================
@@ -5490,6 +5723,9 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
     document.getElementById('chk-rain-particles').addEventListener('change', (e) => {
       rainParticlesActive = e.target.checked;
       if (rainParticles) rainParticles.visible = rainParticlesActive;
+      if (typeof updateAllLegends === 'function') updateAllLegends();
+      if (typeof updateAllLegends === 'function') updateAllLegends();
+      if (typeof redrawXRSpatialMenu === 'function') redrawXRSpatialMenu();
     });
 
     // Su Görünürlüğü (Opaklık) Slider Dinleyicisi
@@ -6089,6 +6325,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
             });
           }
         });
+        if (typeof updateAllLegends === 'function') updateAllLegends();
         if (typeof redrawXRSpatialMenu === 'function') redrawXRSpatialMenu();
         return;
       }
@@ -6199,6 +6436,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         terrainMesh.material = topMat;
         terrainMesh.material.needsUpdate = true;
       }
+      if (typeof updateAllLegends === 'function') updateAllLegends();
       if (typeof redrawXRSpatialMenu === 'function') redrawXRSpatialMenu();
     }
 
@@ -6339,12 +6577,12 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
     let xrActiveDragCtrl = null;
     let xrLastTerrainRebuildTime = 0;
 
-    // 5 Adet Büyük ve Net Sürgü Çubuğu (Slider Bar) Tanımı (Sıfır İkon, Büyük Okunaklı Türkçe Yazı)
+    // 6 Adet Büyük ve Net Sürgü Çubuğu (Slider Bar) Tanımı (Sıfır İkon, Büyük Okunaklı Türkçe Yazı)
     const XR_MENU_SLIDERS = [
       {
         id: 'slider_exag',
         label: 'Yükselti Çarpanı',
-        y: 500,
+        y: 472,
         min: 0.4,
         max: 4.0,
         step: 0.2,
@@ -6371,7 +6609,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       {
         id: 'slider_scale',
         label: 'Harita Boyutu',
-        y: 616,
+        y: 572,
         min: 0.0020,
         max: 0.0180,
         step: 0.0012,
@@ -6386,9 +6624,30 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         }
       },
       {
+        id: 'slider_river_density',
+        label: 'Akarsu Kolları',
+        y: 672,
+        min: 0,
+        max: 5,
+        step: 1,
+        color: '#00b4d8',
+        getValue: () => show3DRivers ? riverBranchDensity : 0,
+        formatValue: (v) => {
+          const lvl = Math.round(v);
+          return lvl <= 0 ? 'Kapalı (0)' : `Kademe ${lvl}/5`;
+        },
+        setValue: (v, isFinal) => {
+          const lvl = Math.max(0, Math.min(5, Math.round(v)));
+          const now = performance.now();
+          const shouldRebuild = isFinal || (lvl !== riverBranchDensity && now - xrLastTerrainRebuildTime > 140);
+          if (shouldRebuild) xrLastTerrainRebuildTime = now;
+          setRiverBranchDensity(lvl, shouldRebuild);
+        }
+      },
+      {
         id: 'slider_water',
         label: 'Taşkın Su Yükü',
-        y: 732,
+        y: 772,
         min: 0,
         max: 100,
         step: 8,
@@ -6416,7 +6675,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       {
         id: 'slider_opacity',
         label: 'Su Görünürlüğü',
-        y: 848,
+        y: 872,
         min: 15,
         max: 100,
         step: 8,
@@ -6438,7 +6697,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       {
         id: 'slider_sun',
         label: 'Güneş Saati',
-        y: 964,
+        y: 972,
         min: 6,
         max: 19,
         step: 1,
@@ -6465,86 +6724,112 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
     const SLIDER_TRACK_X = 820;
     const SLIDER_TRACK_W = 1044;
     const SLIDER_PLUS_X = 1886;
-    const SLIDER_ROW_H = 98;
+    const SLIDER_ROW_H = 88;
 
     const XR_MENU_BUTTONS = [
       // Üst Bar: Panel Taşıma Çubuğu + Hızlı Konum Butonları + Çıkış Butonu (Hiçbir Küçük İkon Yok!)
       {
         id: 'drag_handle',
         label: () => xrMenuMoveMode ? 'PANEL TAŞINIYOR (Sabitlemek İçin Tıklayın)' : 'PANELİ TAŞI (Tut Sürükle veya Tıkla)',
-        x: 28, y: 20, w: 860, h: 96,
+        x: 28, y: 20, w: 860, h: 92,
         isHeaderDrag: true,
         isActive: () => xrMenuMoveMode || !!xrDraggingMenuCtrl
       },
-      { id: 'panel_pos_left', label: 'Sol Taraf', x: 904, y: 20, w: 184, h: 96, isActive: () => xrMenuAnchorMode === 'left' },
-      { id: 'panel_pos_top', label: 'Üst Taraf', x: 1102, y: 20, w: 184, h: 96, isActive: () => xrMenuAnchorMode === 'top' },
-      { id: 'panel_pos_right', label: 'Sağ Taraf', x: 1300, y: 20, w: 184, h: 96, isActive: () => xrMenuAnchorMode === 'right' },
-      { id: 'exit_ar', label: '3B MODUNDAN ÇIK', x: 1500, y: 20, w: 520, h: 96, isExit: true },
+      { id: 'panel_pos_left', label: 'Sol Taraf', x: 904, y: 20, w: 184, h: 92, isActive: () => xrMenuAnchorMode === 'left' },
+      { id: 'panel_pos_top', label: 'Üst Taraf', x: 1102, y: 20, w: 184, h: 92, isActive: () => xrMenuAnchorMode === 'top' },
+      { id: 'panel_pos_right', label: 'Sağ Taraf', x: 1300, y: 20, w: 184, h: 92, isActive: () => xrMenuAnchorMode === 'right' },
+      { id: 'exit_ar', label: '3B MODUNDAN ÇIK', x: 1500, y: 20, w: 520, h: 92, isExit: true },
 
       // Satır 1: Düzleme Oturtma, Önüme Getir, Döndür, SINIR KESİMİ ve DİKDÖRTGEN BLOK (Ayrı ve Net Butonlar)
       {
         id: 're_place',
         label: () => (!xrPlaced || xrSurfacePlacementMode) ? 'Düzlem Seçiliyor (Masaya Tıkla)' : 'Düzleme Oturt (Yüzey Seç)',
-        x: 28, y: 134, w: 540, h: 102,
+        x: 28, y: 126, w: 540, h: 98,
         isHighlight: true,
         isActive: () => !xrPlaced || xrSurfacePlacementMode
       },
-      { id: 'recenter_front', label: 'Önüme Getir', x: 584, y: 134, w: 320, h: 102, isActive: () => false },
-      { id: 'rot_right', label: '45° Döndür', x: 920, y: 134, w: 290, h: 102, isActive: () => false },
+      { id: 'recenter_front', label: 'Önüme Getir', x: 584, y: 126, w: 320, h: 98, isActive: () => false },
+      { id: 'rot_right', label: '45° Döndür', x: 920, y: 126, w: 290, h: 98, isActive: () => false },
       {
         id: 'clip_organic',
         label: 'Sınır Kesimi',
-        x: 1226, y: 134, w: 388, h: 102,
+        x: 1226, y: 126, w: 388, h: 98,
         isActive: () => currentClipMode === 'organic'
       },
       {
         id: 'clip_box',
         label: 'Dikdörtgen Blok',
-        x: 1630, y: 134, w: 390, h: 102,
+        x: 1630, y: 126, w: 390, h: 98,
         isActive: () => currentClipMode === 'box'
       },
 
-      // Satır 2: 3B Arazi Üzerinde Sınır Çizimi (Havza / İl / İlçe / Gizle)
-      { id: 'bound_basin', label: 'Havza Sınırları', x: 28, y: 252, w: 486, h: 102, isActive: () => active3DBoundaryMode === 'basin' },
-      { id: 'bound_prov', label: 'İl Sınırları', x: 530, y: 252, w: 486, h: 102, isActive: () => active3DBoundaryMode === 'province' },
-      { id: 'bound_dist', label: 'İlçe Sınırları', x: 1032, y: 252, w: 486, h: 102, isActive: () => active3DBoundaryMode === 'district' },
-      { id: 'bound_none', label: 'Sınırları Gizle', x: 1534, y: 252, w: 486, h: 102, isActive: () => active3DBoundaryMode === 'none' },
+      // Satır 2: 3B Arazi Üzerinde Sınır Çizimi (Akarsulardan Tamamen Farklı Renklerle Kodlanmış!)
+      {
+        id: 'bound_basin',
+        label: 'Havza Sınırı (Kırmızı)',
+        x: 28, y: 238, w: 486, h: 98,
+        accentColor: '#f43f5e',
+        activeBg: '#be123c',
+        isActive: () => active3DBoundaryMode === 'basin'
+      },
+      {
+        id: 'bound_prov',
+        label: 'İl Sınırı (Sarı)',
+        x: 530, y: 238, w: 486, h: 98,
+        accentColor: '#fbbf24',
+        activeBg: '#b45309',
+        isActive: () => active3DBoundaryMode === 'province'
+      },
+      {
+        id: 'bound_dist',
+        label: 'İlçe Sınırı (Mor)',
+        x: 1032, y: 238, w: 486, h: 98,
+        accentColor: '#c084fc',
+        activeBg: '#6b21a8',
+        isActive: () => active3DBoundaryMode === 'district'
+      },
+      {
+        id: 'bound_none',
+        label: 'Sınırları Gizle',
+        x: 1534, y: 238, w: 486, h: 98,
+        isActive: () => active3DBoundaryMode === 'none'
+      },
 
       // Satır 3: Yüzey Görünümü
-      { id: 'tex_sat', label: 'Gerçek Uydu', x: 28, y: 370, w: 486, h: 102, isActive: () => currentTexMode === 'satellite' },
-      { id: 'tex_rel', label: 'Hipsometrik', x: 530, y: 370, w: 486, h: 102, isActive: () => currentTexMode === 'relief' },
-      { id: 'tex_clay', label: '3B Baskı (Kil)', x: 1032, y: 370, w: 486, h: 102, isActive: () => currentTexMode === 'clay' },
-      { id: 'tex_wire', label: 'Tel Kafes', x: 1534, y: 370, w: 486, h: 102, isActive: () => currentTexMode === 'wireframe' },
+      { id: 'tex_sat', label: 'Gerçek Uydu', x: 28, y: 350, w: 486, h: 98, isActive: () => currentTexMode === 'satellite' },
+      { id: 'tex_rel', label: 'Hipsometrik', x: 530, y: 350, w: 486, h: 98, isActive: () => currentTexMode === 'relief' },
+      { id: 'tex_clay', label: '3B Baskı (Kil)', x: 1032, y: 350, w: 486, h: 98, isActive: () => currentTexMode === 'clay' },
+      { id: 'tex_wire', label: 'Tel Kafes', x: 1534, y: 350, w: 486, h: 98, isActive: () => currentTexMode === 'wireframe' },
 
       // Satır 4 (Alt Satır): Simülasyon, Akarsu Ağı ve Katman Anahtarları (Hiçbir Küçük İkon Yok!)
       {
         id: 'flood_toggle',
         label: () => floodSimActive ? 'Taşkın Suyu: AÇIK' : 'Taşkın Suyu: KAPALI',
-        x: 28, y: 1094, w: 386, h: 104,
+        x: 28, y: 1090, w: 386, h: 98,
         isActive: () => floodSimActive
       },
       {
         id: 'rivers_toggle',
-        label: () => show3DRivers ? 'Akarsu Ağı: AÇIK' : 'Akarsu Ağı: KAPALI',
-        x: 429, y: 1094, w: 386, h: 104,
-        isActive: () => show3DRivers
+        label: () => (show3DRivers && riverBranchDensity > 0) ? `Akarsu: AÇIK (K.${riverBranchDensity})` : 'Akarsu Ağı: KAPALI',
+        x: 429, y: 1090, w: 386, h: 98,
+        isActive: () => show3DRivers && riverBranchDensity > 0
       },
       {
         id: 'rain_toggle',
         label: () => rainParticlesActive ? 'Yağmur Akışı: AÇIK' : 'Yağmur Akışı: KAPALI',
-        x: 830, y: 1094, w: 386, h: 104,
+        x: 830, y: 1090, w: 386, h: 98,
         isActive: () => rainParticlesActive
       },
       {
         id: 'cities_toggle',
         label: () => show3DCitiesPins ? 'Şehirler: AÇIK' : 'Şehirler: KAPALI',
-        x: 1231, y: 1094, w: 386, h: 104,
+        x: 1231, y: 1090, w: 386, h: 98,
         isActive: () => show3DCitiesPins
       },
       {
         id: 'water_color_cycle',
         label: () => waterColorHex === 0x0284c7 ? 'Su Rengi: Okyanus' : (waterColorHex === 0x1d4ed8 ? 'Su Rengi: Derin Mavi' : 'Su Rengi: Turkuaz'),
-        x: 1632, y: 1094, w: 388, h: 104,
+        x: 1632, y: 1090, w: 388, h: 98,
         isActive: () => false
       }
     ];
@@ -6755,8 +7040,8 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       ctx.strokeStyle = (xrMenuMoveMode || xrDraggingMenuCtrl) ? '#fbbf24' : '#38bdf8';
       ctx.stroke();
 
-      // Sürgü Bölümü Çerçevesi
-      drawRoundRectPath(ctx, 24, 486, W - 48, 594, 24);
+      // Sürgü Bölümü Çerçevesi (6 Sürgü Çubuğu İçin)
+      drawRoundRectPath(ctx, 24, 460, W - 48, 616, 24);
       ctx.fillStyle = '#0b1324';
       ctx.fill();
       ctx.lineWidth = 2.5;
@@ -6783,6 +7068,16 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
           ctx.fillStyle = isHover ? '#9333ea' : '#7e22ce';
           ctx.strokeStyle = '#f0abfc';
           ctx.lineWidth = 5;
+        } else if (btn.accentColor) {
+          if (active) {
+            ctx.fillStyle = btn.activeBg || '#0369a1';
+            ctx.strokeStyle = btn.accentColor;
+            ctx.lineWidth = 6;
+          } else {
+            ctx.fillStyle = isHover ? '#1e293b' : '#111a2e';
+            ctx.strokeStyle = btn.accentColor;
+            ctx.lineWidth = isHover ? 5.5 : 3.5;
+          }
         } else if (active) {
           ctx.fillStyle = isHover ? '#0284c7' : '#0369a1';
           ctx.strokeStyle = '#7dd3fc';
@@ -6805,14 +7100,14 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         ctx.textAlign = 'center';
 
         if (btn.isStepper) {
-          ctx.font = 'bold 54px "Segoe UI", Arial, sans-serif';
+          ctx.font = 'bold 52px "Segoe UI", Arial, sans-serif';
           ctx.fillText(text, btn.x + btn.w / 2, btn.y + btn.h / 2);
         } else if (btn.isHeaderDrag) {
-          ctx.font = 'bold 32px "Segoe UI", Arial, sans-serif';
+          ctx.font = 'bold 31px "Segoe UI", Arial, sans-serif';
           ctx.fillStyle = active ? '#fef08a' : '#7dd3fc';
           ctx.fillText(text, btn.x + btn.w / 2, btn.y + btn.h / 2);
         } else {
-          ctx.font = btn.isExit ? 'bold 35px "Segoe UI", Arial, sans-serif' : 'bold 33px "Segoe UI", Arial, sans-serif';
+          ctx.font = btn.isExit ? 'bold 34px "Segoe UI", Arial, sans-serif' : 'bold 31px "Segoe UI", Arial, sans-serif';
           ctx.fillText(text, btn.x + btn.w / 2, btn.y + btn.h / 2);
         }
       });
@@ -6826,14 +7121,14 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
 
         // Sol Başlık Etiketi (Büyük ve Beyaz)
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 34px "Segoe UI", Arial, sans-serif';
+        ctx.font = 'bold 33px "Segoe UI", Arial, sans-serif';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         ctx.fillText(s.label, 48, centerY);
 
         // Anlık Değer Kutusu
         const valText = s.formatValue(val);
-        drawRoundRectPath(ctx, 456, s.y + 8, 194, SLIDER_ROW_H - 16, 16);
+        drawRoundRectPath(ctx, 438, s.y + 8, 212, SLIDER_ROW_H - 16, 16);
         ctx.fillStyle = '#091020';
         ctx.fill();
         ctx.lineWidth = 3.5;
@@ -6841,14 +7136,14 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         ctx.stroke();
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 33px "Segoe UI", Arial, sans-serif';
+        ctx.font = 'bold 31px "Segoe UI", Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(valText, 456 + 97, centerY);
+        ctx.fillText(valText, 438 + 106, centerY);
 
         // Sürgü Kanalı (Track Background)
-        const trackH = 42;
+        const trackH = 40;
         const trackY = centerY - trackH / 2;
-        drawRoundRectPath(ctx, SLIDER_TRACK_X, trackY, SLIDER_TRACK_W, trackH, 21);
+        drawRoundRectPath(ctx, SLIDER_TRACK_X, trackY, SLIDER_TRACK_W, trackH, 20);
         ctx.fillStyle = '#040812';
         ctx.fill();
         ctx.lineWidth = isSliderHover ? 4.5 : 3;
@@ -6856,31 +7151,143 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         ctx.stroke();
 
         // Sürgü Doluluk Çubuğu (Filled Progress Bar)
-        const fillW = Math.max(28, norm * SLIDER_TRACK_W);
-        drawRoundRectPath(ctx, SLIDER_TRACK_X, trackY, fillW, trackH, 21);
+        const fillW = Math.max(26, norm * SLIDER_TRACK_W);
+        drawRoundRectPath(ctx, SLIDER_TRACK_X, trackY, fillW, trackH, 20);
         ctx.fillStyle = s.color;
         ctx.fill();
 
         // Kademeli Ölçek Çentikleri
         ctx.fillStyle = 'rgba(255, 255, 255, 0.32)';
-        for (let t = 1; t < 10; t++) {
-          const tx = SLIDER_TRACK_X + (SLIDER_TRACK_W * t) / 10;
-          ctx.fillRect(tx - 1.5, trackY + 8, 3, trackH - 16);
+        const ticks = s.id === 'slider_river_density' ? 5 : 10;
+        for (let t = 1; t < ticks; t++) {
+          const tx = SLIDER_TRACK_X + (SLIDER_TRACK_W * t) / ticks;
+          ctx.fillRect(tx - 1.5, trackY + 7, 3, trackH - 14);
         }
 
         // Sürgü Tutamacı (Büyük Yuvarlak Başlık)
         const knobX = SLIDER_TRACK_X + norm * SLIDER_TRACK_W;
         ctx.beginPath();
-        ctx.arc(knobX, centerY, isSliderHover ? 32 : 27, 0, Math.PI * 2);
+        ctx.arc(knobX, centerY, isSliderHover ? 30 : 25, 0, Math.PI * 2);
         ctx.fillStyle = '#ffffff';
         ctx.fill();
-        ctx.lineWidth = 7;
+        ctx.lineWidth = 6.5;
         ctx.strokeStyle = s.color;
         ctx.stroke();
       });
 
-      // 4. Alt Durum ve Rehber Şeridi (İkonsuz, Çok Büyük ve Net Yazı)
-      drawRoundRectPath(ctx, 28, 1216, W - 56, 198, 24);
+      // 4. AKTİF 3B HARİTA LEJANTI BÖLÜMÜ (VR/AR Modunda Neyin Hangi Renk Olduğunu Gösteren Aktif Lejant)
+      drawRoundRectPath(ctx, 28, 1200, W - 56, 214, 22);
+      ctx.fillStyle = '#091326';
+      ctx.fill();
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.stroke();
+
+      // Lejant Başlığı
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 26px "Segoe UI", Arial, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('AKTİF 3B HARİTA LEJANTI (RENK VE KATMAN ANAHTARI)', 54, 1232);
+
+      // Sağ Üst Aktif Sınır Özeti Rozeti
+      ctx.textAlign = 'right';
+      const activeBoundText = active3DBoundaryMode === 'basin'
+        ? 'Aktif Sınır: HAVZA SINIRI (KIRMIZI)'
+        : (active3DBoundaryMode === 'province'
+          ? 'Aktif Sınır: İL SINIRI (ALTIN SARISI)'
+          : (active3DBoundaryMode === 'district' ? 'Aktif Sınır: İLÇE SINIRI (MOR)' : 'Aktif Sınır: GİZLİ'));
+      ctx.fillStyle = active3DBoundaryMode === 'basin' ? '#fda4af' : (active3DBoundaryMode === 'province' ? '#fde047' : (active3DBoundaryMode === 'district' ? '#d8b4fe' : '#94a3b8'));
+      ctx.font = 'bold 25px "Segoe UI", Arial, sans-serif';
+      ctx.fillText(activeBoundText, W - 54, 1232);
+
+      // Lejant Satır 1 (Y = 1288): Sınır Renkleri ve Akarsu Katmanları
+      ctx.textAlign = 'left';
+      const drawLegendSwatch = (sx, sy, sw, sh, fillCol, borderCol, labelTxt, isDimmed) => {
+        ctx.save();
+        if (isDimmed) ctx.globalAlpha = 0.48;
+        drawRoundRectPath(ctx, sx, sy - sh / 2, sw, sh, 6);
+        ctx.fillStyle = fillCol;
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = borderCol;
+        ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 26px "Segoe UI", Arial, sans-serif';
+        ctx.fillText(labelTxt, sx + sw + 14, sy);
+        ctx.restore();
+      };
+
+      // 1) Havza Sınırı (Mercan Kırmızısı)
+      drawLegendSwatch(
+        54, 1290, 46, 18,
+        '#f43f5e', '#fecdd3',
+        active3DBoundaryMode === 'basin' ? 'Havza Sınırı (Kırmızı • AÇIK)' : 'Havza Sınırı (Kırmızı)',
+        active3DBoundaryMode !== 'basin'
+      );
+
+      // 2) İl / İlçe Sınırı (Altın Sarısı / Mor)
+      const provDistColor = active3DBoundaryMode === 'district' ? '#c084fc' : '#fbbf24';
+      const provDistLabel = active3DBoundaryMode === 'province'
+        ? 'İl Sınırı (Sarı • AÇIK)'
+        : (active3DBoundaryMode === 'district' ? 'İlçe Sınırı (Mor • AÇIK)' : 'İl (Sarı) / İlçe (Mor)');
+      drawLegendSwatch(
+        545, 1290, 46, 18,
+        provDistColor, '#ffffff',
+        provDistLabel,
+        active3DBoundaryMode !== 'province' && active3DBoundaryMode !== 'district'
+      );
+
+      // 3) Ana Akarsular (Safir Su Mavisi)
+      const riversActiveNow = show3DRivers && riverBranchDensity > 0;
+      drawLegendSwatch(
+        1015, 1290, 46, 18,
+        '#00b4d8', '#041e3a',
+        riversActiveNow ? 'Ana Akarsu (Mavi • AÇIK)' : 'Ana Akarsu (KAPALI)',
+        !riversActiveNow
+      );
+
+      // 4) Yan Drenaj Kolları (Açık Buz Mavisi)
+      drawLegendSwatch(
+        1490, 1290, 46, 14,
+        '#7dd3fc', '#0284c7',
+        riversActiveNow ? `Yan Kollar (Kademe ${riverBranchDensity}/5)` : 'Yan Kollar (KAPALI)',
+        !riversActiveNow || riverBranchDensity <= 1
+      );
+
+      // Lejant Satır 2 (Y = 1356): Şehir Merkezi, Taşkın/Yağış ve Aktif Yüzey Kaplaması
+      // 5) Şehir Merkezi Pini (Zümrüt Yeşili)
+      drawLegendSwatch(
+        54, 1362, 28, 28,
+        '#10b981', '#a7f3d0',
+        `Şehir Merkezi (${show3DCitiesPins ? 'AÇIK' : 'GİZLİ'})`,
+        !show3DCitiesPins
+      );
+
+      // 6) Taşkın Suyu ve Yağış
+      drawLegendSwatch(
+        545, 1362, 46, 20,
+        '#0284c7', '#38bdf8',
+        `Taşkın: ${floodSimActive ? '%' + rainIntensity : 'Kapalı'} • Yağış: ${rainParticlesActive ? 'Açık' : 'Kapalı'}`,
+        !floodSimActive && !rainParticlesActive
+      );
+
+      // 7) Aktif Yüzey Dokusu / Hipsometrik Renk Skalası
+      const surfaceLegendText = currentTexMode === 'satellite'
+        ? 'Yüzey: Gerçek Uydu Fotoğrafı'
+        : (currentTexMode === 'relief'
+          ? 'Yüzey: Hipsometrik (Yeşil Ova → Sarı → Kahve → Beyaz Zirve)'
+          : (currentTexMode === 'clay' ? 'Yüzey: 3B Baskı Mat Toprak Kil' : 'Yüzey: 3B Tel Kafes İskelet'));
+      const surfaceSwatchCol = currentTexMode === 'satellite' ? '#16a34a' : (currentTexMode === 'relief' ? '#eab308' : (currentTexMode === 'clay' ? '#b8ad9e' : '#38bdf8'));
+      drawLegendSwatch(
+        1015, 1362, 46, 20,
+        surfaceSwatchCol, '#ffffff',
+        surfaceLegendText,
+        false
+      );
+
+      // 5. Alt Durum ve Rehber Şeridi (İkonsuz, Çok Büyük ve Net Yazı)
+      drawRoundRectPath(ctx, 28, 1428, W - 56, 172, 24);
       if (!xrPlaced || xrSurfacePlacementMode) {
         ctx.fillStyle = '#3b0764';
         ctx.strokeStyle = '#d8b4fe';
@@ -6901,25 +7308,25 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
 
       if (!xrPlaced || xrSurfacePlacementMode) {
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 35px "Segoe UI", Arial, sans-serif';
-        ctx.fillText('DÜZLEM SEÇİM MODU: Masaya veya zemine bakıp mavi halkayı gördüğünüzde TETİĞE basın', W / 2, 1282);
+        ctx.font = 'bold 34px "Segoe UI", Arial, sans-serif';
+        ctx.fillText('DÜZLEM SEÇİM MODU: Masaya veya zemine bakıp mavi halkayı gördüğünüzde TETİĞE basın', W / 2, 1486);
         ctx.fillStyle = '#e2e8f0';
-        ctx.font = 'bold 29px "Segoe UI", Arial, sans-serif';
-        ctx.fillText('Veya doğrudan havada incelemek için yukarıdaki "Önüme Getir" düğmesine tıklayın', W / 2, 1352);
+        ctx.font = 'bold 28px "Segoe UI", Arial, sans-serif';
+        ctx.fillText('Veya doğrudan havada incelemek için yukarıdaki "Önüme Getir" düğmesine tıklayın', W / 2, 1548);
       } else if (xrMenuMoveMode || xrDraggingMenuCtrl) {
         ctx.fillStyle = '#fef08a';
-        ctx.font = 'bold 35px "Segoe UI", Arial, sans-serif';
-        ctx.fillText('PANEL TAŞIMA MODU: Kumanda lazerini odada istediğiniz yere tutup TETİĞE basın', W / 2, 1282);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 29px "Segoe UI", Arial, sans-serif';
-        ctx.fillText('Üstteki Sol Taraf / Üst Taraf / Sağ Taraf butonlarıyla da paneli hizalayabilirsiniz', W / 2, 1352);
-      } else {
-        ctx.fillStyle = '#7dd3fc';
         ctx.font = 'bold 34px "Segoe UI", Arial, sans-serif';
-        ctx.fillText(`TERRASKOP XR  •  ${unitTitle}  (${currentClipMode === 'organic' ? 'Sınır Kesimi' : 'Dikdörtgen Blok'})`, W / 2, 1282);
+        ctx.fillText('PANEL TAŞIMA MODU: Kumanda lazerini odada istediğiniz yere tutup TETİĞE basın', W / 2, 1486);
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 28px "Segoe UI", Arial, sans-serif';
-        ctx.fillText('Çubukların üzerine tıklayıp sürükleyin veya [−] [+] butonlarını kullanın  •  B/Y Tuşu: Çıkış', W / 2, 1352);
+        ctx.fillText('Üstteki Sol Taraf / Üst Taraf / Sağ Taraf butonlarıyla da paneli hizalayabilirsiniz', W / 2, 1548);
+      } else {
+        ctx.fillStyle = '#7dd3fc';
+        ctx.font = 'bold 33px "Segoe UI", Arial, sans-serif';
+        ctx.fillText(`TERRASKOP XR  •  ${unitTitle}  (${currentClipMode === 'organic' ? 'Sınır Kesimi' : 'Dikdörtgen Blok'})`, W / 2, 1486);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 27px "Segoe UI", Arial, sans-serif';
+        ctx.fillText('Akarsu Kolları sürgüsüyle nehir ağını artırıp azaltabilir veya kapatabilirsiniz  •  B/Y Tuşu: Çıkış', W / 2, 1548);
       }
 
       xrMenuTexture.needsUpdate = true;
@@ -7008,7 +7415,17 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
           break;
         }
         case 'rivers_toggle': {
-          syncRiversVisibility(!show3DRivers);
+          if (show3DRivers && riverBranchDensity > 0) {
+            syncRiversVisibility(false);
+          } else {
+            if (riverBranchDensity <= 0) {
+              setRiverBranchDensity(2, false);
+            }
+            syncRiversVisibility(true);
+            if (solidBlockGroup && currentModelData && !solidBlockGroup.getObjectByName('Rivers3DGroup')) {
+              rebuild3DRiversOnTerrain();
+            }
+          }
           break;
         }
         case 'cities_toggle': {
@@ -7167,10 +7584,10 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       scene.add(reticleGroup);
       reticle = reticleGroup;
 
-      // 2. Meta Quest 3B Kontrol Paneli (2048x1440 Ultra-HD 2K Çözünürlük + 16x Anisotropy + Sabit Uzay Konumu)
+      // 2. Meta Quest 3B Kontrol Paneli (2048x1620 Ultra-HD 2K Çözünürlük + 16x Anisotropy + Sabit Uzay Konumu)
       xrMenuCanvas = document.createElement('canvas');
       xrMenuCanvas.width = 2048;
-      xrMenuCanvas.height = 1440;
+      xrMenuCanvas.height = 1620;
       xrMenuTexture = new THREE.CanvasTexture(xrMenuCanvas);
       xrMenuTexture.generateMipmaps = true;
       xrMenuTexture.minFilter = THREE.LinearMipmapLinearFilter;
@@ -7179,8 +7596,8 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         xrMenuTexture.anisotropy = renderer.capabilities.getMaxAnisotropy() || 16;
       }
 
-      // Geniş ve Rahat Okunur Panel Boyutu (1.08m x 0.76m)
-      const menuGeom = new THREE.PlaneGeometry(1.08, 0.76);
+      // Geniş ve Rahat Okunur Panel Boyutu (1.10m x 0.87m)
+      const menuGeom = new THREE.PlaneGeometry(1.10, 0.87);
       const menuMat = new THREE.MeshBasicMaterial({
         map: xrMenuTexture,
         transparent: true,
