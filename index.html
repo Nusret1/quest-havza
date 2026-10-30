@@ -998,8 +998,8 @@
       <button id="btn-xr-hud-recenter" style="background: rgba(14, 165, 233, 0.25); border: 1px solid #38bdf8; color: #e0f2fe; padding: 6px 12px; border-radius: 16px; font-weight: 700; font-size: 0.75rem; cursor: pointer;">
         Haritayı & Menüyü Önüme Getir
       </button>
-      <button id="btn-xr-hud-bound-basin" style="background: rgba(244, 63, 94, 0.24); border: 1px solid #f43f5e; color: #ffe4e6; padding: 6px 11px; border-radius: 16px; font-weight: 700; font-size: 0.74rem; cursor: pointer;">
-        Havza Sınırı (Kırmızı)
+      <button id="btn-xr-hud-bound-basin" style="background: rgba(217, 107, 67, 0.26); border: 1px solid #d96b43; color: #ffedd5; padding: 6px 11px; border-radius: 16px; font-weight: 700; font-size: 0.74rem; cursor: pointer;">
+        Havza Sınırı (Kiremit)
       </button>
       <button id="btn-xr-hud-bound-prov" style="background: rgba(251, 191, 36, 0.20); border: 1px solid #fbbf24; color: #fde68a; padding: 6px 11px; border-radius: 16px; font-weight: 700; font-size: 0.74rem; cursor: pointer;">
         İl Sınırı (Sarı)
@@ -1099,9 +1099,9 @@
             <div class="slider-container">
               <div class="slider-header">
                 <span>Günün Saati</span>
-                <span id="sun-hour-val" style="color: #fbbf24; font-weight: 700;">14:00</span>
+                <span id="sun-hour-val" style="color: #fbbf24; font-weight: 700;">06:00</span>
               </div>
-              <input type="range" id="slider-sun-hour" min="6" max="18" step="1" value="14" style="accent-color: #f59e0b;" />
+              <input type="range" id="slider-sun-hour" min="6" max="18" step="1" value="6" style="accent-color: #f59e0b;" />
             </div>
           </div>
 
@@ -1132,13 +1132,13 @@
           <div>
             <div class="section-title">3B Arazi Üzerinde Sınır Çizimi</div>
             <div class="option-btn-grid">
-              <button class="opt-btn active" id="btn-3d-bound-basin" style="border-color: rgba(244, 63, 94, 0.55);">Havza Sınırı (Kırmızı)</button>
+              <button class="opt-btn active" id="btn-3d-bound-basin" style="border-color: rgba(217, 107, 67, 0.65);">Havza Sınırı (Kiremit)</button>
               <button class="opt-btn" id="btn-3d-bound-province" style="border-color: rgba(251, 191, 36, 0.45);">İl Sınırı (Sarı)</button>
               <button class="opt-btn" id="btn-3d-bound-district" style="border-color: rgba(192, 132, 252, 0.45);">İlçe Sınırı (Mor)</button>
               <button class="opt-btn" id="btn-3d-bound-none">Sınırları Gizle</button>
             </div>
             <p style="font-size: 0.71rem; color: #94a3b8; margin-top: 4px;">
-              Havza su bölümü sınırı (mercan kırmızısı) ile mavi akarsu ağları birbirinden tamamen ayrılmıştır.
+              Havza su bölümü sınırı (topoğrafik kiremit tonu) ile mavi akarsu ağları birbirinden tamamen ayrılmıştır.
             </p>
           </div>
 
@@ -1165,10 +1165,15 @@
             </p>
           </div>
 
-          <!-- Hızlı Kamera Sıfırlama -->
-          <button class="btn" id="btn-reset-studio-cam" style="width: 100%; padding: 10px; margin-top: 6px;">
-            Modeli Ortala / Karşıdan Bak
-          </button>
+          <!-- Hızlı Kamera Sıfırlama & Doğrudan Blender (.GLB) Tam Sahne İndirme -->
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+            <button class="btn" id="btn-reset-studio-cam" style="width: 100%; padding: 9px;">
+              Modeli Ortala / Karşıdan Bak
+            </button>
+            <button class="btn" id="btn-export-glb-quick" style="width: 100%; padding: 10px 12px; background: linear-gradient(135deg, #ea580c, #d97706); border: 1px solid rgba(251, 191, 36, 0.65); color: #ffffff; font-weight: 800; font-size: 0.80rem; cursor: pointer; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);">
+              Blender Tam 3B Sahne İndir (.GLB • Tüm Özellikleriyle)
+            </button>
+          </div>
         </div>
 
         <!-- 2. BİLİMSEL ANALİZ & BULGULAR SEKMESİ (3 SENARYO BİRLEŞİK) -->
@@ -1403,6 +1408,11 @@
               </div>
             </div>
             
+            <button class="btn-download-stl" id="btn-export-glb" style="background: linear-gradient(135deg, #ea580c, #d97706); border: 1px solid rgba(251, 191, 36, 0.65); box-shadow: 0 6px 18px rgba(234, 88, 12, 0.38); margin-bottom: 4px;">
+              <span>Blender Tam 3B Sahne İndir (.GLB)</span>
+              <span id="glb-subtext" style="font-size: 0.7rem; opacity: 0.92;">4K Doku + Jeolojik Tabakalar + 3B Akarsular + Sınırlar + Şehirler</span>
+            </button>
+
             <button class="btn-download-stl" id="btn-export-stl">
               <span>STL Formatında İndir</span>
               <span id="stl-subtext" style="font-size: 0.7rem; opacity: 0.8;">3B Yazıcı (Sınır Kesimi)</span>
@@ -1610,6 +1620,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
@@ -1991,7 +2002,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
     let rainParticlesActive = false;
     let rainIntensity = 50; // 0-100 arası (0 - 50 kg/m²/sa)
     let rainDuration = 12; // 1 - 72 saat
-    let sunHour = 14;
+    let sunHour = 6; // Açılışta güneş konumu saat 06:00 (Doğu sabah eğik rölyef aydınlatması)
     let currentTexMode = 'satellite';
     let waterOpacity = 0.60; // Varsayılan %60 su görünürlüğü (Opaklık)
     let waterColorHex = 0x0284c7; // Canlı okyanus mavisi
@@ -2475,7 +2486,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         id: 'havzalar-fill-hover',
         type: 'fill',
         source: 'havzalar-source',
-        paint: { 'fill-color': 'rgba(244, 63, 94, 0.20)' },
+        paint: { 'fill-color': 'rgba(217, 107, 67, 0.16)' },
         filter: ['==', ['get', 'id'], -1]
       });
 
@@ -2483,7 +2494,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         id: 'havzalar-fill-selected',
         type: 'fill',
         source: 'havzalar-source',
-        paint: { 'fill-color': 'rgba(244, 63, 94, 0.34)' },
+        paint: { 'fill-color': 'rgba(217, 107, 67, 0.28)' },
         filter: ['==', ['get', 'id'], -1]
       });
 
@@ -2492,7 +2503,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         type: 'line',
         source: 'havzalar-source',
         layout: { 'line-join': 'round', 'line-cap': 'round' },
-        paint: { 'line-color': '#3b0714', 'line-width': 4.4, 'line-opacity': 0.72 }
+        paint: { 'line-color': '#3b180e', 'line-width': 4.2, 'line-opacity': 0.78 }
       });
 
       map.addLayer({
@@ -2500,7 +2511,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         type: 'line',
         source: 'havzalar-source',
         layout: { 'line-join': 'round', 'line-cap': 'round' },
-        paint: { 'line-color': '#f43f5e', 'line-width': 2.2, 'line-opacity': 0.95 }
+        paint: { 'line-color': '#d96b43', 'line-width': 2.2, 'line-opacity': 0.95 }
       });
 
       // Akarsular Kaynağı (Yerel Resmi Türkiye Akarsular.shp Veri Paketi)
@@ -2848,7 +2859,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       if (leg2dEl) {
         const bMode = activeSelectionMode || 'basin';
         const bRow = bMode === 'basin'
-          ? { color: '#f43f5e', name: 'Havza Sınırı (Su Bölümü)', state: 'AÇIK' }
+          ? { color: '#d96b43', name: 'Havza Sınırı (Su Bölümü)', state: 'AÇIK' }
           : (bMode === 'province'
               ? { color: '#fbbf24', name: 'İl İdari Sınırı (81 İl)', state: 'AÇIK' }
               : { color: '#c084fc', name: 'İlçe İdari Sınırı (973 İlçe)', state: 'AÇIK' });
@@ -2888,8 +2899,8 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         let boundHtml = '';
         if (b3d === 'basin') {
           boundHtml = `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-            <span style="display:flex; align-items:center; gap:7px;"><span style="width:15px; height:4px; border-radius:2px; background:#f43f5e; display:inline-block;"></span><b>Havza Sınırı (Su Bölümü)</b></span>
-            <span style="color:#fda4af; font-weight:700; font-size:0.65rem;">KIRMIZI</span>
+            <span style="display:flex; align-items:center; gap:7px;"><span style="width:15px; height:4px; border-radius:2px; background:#d96b43; display:inline-block;"></span><b>Havza Sınırı (Su Bölümü)</b></span>
+            <span style="color:#fdba74; font-weight:700; font-size:0.65rem;">KİREMİT</span>
           </div>`;
         } else if (b3d === 'province') {
           boundHtml = `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
@@ -3576,44 +3587,58 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
     // ========================================================
     // 3. THREE.JS 3D HARİTA STÜDYOSU (PREVIEW & EXPORT)
     // ========================================================
-    // 1. Jeolojik Katmanlı Taban Dokusu Üretici (Sedimentary Geological Strata)
+    // 1. Jeolojik Katmanlı Taban Dokusu Üretici (İnce Mikro-Tabakalı Sedimanter Jeolojik Kesit)
     function createStrataTexture() {
       const canvas = document.createElement('canvas');
-      canvas.width = 128;
+      canvas.width = 256;
       canvas.height = 512;
       const ctx = canvas.getContext('2d');
 
-      // Doğal Sedimanter Jeolojik Katman Gradyanı
+      // İnce ve Orantılı Sedimanter Jeolojik Katman Gradyanı (VR modunda kaba/iri görünmeyen zarif mikro-tabakalar)
       const grad = ctx.createLinearGradient(0, 0, 0, 512);
-      grad.addColorStop(0.00, "#8a7355"); // Üst toprak katmanı (Humus/topsoil)
-      grad.addColorStop(0.12, "#7a6345");
-      grad.addColorStop(0.13, "#b59b7c"); // Kumtaşı tabakası (Sandstone)
-      grad.addColorStop(0.28, "#c4ab8c");
-      grad.addColorStop(0.29, "#544b41"); // Koyu killi şist (Dark shale)
-      grad.addColorStop(0.48, "#63584c");
-      grad.addColorStop(0.49, "#a06820"); // Demir oksit / mineral tortusu
-      grad.addColorStop(0.53, "#8a7d6d");
-      grad.addColorStop(0.70, "#7a7065"); // Kireçtaşı (Limestone)
-      grad.addColorStop(0.71, "#4b5563"); // Bazaltik volkanik katman
-      grad.addColorStop(0.88, "#374151");
-      grad.addColorStop(1.00, "#1e293b"); // Temel ana kayaç (Bedrock)
+      const stops = [
+        [0.00, "#7c6850"], // Üst humus & alüvyon
+        [0.06, "#8d775d"],
+        [0.07, "#a68f72"], // İnce kumtaşı
+        [0.14, "#b49c7e"],
+        [0.15, "#6b5e4f"], // Silttaşı
+        [0.22, "#786a59"],
+        [0.23, "#9c8569"], // Kalkerli marn
+        [0.30, "#a99276"],
+        [0.31, "#574e44"], // Koyu şist
+        [0.39, "#655b50"],
+        [0.40, "#8f6b47"], // Demir oksitli ince damar
+        [0.45, "#7d6f61"],
+        [0.54, "#8a7c6d"], // Kireçtaşı (Limestone)
+        [0.55, "#5c554d"],
+        [0.64, "#6b635a"], // Dolomitik katman
+        [0.65, "#4f5661"],
+        [0.76, "#434a54"], // Metamorfik temel geçişi
+        [0.77, "#363d47"],
+        [0.88, "#2c333d"], // Bazaltik kayaç
+        [1.00, "#1e2530"]  // Ana kayaç (Bedrock)
+      ];
+      for (let s = 0; s < stops.length; s++) {
+        grad.addColorStop(stops[s][0], stops[s][1]);
+      }
 
       ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 128, 512);
+      ctx.fillRect(0, 0, 256, 512);
 
-      // Gerçekçi tortul tabaka çizgileri ve tanecikler
-      for (let i = 0; i < 70; i++) {
-        const y = Math.random() * 512;
-        ctx.strokeStyle = Math.random() > 0.5 ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.18)";
-        ctx.lineWidth = 1 + Math.random() * 2;
+      // İnce ve sık yatay tortul tabaka çizgileri (mikro-stratigrafi)
+      for (let i = 0; i < 160; i++) {
+        const y = (i / 160) * 512 + (Math.random() - 0.5) * 2.5;
+        ctx.strokeStyle = i % 2 === 0 ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.15)";
+        ctx.lineWidth = 0.6 + Math.random() * 0.9;
         ctx.beginPath();
         ctx.moveTo(0, y);
-        ctx.lineTo(128, y + (Math.random() - 0.5) * 8);
+        ctx.lineTo(256, y + (Math.random() - 0.5) * 2.0);
         ctx.stroke();
       }
-      for (let i = 0; i < 3500; i++) {
-        ctx.fillStyle = Math.random() > 0.5 ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.14)";
-        ctx.fillRect(Math.random() * 128, Math.random() * 512, Math.random() * 3, Math.random() * 2);
+      // İnce mineral dokusu
+      for (let i = 0; i < 4500; i++) {
+        ctx.fillStyle = Math.random() > 0.5 ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.09)";
+        ctx.fillRect(Math.random() * 256, Math.random() * 512, 1.5, 1.0);
       }
 
       const tex = new THREE.CanvasTexture(canvas);
@@ -3816,10 +3841,10 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
 
     function updateSunPosition(hour) {
       if (!dirLight) return;
-      const angle = Math.PI * (hour - 6) / 12; // 06:00 doğu, 12:00 tepe, 18:00 batı
+      const angle = Math.PI * (hour - 6) / 12; // 06:00 doğu sabah ışığı, 12:00 tepe, 18:00 batı
       const posX = 130 * Math.cos(angle);
-      const posY = Math.max(20, 160 * Math.sin(angle));
-      const posZ = 80 * Math.sin(angle);
+      const posY = Math.max(30, 160 * Math.sin(angle));
+      const posZ = 36 + 60 * Math.sin(angle);
       dirLight.position.set(posX, posY, posZ);
     }
 
@@ -4078,11 +4103,21 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       return tex;
     }
 
+    // Gerçek yükselti farkına (ΔH = maxElev - minElev) duyarlı ve abartısız, doğal topoğrafik düşey ölçek hesaplayıcı
+    // Eski sabit 16 birim çarpanı (düz ovaları bile dik dağ gibi gösteren aşırı abartı) yerine 9.5 birim dengeli ölçek kullanır
+    function getEffectiveReliefScale(elevRange, exaggeration) {
+      const safeRange = Math.max(50, elevRange || 1000);
+      const reliefFactor = Math.min(1.12, Math.max(0.38, Math.pow(safeRange / 1800, 0.42)));
+      return 9.5 * reliefFactor * exaggeration;
+    }
+
     function buildOrganicBasinGeometry(elevationGrid, gridW, gridH, minElev, maxElev, dimensions, exaggeration, isInside) {
       const blockWidth = (dimensions && dimensions.width) ? dimensions.width : 100;
       const blockDepth = (dimensions && dimensions.depth) ? dimensions.depth : 100;
       const elevRange = Math.max(1, maxElev - minElev);
-      const baseBottomY = -8;
+      const reliefScale = getEffectiveReliefScale(elevRange, exaggeration);
+      // VR/AR ve 3B görünümde alt tabakaların kaba/iri durmaması için zarif ve orantılı kaide tabanı (y = 0.2 -> min yüzey 3.0 = 2.8 birim ince kaide)
+      const baseBottomY = 0.2;
 
       const qw = gridW - 1;
       const qh = gridH - 1;
@@ -4109,7 +4144,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
           const px = ((gx / qw) - 0.5) * blockWidth;
           const elev = elevationGrid[gy * gridW + gx];
           const normalized = Math.max(0, Math.min(1, (elev - minElev) / elevRange));
-          const py = (normalized * 16 * exaggeration) + 3;
+          const py = (normalized * reliefScale) + 3;
           const vIdx = (gy * gridW + gx) * 3;
           vertPositions[vIdx] = px;
           vertPositions[vIdx + 1] = py;
@@ -4204,45 +4239,55 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
           bottomNormals.push(0, -1, 0,  0, -1, 0,  0, -1, 0);
           bottomUvs.push(...uvNE, ...uvSE, ...uvSW);
 
-          // 3. Organik Yan Duvarlar (Sınır kenarlarından tabana inen dik jeolojik yarlar)
+          // 3. Organik Yan Duvarlar (Sınır kenarlarından tabana inen ince, yatay stratigrafik jeolojik kesit duvarları)
+          const uX0 = (x / qw) * 4.0;
+          const uX1 = ((x + 1) / qw) * 4.0;
+          const uZ0 = (y / qh) * 4.0;
+          const uZ1 = ((y + 1) / qh) * 4.0;
+          const maxWallSpan = Math.max(5.5, reliefScale + 3.0);
+          const vNW = Math.max(0.05, Math.min(1.0, (pNW[1] - baseBottomY) / maxWallSpan));
+          const vNE = Math.max(0.05, Math.min(1.0, (pNE[1] - baseBottomY) / maxWallSpan));
+          const vSW = Math.max(0.05, Math.min(1.0, (pSW[1] - baseBottomY) / maxWallSpan));
+          const vSE = Math.max(0.05, Math.min(1.0, (pSE[1] - baseBottomY) / maxWallSpan));
+
           // Kuzey Kenar (-Z)
           if (y === 0 || !isInside[(y - 1) * qw + x]) {
             wallPositions.push(...pNW, ...pNE, ...bNW);
             wallNormals.push(0, 0, -1,  0, 0, -1,  0, 0, -1);
-            wallUvs.push(0, 1,  1, 1,  0, 0);
+            wallUvs.push(uX0, vNW,  uX1, vNE,  uX0, 0);
             wallPositions.push(...pNE, ...bNE, ...bNW);
             wallNormals.push(0, 0, -1,  0, 0, -1,  0, 0, -1);
-            wallUvs.push(1, 1,  1, 0,  0, 0);
+            wallUvs.push(uX1, vNE,  uX1, 0,  uX0, 0);
           }
 
           // Güney Kenar (+Z)
           if (y === qh - 1 || !isInside[(y + 1) * qw + x]) {
             wallPositions.push(...pSE, ...pSW, ...bSE);
             wallNormals.push(0, 0, 1,  0, 0, 1,  0, 0, 1);
-            wallUvs.push(0, 1,  1, 1,  0, 0);
+            wallUvs.push(uX1, vSE,  uX0, vSW,  uX1, 0);
             wallPositions.push(...pSW, ...bSW, ...bSE);
             wallNormals.push(0, 0, 1,  0, 0, 1,  0, 0, 1);
-            wallUvs.push(1, 1,  1, 0,  0, 0);
+            wallUvs.push(uX0, vSW,  uX0, 0,  uX1, 0);
           }
 
           // Doğu Kenar (+X)
           if (x === qw - 1 || !isInside[y * qw + (x + 1)]) {
             wallPositions.push(...pNE, ...pSE, ...bNE);
             wallNormals.push(1, 0, 0,  1, 0, 0,  1, 0, 0);
-            wallUvs.push(0, 1,  1, 1,  0, 0);
+            wallUvs.push(uZ0, vNE,  uZ1, vSE,  uZ0, 0);
             wallPositions.push(...pSE, ...bSE, ...bNE);
             wallNormals.push(1, 0, 0,  1, 0, 0,  1, 0, 0);
-            wallUvs.push(1, 1,  1, 0,  0, 0);
+            wallUvs.push(uZ1, vSE,  uZ1, 0,  uZ0, 0);
           }
 
           // Batı Kenar (-X)
           if (x === 0 || !isInside[y * qw + (x - 1)]) {
             wallPositions.push(...pSW, ...pNW, ...bSW);
             wallNormals.push(-1, 0, 0,  -1, 0, 0,  -1, 0, 0);
-            wallUvs.push(0, 1,  1, 1,  0, 0);
+            wallUvs.push(uZ1, vSW,  uZ0, vNW,  uZ1, 0);
             wallPositions.push(...pNW, ...bNW, ...bSW);
             wallNormals.push(-1, 0, 0,  -1, 0, 0,  -1, 0, 0);
-            wallUvs.push(1, 1,  1, 0,  0, 0);
+            wallUvs.push(uZ0, vNW,  uZ0, 0,  uZ1, 0);
           }
         }
       }
@@ -4357,8 +4402,9 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
 
       const blockWidth = (dimensions && dimensions.width) ? dimensions.width : 100;
       const blockDepth = (dimensions && dimensions.depth) ? dimensions.depth : 100;
-      const blockBaseThickness = 12;
+      const blockBaseThickness = 3.2;
       const elevRange = Math.max(1, maxElev - minElev);
+      const reliefScale = getEffectiveReliefScale(elevRange, exaggeration);
 
       // Jeolojik taban dokusu oluştur
       if (!strataTexture) {
@@ -4492,11 +4538,11 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
 
               const elev = elevationGrid[gy * gridW + gx];
               const normalized = Math.max(0, Math.min(1, (elev - minElev) / elevRange));
-              const height = (normalized * 16 * exaggeration) + 3;
+              const height = (normalized * reliefScale) + 3;
               pos.setY(i, height);
             }
           } else {
-            pos.setY(i, -8);
+            pos.setY(i, 0.2);
           }
         }
         boxGeom.computeVertexNormals();
@@ -4574,7 +4620,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         const gy = Math.min(gridH - 1, Math.max(0, Math.round(((rz / blockDepth) + 0.5) * (gridH - 1))));
         const cellElev = elevationGrid ? elevationGrid[gy * gridW + gx] : minElev;
         const normH = Math.max(0, Math.min(1, (cellElev - minElev) / elevRange));
-        const groundY = (normH * 16 * exaggeration) + 3.1;
+        const groundY = (normH * reliefScale) + 3.1;
 
         const ry = groundY + 4 + Math.random() * 44;
         const dropLen = 1.9 + Math.random() * 1.6;
@@ -4645,7 +4691,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
 
           const elev = elevationGrid[gy * gridW + gx];
           const normalized = Math.max(0, (elev - minElev) / elevRange);
-          const py = (normalized * 16 * exaggeration) + 3;
+          const py = (normalized * reliefScale) + 3;
 
           const px = ((gx / (gridW - 1)) - 0.5) * blockWidth;
           const pz = ((gy / (gridH - 1)) - 0.5) * blockDepth;
@@ -4766,18 +4812,19 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       const blockDepth = (dimensions && dimensions.depth) ? dimensions.depth : 100;
       const elevRange = Math.max(1, maxElev - minElev);
       const exaggeration = parseFloat(document.getElementById('three-slider-exaggeration').value) || 1.0;
+      const reliefScale = getEffectiveReliefScale(elevRange, exaggeration);
 
       const qw = Math.max(1, gridW - 1);
       const qh = Math.max(1, gridH - 1);
 
       let sourceItems = [];
-      let mainColorHex = 0xf43f5e;
-      let casingColorHex = 0x3b0714;
+      let mainColorHex = 0xd96b43;
+      let casingColorHex = 0x3b180e;
 
       if (active3DBoundaryMode === 'basin') {
         sourceItems = allBasinItems || [];
-        mainColorHex = 0xf43f5e;   // Mercan Kırmızısı (Su Bölümü Sınırı - Mavi Akarsulardan Tamamen Ayrı!)
-        casingColorHex = 0x3b0714; // Koyu Bordo Kontur
+        mainColorHex = 0xd96b43;   // Topoğrafik Kiremit / Bakır Kızılı (Su Bölümü Sınırı - Mavi Akarsulardan Tamamen Ayrı ve Profesyonel!)
+        casingColorHex = 0x3b180e; // Koyu Kahve-Bordo Kontur
       } else if (active3DBoundaryMode === 'province') {
         sourceItems = allProvinceItems || [];
         mainColorHex = 0xfbbf24;   // Altın Kehribar
@@ -4818,7 +4865,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         const e11 = elevationGrid[y1 * gridW + x1];
         const elev = (e00 * (1 - fx) + e10 * fx) * (1 - fy) + (e01 * (1 - fx) + e11 * fx) * fy;
         const norm = Math.max(0, Math.min(1, (elev - minElev) / elevRange));
-        return (norm * 16 * exaggeration) + 3;
+        return (norm * reliefScale) + 3;
       };
 
       // Sınır Kesimi modunda kenar/iç hücre kontrolü (1 hücre komşuluk toleranslı, böylece dış sınır da çizilir)
@@ -4979,6 +5026,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       const blockDepth = (dimensions && dimensions.depth) ? dimensions.depth : 100;
       const elevRange = Math.max(1, maxElev - minElev);
       const exaggeration = parseFloat(document.getElementById('three-slider-exaggeration').value) || 1.0;
+      const reliefScale = getEffectiveReliefScale(elevRange, exaggeration);
 
       let bMinX = 26, bMinY = 36, bMaxX = 45, bMaxY = 42;
       if (bounds && bounds.length === 4) {
@@ -5002,7 +5050,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         const e11 = elevationGrid[y1 * gridW + x1];
         const elev = (e00 * (1 - fx) + e10 * fx) * (1 - fy) + (e01 * (1 - fx) + e11 * fx) * fy;
         const norm = Math.max(0, Math.min(1, (elev - minElev) / elevRange));
-        return (norm * 16 * exaggeration) + 3;
+        return (norm * reliefScale) + 3;
       };
 
       const isUVInside = (u, v) => {
@@ -5599,7 +5647,9 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         waterMesh.visible = true;
         // Biriken suya göre su seviyesini vadi yataklarından yukarı yükselt
         floodRatio = Math.min(1.0, totalWater / 2400); // 2400 kg/m² max taşkın eşiği
-        const targetY = 2 + (floodRatio * 13 * exaggeration);
+        const elevRange = currentModelData ? Math.max(1, (currentModelData.maxElev || 1000) - (currentModelData.minElev || 0)) : 1500;
+        const reliefScale = getEffectiveReliefScale(elevRange, exaggeration);
+        const targetY = 2.4 + (floodRatio * reliefScale * 0.82);
         waterMesh.userData.baseY = targetY;
         waterMesh.position.y = targetY;
       } else {
@@ -6483,7 +6533,7 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
     document.getElementById('btn-tex-relief').addEventListener('click', () => setTextureMode('relief'));
 
     // ==========================================
-    // STL VE OBJ İNDİRME İŞLEMLERİ
+    // BLENDER TAM SAHNE (.GLB), STL VE OBJ İNDİRME İŞLEMLERİ
     // ==========================================
     function saveFile(blob, filename) {
       const link = document.createElement('a');
@@ -6493,6 +6543,471 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(link.href);
+    }
+
+    // Dokunun GLTFExporter tarafından kayıpsız gömülebilmesi için temiz CanvasTexture kopyası üretir
+    function cloneTextureWithCanvasImage(srcTex) {
+      if (!srcTex || !srcTex.image) return null;
+      try {
+        const img = srcTex.image;
+        const w = Math.max(2, img.width || img.videoWidth || 512);
+        const h = Math.max(2, img.height || img.videoHeight || 512);
+        const c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        const ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const outTex = new THREE.CanvasTexture(c);
+        outTex.wrapS = srcTex.wrapS || THREE.ClampToEdgeWrapping;
+        outTex.wrapT = srcTex.wrapT || THREE.ClampToEdgeWrapping;
+        outTex.flipY = false; // glTF 2.0 standardında flipY = false beklenir; UV'leri buna göre eşleştiriyoruz
+        outTex.needsUpdate = true;
+        return outTex;
+      } catch (e) {
+        return srcTex;
+      }
+    }
+
+    // Three.js LineSegments (akarsular, sınırlar, drenaj kolları) verisini Blender'da tüm modlarda (Solid, Material Preview, Eevee, Cycles)
+    // doğrudan 3B hacimli ve renkli görünen üçgen şerit (3D Ribbon Mesh) geometrisine dönüştürür
+    function convertLineSegmentsToBlenderRibbonMesh(lineSegs, meshName, halfWidth, yOffset, colorHex, emissiveHex = 0x000000, opacity = 1.0) {
+      if (!lineSegs || !lineSegs.geometry || !lineSegs.geometry.attributes.position) return null;
+      const posAttr = lineSegs.geometry.attributes.position;
+      const count = posAttr.count;
+      if (count < 2) return null;
+
+      const segCount = Math.floor(count / 2);
+      const positions = new Float32Array(segCount * 18); // Her çizgi segmenti için 2 üçgen (6 köşe * 3 = 18 float)
+      const normals = new Float32Array(segCount * 18);
+      let ptr = 0;
+
+      for (let i = 0; i < count - 1; i += 2) {
+        const xA = posAttr.getX(i),     yA = posAttr.getY(i) + yOffset,     zA = posAttr.getZ(i);
+        const xB = posAttr.getX(i + 1), yB = posAttr.getY(i + 1) + yOffset, zB = posAttr.getZ(i + 1);
+
+        const dx = xB - xA;
+        const dy = yB - yA;
+        const dz = zB - zA;
+        const horizLen = Math.hypot(dx, dz);
+
+        let nx = 0, ny = 0, nz = 0;
+        let upX = 0, upY = 1, upZ = 0;
+
+        if (horizLen > 1e-4) {
+          nx = (-dz / horizLen) * halfWidth;
+          nz = (dx / horizLen) * halfWidth;
+        } else {
+          // Düşey yağmur damlası izleri için yatay şerit genişliği
+          nx = halfWidth;
+          nz = halfWidth * 0.5;
+          upX = 0; upY = 0; upZ = 1;
+        }
+
+        const p0x = xA - nx, p0y = yA, p0z = zA - nz;
+        const p1x = xA + nx, p1y = yA, p1z = zA + nz;
+        const p2x = xB + nx, p2y = yB, p2z = zB + nz;
+        const p3x = xB - nx, p3y = yB, p3z = zB - nz;
+
+        // Üçgen 1: p0 -> p1 -> p2
+        positions[ptr]     = p0x; positions[ptr + 1] = p0y; positions[ptr + 2] = p0z;
+        positions[ptr + 3] = p1x; positions[ptr + 4] = p1y; positions[ptr + 5] = p1z;
+        positions[ptr + 6] = p2x; positions[ptr + 7] = p2y; positions[ptr + 8] = p2z;
+        // Üçgen 2: p0 -> p2 -> p3
+        positions[ptr + 9]  = p0x; positions[ptr + 10] = p0y; positions[ptr + 11] = p0z;
+        positions[ptr + 12] = p2x; positions[ptr + 13] = p2y; positions[ptr + 14] = p2z;
+        positions[ptr + 15] = p3x; positions[ptr + 16] = p3y; positions[ptr + 17] = p3z;
+
+        for (let k = 0; k < 18; k += 3) {
+          normals[ptr + k]     = upX;
+          normals[ptr + k + 1] = upY;
+          normals[ptr + k + 2] = upZ;
+        }
+        ptr += 18;
+      }
+
+      if (ptr === 0) return null;
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.BufferAttribute(positions.subarray(0, ptr), 3));
+      geom.setAttribute('normal', new THREE.BufferAttribute(normals.subarray(0, ptr), 3));
+
+      const mat = new THREE.MeshStandardMaterial({
+        color: colorHex,
+        emissive: emissiveHex,
+        emissiveIntensity: emissiveHex ? 0.28 : 0.0,
+        roughness: 0.35,
+        metalness: 0.05,
+        transparent: opacity < 0.99,
+        opacity: opacity,
+        side: THREE.DoubleSide
+      });
+
+      const mesh = new THREE.Mesh(geom, mat);
+      mesh.name = meshName;
+      return mesh;
+    }
+
+    // Çoklu malzemeli (multi-material) arazi geometrisini Blender için ayrı ve temiz tekil malzemeli alt Mesh'lere ayırır
+    function buildBlenderTerrainGroup(srcTerrainMesh) {
+      const terrainExportGroup = new THREE.Group();
+      terrainExportGroup.name = '1_Arazi_Modeli_ve_Jeolojik_Kaide_3B';
+
+      if (!srcTerrainMesh) return terrainExportGroup;
+
+      // Eğer özel yüklenmiş bir modelse doğrudan klonla
+      if (!srcTerrainMesh.geometry || !Array.isArray(srcTerrainMesh.material)) {
+        const cloned = srcTerrainMesh.clone();
+        cloned.name = 'Arazi_Modeli_Ana_Govde';
+        terrainExportGroup.add(cloned);
+        return terrainExportGroup;
+      }
+
+      // İndeksli geometri ise (örn. BoxGeometry) non-indexed hale getir ki grup dilimleri tam üçgen sınırlarına otursun
+      const baseGeom = srcTerrainMesh.geometry.index
+        ? srcTerrainMesh.geometry.toNonIndexed()
+        : srcTerrainMesh.geometry.clone();
+
+      const groups = (srcTerrainMesh.geometry.groups && srcTerrainMesh.geometry.groups.length > 0)
+        ? srcTerrainMesh.geometry.groups
+        : [{ start: 0, count: baseGeom.attributes.position.count, materialIndex: 0 }];
+
+      const posAttr = baseGeom.attributes.position;
+      const normAttr = baseGeom.attributes.normal;
+      const uvAttr = baseGeom.attributes.uv;
+
+      // Malzeme indeksine göre üçgenleri birleştir (Üst Arazi Yüzeyi, Alt Taban Kaidesi, Jeolojik Yan Duvarlar)
+      const buckets = new Map();
+      for (let g = 0; g < groups.length; g++) {
+        const grp = groups[g];
+        const mIdx = grp.materialIndex || 0;
+        if (!buckets.has(mIdx)) {
+          buckets.set(mIdx, { pos: [], norm: [], uv: [] });
+        }
+        const b = buckets.get(mIdx);
+        const end = Math.min(posAttr.count, grp.start + grp.count);
+        for (let i = grp.start; i < end; i++) {
+          b.pos.push(posAttr.getX(i), posAttr.getY(i), posAttr.getZ(i));
+          if (normAttr) {
+            b.norm.push(normAttr.getX(i), normAttr.getY(i), normAttr.getZ(i));
+          } else {
+            b.norm.push(0, 1, 0);
+          }
+          if (uvAttr) {
+            // glTF flipY=false uyumu için V koordinatını (1 - v) olarak kaydet
+            b.uv.push(uvAttr.getX(i), 1.0 - uvAttr.getY(i));
+          } else {
+            b.uv.push(0, 0);
+          }
+        }
+      }
+
+      buckets.forEach((b, mIdx) => {
+        if (b.pos.length === 0) return;
+        const subGeom = new THREE.BufferGeometry();
+        subGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(b.pos), 3));
+        subGeom.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(b.norm), 3));
+        subGeom.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(b.uv), 2));
+
+        const origMat = srcTerrainMesh.material[mIdx] || srcTerrainMesh.material[0];
+        let partName = `Arazi_Bolumu_${mIdx}`;
+        if (currentClipMode === 'organic') {
+          if (mIdx === 0) partName = 'Arazi_Ust_Topografik_Yuzey';
+          else if (mIdx === 1) partName = 'Arazi_Alt_Taban_Kaidesi';
+          else if (mIdx === 2) partName = 'Arazi_Jeolojik_Yan_Tabakalar';
+        } else {
+          if (mIdx === 2) partName = 'Arazi_Ust_Topografik_Yuzey';
+          else if (mIdx === 3) partName = 'Arazi_Alt_Taban_Kaidesi';
+          else partName = `Arazi_Jeolojik_Yan_Tabaka_${mIdx}`;
+        }
+
+        const clonedTex = origMat && origMat.map ? cloneTextureWithCanvasImage(origMat.map) : null;
+        const cleanMat = new THREE.MeshStandardMaterial({
+          name: `${partName}_Materyal`,
+          map: clonedTex,
+          color: origMat && origMat.color ? origMat.color.clone() : new THREE.Color(0xffffff),
+          roughness: origMat && typeof origMat.roughness === 'number' ? origMat.roughness : 0.65,
+          metalness: origMat && typeof origMat.metalness === 'number' ? origMat.metalness : 0.05,
+          side: THREE.DoubleSide
+        });
+
+        const subMesh = new THREE.Mesh(subGeom, cleanMat);
+        subMesh.name = partName;
+        terrainExportGroup.add(subMesh);
+      });
+
+      return terrainExportGroup;
+    }
+
+    // 3B Sahneyi Tüm Özellikleriyle (4K Doku + Jeolojik Yan Kesit + 3B Akarsular ve Yan Kollar + Sınırlar + Şehir Pinleri ve 3B İsim Levhaları + Taşkın Suyu)
+    // Blender için Tek Dosya Binary glTF 2.0 (.GLB) Formatında Dışa Aktarır
+    function exportFullSceneToBlenderGLB() {
+      if (!solidBlockGroup || !terrainMesh || !currentModelData) {
+        alert('Lütfen önce bir havza, il veya ilçe seçerek 3B modeli oluşturun.');
+        return;
+      }
+      if (typeof THREE.GLTFExporter === 'undefined') {
+        alert('GLTFExporter modülü yüklenemedi. Lütfen internet bağlantınızı kontrol edin.');
+        return;
+      }
+
+      try {
+        showStatus('Blender Tam 3B Sahne (.GLB) hazırlanıyor: Dokular, Akarsular, Sınırlar ve Etiketler paketleniyor...');
+        setTimeout(() => {
+          try {
+            const exportRoot = new THREE.Group();
+            const safeUnitName = (currentModelData.basinName || 'TERRASKOP_XR_Havza').replace(/\s+/g, '_');
+            exportRoot.name = `TERRASKOP_XR_${safeUnitName}`;
+
+            // 1. ARAZİ MODELİ VE JEOLOJİK YAN TABAKALAR (Dokuları doğrudan .GLB içine gömülü)
+            const terrainGroup = buildBlenderTerrainGroup(terrainMesh);
+            exportRoot.add(terrainGroup);
+
+            // 2. AKTİF SINIR ÇİZGİLERİ (Havza / İl / İlçe -> Blender'da net görünen 3B Şerit Mesh)
+            const srcBoundaryGroup = solidBlockGroup.getObjectByName('BoundaryLines3DGroup');
+            if (srcBoundaryGroup && active3DBoundaryMode !== 'none') {
+              const boundExportGroup = new THREE.Group();
+              const boundTypeTag = active3DBoundaryMode === 'basin'
+                ? 'Havza_Siniri_Kiremit'
+                : (active3DBoundaryMode === 'province' ? 'Il_Siniri_Sari' : 'Ilce_Siniri_Mor');
+              boundExportGroup.name = `2_Sinir_Cizgileri_${boundTypeTag}_3B`;
+
+              let bIdx = 0;
+              srcBoundaryGroup.children.forEach((child) => {
+                if (child.isLineSegments) {
+                  const isCore = bIdx === 1;
+                  const colHex = child.material && child.material.color ? child.material.color.getHex() : (isCore ? 0xd96b43 : 0x3b180e);
+                  const ribbon = convertLineSegmentsToBlenderRibbonMesh(
+                    child,
+                    isCore ? `${boundTypeTag}_Ust_Serit` : `${boundTypeTag}_Alt_Kontur`,
+                    isCore ? 0.24 : 0.38,
+                    isCore ? 0.08 : 0.02,
+                    colHex,
+                    isCore ? colHex : 0x000000,
+                    1.0
+                  );
+                  if (ribbon) boundExportGroup.add(ribbon);
+                  bIdx++;
+                }
+              });
+
+              if (boundExportGroup.children.length > 0) {
+                exportRoot.add(boundExportGroup);
+              }
+            }
+
+            // 3. AKARSU VE DRENAJ AĞLARI (Ana CBS Akarsuları + DEM D8 Yan Kolları + 3B Nehir İsim Levhaları)
+            const srcRiversGroup = solidBlockGroup.getObjectByName('Rivers3DGroup');
+            if (srcRiversGroup && show3DRivers && riverBranchDensity > 0) {
+              const riversExportGroup = new THREE.Group();
+              riversExportGroup.name = `3_Akarsu_ve_Drenaj_Agi_Kademe_${riverBranchDensity}_3B`;
+
+              srcRiversGroup.children.forEach((child, idx) => {
+                if (child.isLineSegments) {
+                  const colHex = child.material && child.material.color ? child.material.color.getHex() : 0x00b4d8;
+                  let layerTitle = `Akarsu_Katmani_${idx}`;
+                  let halfW = 0.20;
+                  let yOff = 0.05;
+                  let emHex = 0x0077b6;
+
+                  if (colHex === 0x041e3a) {
+                    layerTitle = 'Ana_Akarsu_Yatagi_Kontur';
+                    halfW = 0.34;
+                    yOff = 0.01;
+                    emHex = 0x000000;
+                  } else if (colHex === 0x7dd3fc) {
+                    layerTitle = `Yan_Drenaj_Kollari_D8_Kademe_${riverBranchDensity}`;
+                    halfW = 0.16;
+                    yOff = 0.04;
+                    emHex = 0x0284c7;
+                  } else {
+                    layerTitle = 'Ana_Akarsular_CBS_Mavi';
+                    halfW = 0.24;
+                    yOff = 0.07;
+                    emHex = 0x00b4d8;
+                  }
+
+                  const ribbon = convertLineSegmentsToBlenderRibbonMesh(child, layerTitle, halfW, yOff, colHex, emHex, 1.0);
+                  if (ribbon) riversExportGroup.add(ribbon);
+                } else if (child.isSprite && child.material && child.material.map) {
+                  // Nehir isim etiketini (Sprite) Blender için 3B Dokulu Plaka (PlaneGeometry) Mesh'e dönüştür
+                  const labelTex = cloneTextureWithCanvasImage(child.material.map);
+                  const w = child.scale.x || 8.6;
+                  const h = child.scale.y || 2.0;
+                  const planeGeom = new THREE.PlaneGeometry(w, h);
+                  // flipY=false dokusu için PlaneGeometry UV'lerini düzelt
+                  const uvA = planeGeom.attributes.uv;
+                  for (let u = 0; u < uvA.count; u++) {
+                    uvA.setY(u, 1.0 - uvA.getY(u));
+                  }
+                  const planeMat = new THREE.MeshStandardMaterial({
+                    map: labelTex,
+                    transparent: true,
+                    roughness: 0.4,
+                    metalness: 0.0,
+                    side: THREE.DoubleSide
+                  });
+                  const labelMesh = new THREE.Mesh(planeGeom, planeMat);
+                  labelMesh.position.copy(child.position);
+                  labelMesh.rotation.x = -0.35; // Blender'da hem üstten hem karşıdan rahat okunması için hafif eğimli
+                  labelMesh.name = `Akarsu_Isim_Etiketi_${idx}`;
+                  riversExportGroup.add(labelMesh);
+                }
+              });
+
+              if (riversExportGroup.children.length > 0) {
+                exportRoot.add(riversExportGroup);
+              }
+            }
+
+            // 4. ŞEHİR MERKEZLERİ, NÜFUS PİNLERİ VE 3B İSİM LEVHALARI
+            const srcCitiesGroup = solidBlockGroup.getObjectByName('CityPinsGroup');
+            if (srcCitiesGroup && show3DCitiesPins && srcCitiesGroup.children.length > 0) {
+              const citiesExportGroup = new THREE.Group();
+              citiesExportGroup.name = '4_Sehir_Merkezleri_ve_Nufus_Pinleri_3B';
+
+              srcCitiesGroup.children.forEach((pinGroup, pIdx) => {
+                const clonedPinGroup = new THREE.Group();
+                clonedPinGroup.name = `Sehir_Merkezi_Pini_${pIdx + 1}`;
+                clonedPinGroup.position.copy(pinGroup.position);
+
+                pinGroup.children.forEach((part) => {
+                  if (part.isMesh) {
+                    const mClone = new THREE.Mesh(
+                      part.geometry.clone(),
+                      part.material.clone()
+                    );
+                    mClone.position.copy(part.position);
+                    mClone.rotation.copy(part.rotation);
+                    mClone.scale.copy(part.scale);
+                    mClone.name = part.geometry.type === 'SphereGeometry' ? 'Sehir_Zumrut_Kure' : 'Sehir_Pin_Govdesi';
+                    clonedPinGroup.add(mClone);
+                  } else if (part.isSprite && part.material && part.material.map) {
+                    const cTex = cloneTextureWithCanvasImage(part.material.map);
+                    const w = part.scale.x || 9.5;
+                    const h = part.scale.y || 2.8;
+                    const pGeom = new THREE.PlaneGeometry(w, h);
+                    const uvA = pGeom.attributes.uv;
+                    for (let u = 0; u < uvA.count; u++) {
+                      uvA.setY(u, 1.0 - uvA.getY(u));
+                    }
+                    const pMat = new THREE.MeshStandardMaterial({
+                      map: cTex,
+                      transparent: true,
+                      roughness: 0.35,
+                      metalness: 0.0,
+                      side: THREE.DoubleSide
+                    });
+                    const boardMesh = new THREE.Mesh(pGeom, pMat);
+                    boardMesh.position.copy(part.position);
+                    boardMesh.rotation.x = -0.35;
+                    boardMesh.name = `Sehir_Isim_ve_Nufus_Levhasi_${pIdx + 1}`;
+                    clonedPinGroup.add(boardMesh);
+                  }
+                });
+
+                citiesExportGroup.add(clonedPinGroup);
+              });
+
+              exportRoot.add(citiesExportGroup);
+            }
+
+            // 5. TAŞKIN SUYU YÜZEYİ VE YAĞIŞ AKIŞI (Aktifse doğrudan kendi yüksekliğinde, kapalıysa da Blender'da açılabilir katman olarak)
+            if (waterMesh && waterMesh.geometry) {
+              const waterGeomClone = waterMesh.geometry.index
+                ? waterMesh.geometry.toNonIndexed()
+                : waterMesh.geometry.clone();
+              const waterMatClone = new THREE.MeshStandardMaterial({
+                name: 'Taskin_Suyu_Materyali',
+                color: waterColorHex || 0x0284c7,
+                emissive: waterEmissiveHex || 0x0369a1,
+                emissiveIntensity: 0.25,
+                roughness: 0.15,
+                metalness: 0.1,
+                transparent: true,
+                opacity: floodSimActive ? waterOpacity : 0.65,
+                side: THREE.DoubleSide
+              });
+              const exportedWater = new THREE.Mesh(waterGeomClone, waterMatClone);
+              exportedWater.name = floodSimActive ? '5_Taskin_Suyu_Katmani_AKTIF' : '5_Taskin_Suyu_Katmani_Opsiyonel';
+              exportedWater.position.set(0, floodSimActive ? waterMesh.position.y : 2.2, 0);
+              exportRoot.add(exportedWater);
+            }
+
+            // 6. YÜZEY AKIŞI VE YAĞMUR İZLERİ (Eğer Yağış Parçacıkları & Yüzey Akışı açıksa 3B şerit olarak ekle)
+            if (rainParticlesActive) {
+              const rainExportGroup = new THREE.Group();
+              rainExportGroup.name = '6_Yagis_ve_Yuzey_Akisi_3B';
+
+              const srcRunoff = solidBlockGroup.getObjectByName('SurfaceRunoff3DGroup');
+              if (srcRunoff && srcRunoff.isLineSegments) {
+                const runoffRibbon = convertLineSegmentsToBlenderRibbonMesh(
+                  srcRunoff,
+                  'Vadi_Yuzey_Akisi_Ok_Hatlari',
+                  0.22,
+                  0.10,
+                  0x38bdf8,
+                  0x0ea5e9,
+                  0.92
+                );
+                if (runoffRibbon) rainExportGroup.add(runoffRibbon);
+              }
+
+              if (rainParticles && rainParticles.isLineSegments) {
+                const rainRibbon = convertLineSegmentsToBlenderRibbonMesh(
+                  rainParticles,
+                  'Yagmur_Damlasi_Su_Izleri',
+                  0.08,
+                  0.0,
+                  0xbae6fd,
+                  0x38bdf8,
+                  0.75
+                );
+                if (rainRibbon) rainExportGroup.add(rainRibbon);
+              }
+
+              if (rainExportGroup.children.length > 0) {
+                exportRoot.add(rainExportGroup);
+              }
+            }
+
+            exportRoot.updateMatrixWorld(true);
+
+            const gltfExporter = new THREE.GLTFExporter();
+            gltfExporter.parse(
+              exportRoot,
+              (result) => {
+                const clipTag = currentClipMode === 'organic' ? 'sinir_kesimi' : 'dikdortgen_blok';
+                const texTag = currentTexMode || 'uydu';
+                if (result instanceof ArrayBuffer) {
+                  const blob = new Blob([result], { type: 'model/gltf-binary' });
+                  saveFile(blob, `${safeUnitName}_${clipTag}_${texTag}_Blender_Tam_3B_Sahne.glb`);
+                } else {
+                  const jsonStr = JSON.stringify(result);
+                  const blob = new Blob([jsonStr], { type: 'application/json' });
+                  saveFile(blob, `${safeUnitName}_${clipTag}_${texTag}_Blender_Tam_3B_Sahne.gltf`);
+                }
+                hideStatus();
+              },
+              { binary: true, embedImages: true, onlyVisible: false }
+            );
+          } catch (innerErr) {
+            console.error(innerErr);
+            hideStatus();
+            alert('Blender .GLB dışa aktarma hatası: ' + innerErr.message);
+          }
+        }, 120);
+      } catch (err) {
+        hideStatus();
+        alert('Blender dışa aktarma hatası: ' + err.message);
+      }
+    }
+
+    const btnExportGlb = document.getElementById('btn-export-glb');
+    if (btnExportGlb) {
+      btnExportGlb.addEventListener('click', exportFullSceneToBlenderGLB);
+    }
+    const btnExportGlbQuick = document.getElementById('btn-export-glb-quick');
+    if (btnExportGlbQuick) {
+      btnExportGlbQuick.addEventListener('click', exportFullSceneToBlenderGLB);
     }
 
     // STL İndir (3D Yazıcılar İçin Katı Blok STL)
@@ -6787,10 +7302,10 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       // Satır 2: 3B Arazi Üzerinde Sınır Çizimi (Akarsulardan Tamamen Farklı Renklerle Kodlanmış!)
       {
         id: 'bound_basin',
-        label: 'Havza Sınırı (Kırmızı)',
+        label: 'Havza Sınırı (Kiremit)',
         x: 28, y: 238, w: 486, h: 98,
-        accentColor: '#f43f5e',
-        activeBg: '#be123c',
+        accentColor: '#d96b43',
+        activeBg: '#9a3412',
         isActive: () => active3DBoundaryMode === 'basin'
       },
       {
@@ -7214,11 +7729,11 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
       // Sağ Üst Aktif Sınır Özeti Rozeti
       ctx.textAlign = 'right';
       const activeBoundText = active3DBoundaryMode === 'basin'
-        ? 'Aktif Sınır: HAVZA SINIRI (KIRMIZI)'
+        ? 'Aktif Sınır: HAVZA SINIRI (KİREMİT)'
         : (active3DBoundaryMode === 'province'
           ? 'Aktif Sınır: İL SINIRI (ALTIN SARISI)'
           : (active3DBoundaryMode === 'district' ? 'Aktif Sınır: İLÇE SINIRI (MOR)' : 'Aktif Sınır: GİZLİ'));
-      ctx.fillStyle = active3DBoundaryMode === 'basin' ? '#fda4af' : (active3DBoundaryMode === 'province' ? '#fde047' : (active3DBoundaryMode === 'district' ? '#d8b4fe' : '#94a3b8'));
+      ctx.fillStyle = active3DBoundaryMode === 'basin' ? '#fdba74' : (active3DBoundaryMode === 'province' ? '#fde047' : (active3DBoundaryMode === 'district' ? '#d8b4fe' : '#94a3b8'));
       ctx.font = 'bold 25px "Segoe UI", Arial, sans-serif';
       ctx.fillText(activeBoundText, W - 54, 1232);
 
@@ -7239,11 +7754,11 @@ window.TR_LOCAL_AKARSULAR = {"type":"FeatureCollection","features":[{"type":"Fea
         ctx.restore();
       };
 
-      // 1) Havza Sınırı (Mercan Kırmızısı)
+      // 1) Havza Sınırı (Topoğrafik Kiremit)
       drawLegendSwatch(
         54, 1290, 46, 18,
-        '#f43f5e', '#fecdd3',
-        active3DBoundaryMode === 'basin' ? 'Havza Sınırı (Kırmızı • AÇIK)' : 'Havza Sınırı (Kırmızı)',
+        '#d96b43', '#fed7aa',
+        active3DBoundaryMode === 'basin' ? 'Havza Sınırı (Kiremit • AÇIK)' : 'Havza Sınırı (Kiremit)',
         active3DBoundaryMode !== 'basin'
       );
 
