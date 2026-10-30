@@ -3600,6 +3600,11 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       ctx.putImageData(imgData, 0, 0);
       const tex = new THREE.CanvasTexture(canvas);
       tex.generateMipmaps = true;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      if (renderer && renderer.capabilities) {
+        tex.anisotropy = renderer.capabilities.getMaxAnisotropy() || 16;
+      }
       return tex;
     }
 
@@ -5654,7 +5659,7 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
 
     // ==========================================
     // 4. META QUEST WEBXR PASSTHROUGH (AR) MODÜLÜ
-    //    + PROFESYONEL SÜRGÜLÜ (SLIDER) & TAŞINABİLİR 3B HOLOGRAFİK KONTROL PANELİ
+    //    + ULTRA-HD (2K), TİTREMEZ, İKONSUZ, BÜYÜK YAZILI & SÜRGÜLÜ 3B KONTROL PANELİ
     // ==========================================
     let xrRaycaster = new THREE.Raycaster();
     let xrHoveredBtnId = null;
@@ -5663,22 +5668,22 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
     let xrRecenterButtonCooldown = false;
     let xrSurfacePlacementMode = true;
 
-    // 3B Holografik Menü Konumlandırma & Taşıma Değişkenleri
+    // 3B Kontrol Paneli Sabitleme (World-Locked) Değişkenleri (Kafa hareketiyle titremeyi %100 engeller)
     let xrMenuAnchorMode = 'top'; // 'top' | 'left' | 'right' | 'custom'
-    let xrMenuCustomPos = new THREE.Vector3(0, 0.15, -0.82);
+    let xrMenuCustomPos = new THREE.Vector3(0, 0.15, -0.78);
     let xrMenuMoveMode = false;
     let xrDraggingMenuCtrl = null;
-    let xrDraggingMenuDist = 0.85;
+    let xrDraggingMenuDist = 0.80;
     let xrActiveDragSlider = null;
     let xrActiveDragCtrl = null;
     let xrLastTerrainRebuildTime = 0;
 
-    // 5 Adet Profesyonel Etkileşimli Sürgü Çubuğu (Slider Bar) Tanımı
+    // 5 Adet Büyük ve Net Sürgü Çubuğu (Slider Bar) Tanımı (Sıfır İkon, Büyük Okunaklı Türkçe Yazı)
     const XR_MENU_SLIDERS = [
       {
         id: 'slider_exag',
-        label: '⛰️ Düşey Yükselti Abartısı',
-        y: 392,
+        label: 'Yükselti Çarpanı',
+        y: 500,
         min: 0.4,
         max: 4.0,
         step: 0.2,
@@ -5695,7 +5700,7 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
           if (el) el.value = clamped.toFixed(1);
           if (lbl) lbl.textContent = clamped.toFixed(1) + (clamped === 1.0 ? 'x (Orijinal)' : 'x');
           const now = performance.now();
-          if (isFinal || now - xrLastTerrainRebuildTime > 140) {
+          if (isFinal || now - xrLastTerrainRebuildTime > 160) {
             xrLastTerrainRebuildTime = now;
             build3DTerrainBlock();
             setTextureMode(currentTexMode);
@@ -5704,8 +5709,8 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       },
       {
         id: 'slider_scale',
-        label: '📏 Harita Boyutu (Masa Ölçeği)',
-        y: 472,
+        label: 'Harita Boyutu',
+        y: 616,
         min: 0.0020,
         max: 0.0180,
         step: 0.0012,
@@ -5721,14 +5726,14 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       },
       {
         id: 'slider_water',
-        label: '🌊 Taşkın / Yağış Su Yükü',
-        y: 552,
+        label: 'Taşkın Su Yükü',
+        y: 732,
         min: 0,
         max: 100,
         step: 8,
         color: '#0ea5e9',
         getValue: () => floodSimActive ? rainIntensity : 0,
-        formatValue: (v) => floodSimActive ? `%${Math.round(v)}` : 'Kapalı (%0)',
+        formatValue: (v) => floodSimActive ? `%${Math.round(v)}` : 'Kapalı',
         setValue: (v) => {
           const pct = Math.max(0, Math.min(100, Math.round(v)));
           rainIntensity = pct;
@@ -5749,8 +5754,8 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       },
       {
         id: 'slider_opacity',
-        label: '💧 Su Görünürlüğü (Opaklık)',
-        y: 632,
+        label: 'Su Görünürlüğü',
+        y: 848,
         min: 15,
         max: 100,
         step: 8,
@@ -5771,8 +5776,8 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       },
       {
         id: 'slider_sun',
-        label: '☀️ Güneş Saati (Işık & Bakı)',
-        y: 712,
+        label: 'Güneş Saati',
+        y: 964,
         min: 6,
         max: 19,
         step: 1,
@@ -5793,86 +5798,91 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       }
     ];
 
-    // Sürgü Çubuğu (Slider) Yatay Koordinat Sabitleri (1440px Kanvas Üzerinde)
-    const SLIDER_MINUS_X = 468;
-    const SLIDER_BTN_W = 84;
-    const SLIDER_TRACK_X = 566;
-    const SLIDER_TRACK_W = 744;
-    const SLIDER_PLUS_X = 1324;
-    const SLIDER_ROW_H = 66;
+    // Sürgü Çubuğu (Slider) Yatay Koordinatları (2048px Ultra-HD Kanvas Üzerinde)
+    const SLIDER_MINUS_X = 670;
+    const SLIDER_BTN_W = 128;
+    const SLIDER_TRACK_X = 820;
+    const SLIDER_TRACK_W = 1044;
+    const SLIDER_PLUS_X = 1886;
+    const SLIDER_ROW_H = 98;
 
     const XR_MENU_BUTTONS = [
-      // Üst Bar: Panel Taşıma Tutamacı + Hızlı Konum Sekmeleri + AR Çıkış Butonu
+      // Üst Bar: Panel Taşıma Çubuğu + Hızlı Konum Butonları + Çıkış Butonu (Hiçbir Küçük İkon Yok!)
       {
         id: 'drag_handle',
-        label: () => xrMenuMoveMode ? '✥ PANEL TAŞINIYOR (Sabitlemek İçin Tıklayın)' : '✥ PANELİ TAŞI (Basılı Tutup Sürükleyin veya Tıklayın)',
-        x: 20, y: 14, w: 686, h: 68,
+        label: () => xrMenuMoveMode ? 'PANEL TAŞINIYOR (Sabitlemek İçin Tıklayın)' : 'PANELİ TAŞI (Tut Sürükle veya Tıkla)',
+        x: 28, y: 20, w: 860, h: 96,
         isHeaderDrag: true,
         isActive: () => xrMenuMoveMode || !!xrDraggingMenuCtrl
       },
-      { id: 'panel_pos_left', label: '◀ Sol', x: 716, y: 14, w: 112, h: 68, isActive: () => xrMenuAnchorMode === 'left' },
-      { id: 'panel_pos_top', label: '▲ Üst', x: 836, y: 14, w: 112, h: 68, isActive: () => xrMenuAnchorMode === 'top' },
-      { id: 'panel_pos_right', label: 'Sağ ▶', x: 956, y: 14, w: 112, h: 68, isActive: () => xrMenuAnchorMode === 'right' },
-      { id: 'exit_ar', label: '✕ AR MODUNDAN ÇIK', x: 1080, y: 14, w: 340, h: 68, isExit: true },
+      { id: 'panel_pos_left', label: 'Sol Taraf', x: 904, y: 20, w: 184, h: 96, isActive: () => xrMenuAnchorMode === 'left' },
+      { id: 'panel_pos_top', label: 'Üst Taraf', x: 1102, y: 20, w: 184, h: 96, isActive: () => xrMenuAnchorMode === 'top' },
+      { id: 'panel_pos_right', label: 'Sağ Taraf', x: 1300, y: 20, w: 184, h: 96, isActive: () => xrMenuAnchorMode === 'right' },
+      { id: 'exit_ar', label: '3B MODUNDAN ÇIK', x: 1500, y: 20, w: 520, h: 96, isExit: true },
 
-      // Satır 1: Düzleme (Masaya/Zemine) Oturtma, Önüme Getir, Döndürme ve Kesim Biçimi
+      // Satır 1: Düzleme Oturtma, Önüme Getir, Döndür, SINIR KESİMİ ve DİKDÖRTGEN BLOK (Ayrı ve Net Butonlar)
       {
         id: 're_place',
-        label: () => (!xrPlaced || xrSurfacePlacementMode) ? '🎯 Düzlem Seçiliyor (Masaya Tıklayın)' : '🎯 Düzleme Oturt / Masaya Taşı',
-        x: 24, y: 100, w: 416, h: 74,
+        label: () => (!xrPlaced || xrSurfacePlacementMode) ? 'Düzlem Seçiliyor (Masaya Tıkla)' : 'Düzleme Oturt (Yüzey Seç)',
+        x: 28, y: 134, w: 540, h: 102,
         isHighlight: true,
         isActive: () => !xrPlaced || xrSurfacePlacementMode
       },
-      { id: 'recenter_front', label: '👁️ Havada Önüme Getir', x: 452, y: 100, w: 280, h: 74, isActive: () => false },
-      { id: 'rot_left', label: '↺ -45°', x: 744, y: 100, w: 148, h: 74, isActive: () => false },
-      { id: 'rot_right', label: '↻ +45°', x: 904, y: 100, w: 148, h: 74, isActive: () => false },
+      { id: 'recenter_front', label: 'Önüme Getir', x: 584, y: 134, w: 320, h: 102, isActive: () => false },
+      { id: 'rot_right', label: '45° Döndür', x: 920, y: 134, w: 290, h: 102, isActive: () => false },
       {
-        id: 'clip_toggle',
-        label: () => currentClipMode === 'organic' ? '✂️ Kesim: Sınır Kesimi' : '✂️ Kesim: Dikdörtgen Blok',
-        x: 1064, y: 100, w: 352, h: 74,
+        id: 'clip_organic',
+        label: 'Sınır Kesimi',
+        x: 1226, y: 134, w: 388, h: 102,
         isActive: () => currentClipMode === 'organic'
+      },
+      {
+        id: 'clip_box',
+        label: 'Dikdörtgen Blok',
+        x: 1630, y: 134, w: 390, h: 102,
+        isActive: () => currentClipMode === 'box'
       },
 
       // Satır 2: 3B Arazi Üzerinde Sınır Çizimi (Havza / İl / İlçe / Gizle)
-      { id: 'bound_basin', label: '💧 3B Havza Sınırları', x: 24, y: 190, w: 338, h: 74, isActive: () => active3DBoundaryMode === 'basin' },
-      { id: 'bound_prov', label: '🏛️ 3B İl Sınırları (81)', x: 376, y: 190, w: 338, h: 74, isActive: () => active3DBoundaryMode === 'province' },
-      { id: 'bound_dist', label: '📍 3B İlçe Sınırları (973)', x: 728, y: 190, w: 338, h: 74, isActive: () => active3DBoundaryMode === 'district' },
-      { id: 'bound_none', label: '🚫 Sınır Çizgilerini Gizle', x: 1080, y: 190, w: 336, h: 74, isActive: () => active3DBoundaryMode === 'none' },
+      { id: 'bound_basin', label: 'Havza Sınırları', x: 28, y: 252, w: 486, h: 102, isActive: () => active3DBoundaryMode === 'basin' },
+      { id: 'bound_prov', label: 'İl Sınırları', x: 530, y: 252, w: 486, h: 102, isActive: () => active3DBoundaryMode === 'province' },
+      { id: 'bound_dist', label: 'İlçe Sınırları', x: 1032, y: 252, w: 486, h: 102, isActive: () => active3DBoundaryMode === 'district' },
+      { id: 'bound_none', label: 'Sınırları Gizle', x: 1534, y: 252, w: 486, h: 102, isActive: () => active3DBoundaryMode === 'none' },
 
-      // Satır 3: Yüzey / Kaplama Modu
-      { id: 'tex_sat', label: '🛰️ Gerçek Uydu (4K)', x: 24, y: 280, w: 338, h: 74, isActive: () => currentTexMode === 'satellite' },
-      { id: 'tex_rel', label: '⛰️ Hipsometrik Rölyef', x: 376, y: 280, w: 338, h: 74, isActive: () => currentTexMode === 'relief' },
-      { id: 'tex_clay', label: '🧱 3B Baskı (Mat Kil)', x: 728, y: 280, w: 338, h: 74, isActive: () => currentTexMode === 'clay' },
-      { id: 'tex_wire', label: '🕸️ Tel Kafes (Mesh)', x: 1080, y: 280, w: 336, h: 74, isActive: () => currentTexMode === 'wireframe' },
+      // Satır 3: Yüzey Görünümü
+      { id: 'tex_sat', label: 'Gerçek Uydu', x: 28, y: 370, w: 486, h: 102, isActive: () => currentTexMode === 'satellite' },
+      { id: 'tex_rel', label: 'Hipsometrik', x: 530, y: 370, w: 486, h: 102, isActive: () => currentTexMode === 'relief' },
+      { id: 'tex_clay', label: '3B Baskı (Kil)', x: 1032, y: 370, w: 486, h: 102, isActive: () => currentTexMode === 'clay' },
+      { id: 'tex_wire', label: 'Tel Kafes', x: 1534, y: 370, w: 486, h: 102, isActive: () => currentTexMode === 'wireframe' },
 
-      // Satır 4 (Alt Satır): Simülasyon & Katman Anahtarları
+      // Satır 4 (Alt Satır): Simülasyon ve Katman Anahtarları
       {
         id: 'flood_toggle',
-        label: () => floodSimActive ? '🌊 Taşkın Suyu: AÇIK' : '🌊 Taşkın Suyu: KAPALI',
-        x: 24, y: 808, w: 338, h: 74,
+        label: () => floodSimActive ? 'Taşkın Suyu: AÇIK' : 'Taşkın Suyu: KAPALI',
+        x: 28, y: 1094, w: 486, h: 104,
         isActive: () => floodSimActive
       },
       {
         id: 'rain_toggle',
-        label: () => rainParticlesActive ? '🌧️ Yağmur Akışı: AÇIK' : '🌧️ Yağmur Akışı: KAPALI',
-        x: 376, y: 808, w: 338, h: 74,
+        label: () => rainParticlesActive ? 'Yağmur Akışı: AÇIK' : 'Yağmur Akışı: KAPALI',
+        x: 530, y: 1094, w: 486, h: 104,
         isActive: () => rainParticlesActive
       },
       {
         id: 'cities_toggle',
-        label: () => show3DCitiesPins ? '🏙️ Şehir Pinleri: AÇIK' : '🏙️ Şehir Pinleri: KAPALI',
-        x: 728, y: 808, w: 338, h: 74,
+        label: () => show3DCitiesPins ? 'Şehirler: AÇIK' : 'Şehirler: KAPALI',
+        x: 1032, y: 1094, w: 486, h: 104,
         isActive: () => show3DCitiesPins
       },
       {
         id: 'water_color_cycle',
-        label: () => waterColorHex === 0x0284c7 ? '🎨 Su: Okyanus Mavisi' : (waterColorHex === 0x1d4ed8 ? '🎨 Su: Derin Mavi' : '🎨 Su: Turkuaz'),
-        x: 1080, y: 808, w: 336, h: 74,
+        label: () => waterColorHex === 0x0284c7 ? 'Su Rengi: Okyanus' : (waterColorHex === 0x1d4ed8 ? 'Su Rengi: Derin Mavi' : 'Su Rengi: Turkuaz'),
+        x: 1534, y: 1094, w: 486, h: 104,
         isActive: () => false
       }
     ];
 
-    // Her sürgü çubuğu için [-] ve [+] butonlarını otomatik olarak XR_MENU_BUTTONS listesine ekle
+    // Her sürgü çubuğu için büyük [-] ve [+] butonlarını ekle
     XR_MENU_SLIDERS.forEach(s => {
       XR_MENU_BUTTONS.push({
         id: `${s.id}_minus`,
@@ -5907,6 +5917,60 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       }
     }
 
+    // Paneli SADECE çağrıldığında (yerleştirme, buton tıklaması veya taşıma anında) konumlandırır.
+    // Kafa hareketiyle her karede (frame) dönmesini engelleyerek titremeyi %100 ortadan kaldırır!
+    function snapXRMenuToAnchor() {
+      if (!xrMenuGroup || !renderer || !renderer.xr) return;
+      const xrCam = renderer.xr.getCamera(camera);
+      const camPos = new THREE.Vector3();
+      const camDir = new THREE.Vector3();
+      xrCam.getWorldPosition(camPos);
+      xrCam.getWorldDirection(camDir);
+
+      const flatForward = new THREE.Vector3(camDir.x, 0, camDir.z);
+      if (flatForward.lengthSq() < 0.001) flatForward.set(0, 0, -1);
+      else flatForward.normalize();
+
+      if (xrMenuAnchorMode === 'custom') {
+        xrMenuGroup.position.copy(xrMenuCustomPos);
+      } else if (solidBlockGroup && xrPlaced) {
+        const offsetHeight = Math.max(0.42, xrCurrentScale * 48);
+        const toCam = new THREE.Vector3(camPos.x - xrPlacedPos.x, 0, camPos.z - xrPlacedPos.z);
+        if (toCam.lengthSq() < 0.001) toCam.copy(flatForward).negate();
+        else toCam.normalize();
+        const rightVec = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), toCam).normalize();
+
+        const targetPos = xrPlacedPos.clone();
+        if (xrMenuAnchorMode === 'left') {
+          targetPos.add(rightVec.clone().multiplyScalar(-0.72));
+          targetPos.y += offsetHeight * 0.72;
+        } else if (xrMenuAnchorMode === 'right') {
+          targetPos.add(rightVec.clone().multiplyScalar(0.72));
+          targetPos.y += offsetHeight * 0.72;
+        } else {
+          targetPos.y += offsetHeight;
+          targetPos.add(toCam.clone().multiplyScalar(-0.12));
+        }
+        xrMenuCustomPos.copy(targetPos);
+        xrMenuGroup.position.copy(targetPos);
+      } else {
+        // Henüz düzlem seçilirken kullanıcının rahat okuyacağı mesafede sabit durur
+        const targetPos = camPos.clone().add(flatForward.clone().multiplyScalar(0.84));
+        targetPos.y = camPos.y + 0.08;
+        xrMenuCustomPos.copy(targetPos);
+        xrMenuGroup.position.copy(targetPos);
+      }
+
+      // Paneli yalnızca bu sabitleme anında bir kez kullanıcıya doğru çevir (sürekli titreme yapmaz)
+      const lookTarget = new THREE.Vector3(
+        camPos.x,
+        xrMenuGroup.position.y + (camPos.y - xrMenuGroup.position.y) * 0.35,
+        camPos.z
+      );
+      xrMenuGroup.lookAt(lookTarget);
+      xrMenuGroup.updateMatrixWorld(true);
+    }
+
     function updateFallbackReticleFromController() {
       if (!reticle || !renderer || !renderer.xr) return;
       const xrCam = renderer.xr.getCamera(camera);
@@ -5915,7 +5979,6 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       xrCam.getWorldPosition(camPos);
       xrCam.getWorldDirection(camDir);
 
-      // Önce aktif kumandanın ışınını kontrol et (menü üzerinde değilse)
       let rayOrigin = null;
       let rayDir = null;
       const tempMat = new THREE.Matrix4();
@@ -5940,7 +6003,6 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
         rayDir = camDir.clone().normalize();
       }
 
-      // Kullanıcının masa hizası düzlemiyle (göz hizasının ~42 cm altı) kesiştir
       const planeY = camPos.y - 0.42;
       let targetPos = new THREE.Vector3();
       if (rayDir.y < -0.06 && rayOrigin.y > planeY) {
@@ -5974,8 +6036,11 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       xrPlaced = true;
       xrSurfacePlacementMode = false;
       reticle.visible = false;
+      if (xrMenuAnchorMode !== 'custom') {
+        snapXRMenuToAnchor();
+      }
       redrawXRSpatialMenu();
-      updateXRHudText('Harita seçtiğiniz düzleme oturtuldu! Karşınızdaki 3B panelden sürgülerle kontrol edebilirsiniz.');
+      updateXRHudText('Harita seçtiğiniz düzleme oturtuldu! Karşınızdaki sabit panelden tüm ayarları yapabilirsiniz.');
       return true;
     }
 
@@ -6004,6 +6069,7 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       xrPlaced = true;
       xrSurfacePlacementMode = false;
       if (reticle) reticle.visible = false;
+      snapXRMenuToAnchor();
       redrawXRSpatialMenu();
     }
 
@@ -6014,77 +6080,73 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       const H = xrMenuCanvas.height;
       ctx.clearRect(0, 0, W, H);
 
-      // 1. Ana Profesyonel Koyu Safir Holografik Cam Gövde
-      drawRoundRectPath(ctx, 6, 6, W - 12, H - 12, 32);
-      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-      bgGrad.addColorStop(0, 'rgba(10, 18, 36, 0.95)');
-      bgGrad.addColorStop(0.5, 'rgba(7, 12, 24, 0.95)');
-      bgGrad.addColorStop(1, 'rgba(12, 20, 38, 0.96)');
-      ctx.fillStyle = bgGrad;
+      // 1. Yüksek Kontrastlı Net Koyu Arka Plan (Yarı saydam bulanıklık yerine keskin kontrast)
+      drawRoundRectPath(ctx, 8, 8, W - 16, H - 16, 36);
+      ctx.fillStyle = '#070d19';
       ctx.fill();
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = (xrMenuMoveMode || xrDraggingMenuCtrl) ? '#fbbf24' : 'rgba(56, 189, 248, 0.82)';
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = (xrMenuMoveMode || xrDraggingMenuCtrl) ? '#fbbf24' : '#38bdf8';
       ctx.stroke();
 
-      // Sürgü Bölümü Arka Plan Kutusu
-      drawRoundRectPath(ctx, 18, 372, W - 36, 420, 22);
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
+      // Sürgü Bölümü Çerçevesi
+      drawRoundRectPath(ctx, 24, 486, W - 48, 594, 24);
+      ctx.fillStyle = '#0b1324';
       ctx.fill();
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.22)';
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#1e3a5f';
       ctx.stroke();
 
-      // 2. Tüm 3B Butonları Çiz
+      // 2. Tüm 3B Butonları Çiz (Büyük, Kalın, İkonsuz ve Yüksek Kontrastlı Yazılar)
       XR_MENU_BUTTONS.forEach(btn => {
         const isHover = xrHoveredBtnId === btn.id;
         const active = typeof btn.isActive === 'function' ? btn.isActive() : false;
         const text = typeof btn.label === 'function' ? btn.label() : btn.label;
 
-        drawRoundRectPath(ctx, btn.x, btn.y, btn.w, btn.h, btn.isStepper ? 14 : 16);
+        drawRoundRectPath(ctx, btn.x, btn.y, btn.w, btn.h, 18);
 
         if (btn.isExit) {
-          ctx.fillStyle = isHover ? '#f87171' : '#dc2626';
+          ctx.fillStyle = isHover ? '#ef4444' : '#dc2626';
           ctx.strokeStyle = '#fecaca';
-          ctx.lineWidth = isHover ? 4.5 : 2.5;
+          ctx.lineWidth = isHover ? 6 : 4;
         } else if (btn.isHeaderDrag) {
-          ctx.fillStyle = active ? 'rgba(245, 158, 11, 0.35)' : (isHover ? 'rgba(30, 58, 138, 0.85)' : 'rgba(30, 41, 59, 0.92)');
-          ctx.strokeStyle = active ? '#fbbf24' : (isHover ? '#38bdf8' : 'rgba(56, 189, 248, 0.45)');
-          ctx.lineWidth = isHover || active ? 3.5 : 2;
+          ctx.fillStyle = active ? '#b45309' : (isHover ? '#1e40af' : '#111c33');
+          ctx.strokeStyle = active ? '#fbbf24' : '#38bdf8';
+          ctx.lineWidth = isHover || active ? 5 : 3;
         } else if (btn.isHighlight && active) {
-          ctx.fillStyle = isHover ? 'rgba(168, 85, 247, 0.65)' : 'rgba(147, 51, 234, 0.50)';
-          ctx.strokeStyle = '#e879f9';
-          ctx.lineWidth = 4;
+          ctx.fillStyle = isHover ? '#9333ea' : '#7e22ce';
+          ctx.strokeStyle = '#f0abfc';
+          ctx.lineWidth = 5;
         } else if (active) {
-          ctx.fillStyle = isHover ? 'rgba(14, 165, 233, 0.68)' : 'rgba(2, 132, 199, 0.48)';
-          ctx.strokeStyle = '#38bdf8';
-          ctx.lineWidth = isHover ? 4.5 : 3;
+          ctx.fillStyle = isHover ? '#0284c7' : '#0369a1';
+          ctx.strokeStyle = '#7dd3fc';
+          ctx.lineWidth = 5;
         } else if (btn.isStepper) {
-          ctx.fillStyle = isHover ? 'rgba(56, 189, 248, 0.35)' : 'rgba(30, 41, 59, 0.95)';
-          ctx.strokeStyle = isHover ? '#38bdf8' : 'rgba(148, 163, 184, 0.45)';
-          ctx.lineWidth = isHover ? 3.5 : 2;
+          ctx.fillStyle = isHover ? '#1e40af' : '#172542';
+          ctx.strokeStyle = isHover ? '#38bdf8' : '#475569';
+          ctx.lineWidth = isHover ? 5 : 3;
         } else {
-          ctx.fillStyle = isHover ? 'rgba(51, 65, 85, 0.96)' : 'rgba(30, 41, 59, 0.88)';
-          ctx.strokeStyle = isHover ? '#38bdf8' : 'rgba(148, 163, 184, 0.35)';
-          ctx.lineWidth = isHover ? 4 : 2;
+          ctx.fillStyle = isHover ? '#1e293b' : '#111a2e';
+          ctx.strokeStyle = isHover ? '#38bdf8' : '#334155';
+          ctx.lineWidth = isHover ? 5 : 3;
         }
 
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = btn.isExit ? '#ffffff' : (active ? '#e0f2fe' : '#f8fafc');
+        ctx.fillStyle = '#ffffff';
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
+
         if (btn.isStepper) {
-          ctx.font = 'bold 34px system-ui, sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(text, btn.x + btn.w / 2, btn.y + btn.h / 2 + 11);
+          ctx.font = 'bold 54px "Segoe UI", Arial, sans-serif';
+          ctx.fillText(text, btn.x + btn.w / 2, btn.y + btn.h / 2);
         } else if (btn.isHeaderDrag) {
-          ctx.font = 'bold 21px system-ui, sans-serif';
-          ctx.textAlign = 'left';
-          ctx.fillStyle = active ? '#fde68a' : '#38bdf8';
-          ctx.fillText(text, btn.x + 22, btn.y + btn.h / 2 + 8);
+          ctx.font = 'bold 32px "Segoe UI", Arial, sans-serif';
+          ctx.fillStyle = active ? '#fef08a' : '#7dd3fc';
+          ctx.fillText(text, btn.x + btn.w / 2, btn.y + btn.h / 2);
         } else {
-          ctx.font = btn.isExit ? 'bold 23px system-ui, sans-serif' : 'bold 21px system-ui, sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(text, btn.x + btn.w / 2, btn.y + btn.h / 2 + 8);
+          ctx.font = btn.isExit ? 'bold 35px "Segoe UI", Arial, sans-serif' : 'bold 33px "Segoe UI", Arial, sans-serif';
+          ctx.fillText(text, btn.x + btn.w / 2, btn.y + btn.h / 2);
         }
       });
 
@@ -6095,100 +6157,102 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
         const isSliderHover = xrHoveredSliderId === s.id || (xrActiveDragSlider && xrActiveDragSlider.id === s.id);
         const centerY = s.y + SLIDER_ROW_H / 2;
 
-        // Sol Başlık Etiketi
-        ctx.fillStyle = '#e2e8f0';
-        ctx.font = 'bold 22px system-ui, sans-serif';
+        // Sol Başlık Etiketi (Büyük ve Beyaz)
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 34px "Segoe UI", Arial, sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(s.label, 34, centerY + 8);
+        ctx.textBaseline = 'middle';
+        ctx.fillText(s.label, 48, centerY);
 
-        // Anlık Değer Rozeti (Badge)
+        // Anlık Değer Kutusu
         const valText = s.formatValue(val);
-        drawRoundRectPath(ctx, 326, s.y + 10, 128, SLIDER_ROW_H - 20, 12);
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+        drawRoundRectPath(ctx, 456, s.y + 8, 194, SLIDER_ROW_H - 16, 16);
+        ctx.fillStyle = '#091020';
         ctx.fill();
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3.5;
         ctx.strokeStyle = s.color;
         ctx.stroke();
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 21px system-ui, sans-serif';
+        ctx.font = 'bold 33px "Segoe UI", Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(valText, 326 + 64, centerY + 7);
+        ctx.fillText(valText, 456 + 97, centerY);
 
         // Sürgü Kanalı (Track Background)
-        const trackH = 26;
+        const trackH = 42;
         const trackY = centerY - trackH / 2;
-        drawRoundRectPath(ctx, SLIDER_TRACK_X, trackY, SLIDER_TRACK_W, trackH, 13);
-        ctx.fillStyle = 'rgba(2, 6, 23, 0.92)';
+        drawRoundRectPath(ctx, SLIDER_TRACK_X, trackY, SLIDER_TRACK_W, trackH, 21);
+        ctx.fillStyle = '#040812';
         ctx.fill();
-        ctx.lineWidth = isSliderHover ? 3 : 2;
-        ctx.strokeStyle = isSliderHover ? '#38bdf8' : 'rgba(148, 163, 184, 0.42)';
+        ctx.lineWidth = isSliderHover ? 4.5 : 3;
+        ctx.strokeStyle = isSliderHover ? '#38bdf8' : '#475569';
         ctx.stroke();
 
         // Sürgü Doluluk Çubuğu (Filled Progress Bar)
-        const fillW = Math.max(18, norm * SLIDER_TRACK_W);
-        drawRoundRectPath(ctx, SLIDER_TRACK_X, trackY, fillW, trackH, 13);
+        const fillW = Math.max(28, norm * SLIDER_TRACK_W);
+        drawRoundRectPath(ctx, SLIDER_TRACK_X, trackY, fillW, trackH, 21);
         ctx.fillStyle = s.color;
         ctx.fill();
 
-        // Kademeli Ölçek Çentikleri (Ticks)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+        // Kademeli Ölçek Çentikleri
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.32)';
         for (let t = 1; t < 10; t++) {
           const tx = SLIDER_TRACK_X + (SLIDER_TRACK_W * t) / 10;
-          ctx.fillRect(tx - 1, trackY + 5, 2, trackH - 10);
+          ctx.fillRect(tx - 1.5, trackY + 8, 3, trackH - 16);
         }
 
-        // Sürgü Tutamacı (Thumb Knob)
+        // Sürgü Tutamacı (Büyük Yuvarlak Başlık)
         const knobX = SLIDER_TRACK_X + norm * SLIDER_TRACK_W;
         ctx.beginPath();
-        ctx.arc(knobX, centerY, isSliderHover ? 22 : 18, 0, Math.PI * 2);
+        ctx.arc(knobX, centerY, isSliderHover ? 32 : 27, 0, Math.PI * 2);
         ctx.fillStyle = '#ffffff';
         ctx.fill();
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 7;
         ctx.strokeStyle = s.color;
         ctx.stroke();
       });
 
-      // 4. Alt Durum ve Rehber Şeridi (Footer Banner)
-      drawRoundRectPath(ctx, 20, 900, W - 40, 118, 20);
+      // 4. Alt Durum ve Rehber Şeridi (İkonsuz, Çok Büyük ve Net Yazı)
+      drawRoundRectPath(ctx, 28, 1216, W - 56, 198, 24);
       if (!xrPlaced || xrSurfacePlacementMode) {
-        ctx.fillStyle = 'rgba(147, 51, 234, 0.28)';
-        ctx.strokeStyle = '#c084fc';
+        ctx.fillStyle = '#3b0764';
+        ctx.strokeStyle = '#d8b4fe';
       } else if (xrMenuMoveMode || xrDraggingMenuCtrl) {
-        ctx.fillStyle = 'rgba(245, 158, 11, 0.25)';
-        ctx.strokeStyle = '#fbbf24';
+        ctx.fillStyle = '#451a03';
+        ctx.strokeStyle = '#fde047';
       } else {
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+        ctx.fillStyle = '#0c1629';
+        ctx.strokeStyle = '#38bdf8';
       }
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 3.5;
       ctx.fill();
       ctx.stroke();
 
       const unitTitle = (currentModelData && currentModelData.basinName) ? currentModelData.basinName : '3B Arazi Modeli';
       ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
       if (!xrPlaced || xrSurfacePlacementMode) {
-        ctx.fillStyle = '#f5d0fe';
-        ctx.font = 'bold 24px system-ui, sans-serif';
-        ctx.fillText('🎯 DÜZLEM SEÇİM MODU AKTİF: Masaya veya zemine bakıp mavi halkayı gördüğünüzde TETİĞE basın', W / 2, 946);
-        ctx.fillStyle = '#cbd5e1';
-        ctx.font = '600 20px system-ui, sans-serif';
-        ctx.fillText('Veya doğrudan havada incelemek için yukarıdaki "👁️ Havada Önüme Getir" düğmesine tıklayın', W / 2, 988);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 35px "Segoe UI", Arial, sans-serif';
+        ctx.fillText('DÜZLEM SEÇİM MODU: Masaya veya zemine bakıp mavi halkayı gördüğünüzde TETİĞE basın', W / 2, 1282);
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = 'bold 29px "Segoe UI", Arial, sans-serif';
+        ctx.fillText('Veya doğrudan havada incelemek için yukarıdaki "Önüme Getir" düğmesine tıklayın', W / 2, 1352);
       } else if (xrMenuMoveMode || xrDraggingMenuCtrl) {
-        ctx.fillStyle = '#fde68a';
-        ctx.font = 'bold 24px system-ui, sans-serif';
-        ctx.fillText('✥ PANEL TAŞIMA MODU AKTİF: Kumanda lazerini odada istediğiniz yere tutup TETİĞE basın', W / 2, 946);
-        ctx.fillStyle = '#cbd5e1';
-        ctx.font = '600 20px system-ui, sans-serif';
-        ctx.fillText('Üstteki [◀ Sol] [▲ Üst] [Sağ ▶] butonlarıyla da paneli harita etrafında hizalayabilirsiniz', W / 2, 988);
+        ctx.fillStyle = '#fef08a';
+        ctx.font = 'bold 35px "Segoe UI", Arial, sans-serif';
+        ctx.fillText('PANEL TAŞIMA MODU: Kumanda lazerini odada istediğiniz yere tutup TETİĞE basın', W / 2, 1282);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 29px "Segoe UI", Arial, sans-serif';
+        ctx.fillText('Üstteki Sol Taraf / Üst Taraf / Sağ Taraf butonlarıyla da paneli hizalayabilirsiniz', W / 2, 1352);
       } else {
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = 'bold 23px system-ui, sans-serif';
-        ctx.fillText(`TERRASKOP XR • ${unitTitle}  |  Çubukları (Slider) lazerle sürükleyin veya [−] [+] tuşlarını kullanın`, W / 2, 946);
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '600 19px system-ui, sans-serif';
-        ctx.fillText('Haritayı başka bir masaya/zemine oturtmak için "🎯 Düzleme Oturt" butonuna tıklayın  •  B/Y Tuşu: Çıkış', W / 2, 988);
+        ctx.fillStyle = '#7dd3fc';
+        ctx.font = 'bold 34px "Segoe UI", Arial, sans-serif';
+        ctx.fillText(`TERRASKOP XR  •  ${unitTitle}  (${currentClipMode === 'organic' ? 'Sınır Kesimi' : 'Dikdörtgen Blok'})`, W / 2, 1282);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 28px "Segoe UI", Arial, sans-serif';
+        ctx.fillText('Çubukların üzerine tıklayıp sürükleyin veya [−] [+] butonlarını kullanın  •  B/Y Tuşu: Çıkış', W / 2, 1352);
       }
 
       xrMenuTexture.needsUpdate = true;
@@ -6227,18 +6291,21 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
           xrMenuAnchorMode = 'left';
           xrMenuMoveMode = false;
           xrDraggingMenuCtrl = null;
+          snapXRMenuToAnchor();
           break;
         }
         case 'panel_pos_top': {
           xrMenuAnchorMode = 'top';
           xrMenuMoveMode = false;
           xrDraggingMenuCtrl = null;
+          snapXRMenuToAnchor();
           break;
         }
         case 'panel_pos_right': {
           xrMenuAnchorMode = 'right';
           xrMenuMoveMode = false;
           xrDraggingMenuCtrl = null;
+          snapXRMenuToAnchor();
           break;
         }
         case 'bound_basin':
@@ -6265,10 +6332,12 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
         case 'tex_wire':
           setTextureMode('wireframe');
           break;
-        case 'clip_toggle': {
-          if (currentModelData && currentModelData.geometry) {
-            setClipMode(currentClipMode === 'organic' ? 'box' : 'organic');
-          }
+        case 'clip_organic': {
+          setClipMode('organic');
+          break;
+        }
+        case 'clip_box': {
+          setClipMode('box');
           break;
         }
         case 'cities_toggle': {
@@ -6308,20 +6377,15 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
           else setWaterColor('ocean');
           break;
         }
-        case 'rot_left': {
-          xrModelRotationY -= Math.PI / 4;
-          if (solidBlockGroup) solidBlockGroup.rotation.y = xrModelRotationY;
-          break;
-        }
         case 'rot_right': {
           xrModelRotationY += Math.PI / 4;
           if (solidBlockGroup) solidBlockGroup.rotation.y = xrModelRotationY;
           break;
         }
         case 'recenter_front': {
-          placeXRModelInFrontOfUser();
           if (xrMenuAnchorMode === 'custom') xrMenuAnchorMode = 'top';
-          updateXRHudText('3B harita ve kontrol paneli tam karşınıza hizalandı.');
+          placeXRModelInFrontOfUser();
+          updateXRHudText('3B harita ve kontrol paneli tam karşınıza sabitlendi.');
           break;
         }
         case 're_place': {
@@ -6361,7 +6425,7 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
         let hitSlider = null;
         let sliderRatio = 0;
         for (const s of XR_MENU_SLIDERS) {
-          if (cx >= SLIDER_TRACK_X - 18 && cx <= SLIDER_TRACK_X + SLIDER_TRACK_W + 18 &&
+          if (cx >= SLIDER_TRACK_X - 24 && cx <= SLIDER_TRACK_X + SLIDER_TRACK_W + 24 &&
               cy >= s.y && cy <= s.y + SLIDER_ROW_H) {
             hitSlider = s;
             sliderRatio = Math.max(0, Math.min(1, (cx - SLIDER_TRACK_X) / SLIDER_TRACK_W));
@@ -6401,12 +6465,10 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       const rayMat = new THREE.LineBasicMaterial({
         color: 0x38bdf8,
         transparent: true,
-        opacity: 0.92,
-        depthTest: false
+        opacity: 0.92
       });
       const line = new THREE.Line(rayGeom, rayMat);
       line.name = 'XRLaserLine';
-      line.renderOrder = 1000;
       line.visible = false;
       return line;
     }
@@ -6414,54 +6476,59 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
     function initWebXR() {
       if (!renderer || !renderer.xr) return;
 
+      // Meta Quest WebXR Göz Tamponu Çözünürlüğünü (Supersampling) Artır -> Harita ve Panel Çok Daha Net Görünür!
+      if (typeof renderer.xr.setFramebufferScaleFactor === 'function') {
+        try {
+          renderer.xr.setFramebufferScaleFactor(1.4);
+        } catch (e) {}
+      }
+
       // 1. Zemin / Masa Düzlem Hedef Göstergesi (Reticle)
       const reticleGroup = new THREE.Group();
       const outerRingGeom = new THREE.RingGeometry(0.16, 0.21, 40).rotateX(-Math.PI / 2);
-      const outerRingMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, opacity: 0.95, transparent: true, side: THREE.DoubleSide, depthTest: false });
+      const outerRingMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, opacity: 0.95, transparent: true, side: THREE.DoubleSide });
       reticleGroup.add(new THREE.Mesh(outerRingGeom, outerRingMat));
 
       const innerRingGeom = new THREE.RingGeometry(0.08, 0.10, 32).rotateX(-Math.PI / 2);
-      const innerRingMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee, opacity: 0.75, transparent: true, side: THREE.DoubleSide, depthTest: false });
+      const innerRingMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee, opacity: 0.75, transparent: true, side: THREE.DoubleSide });
       reticleGroup.add(new THREE.Mesh(innerRingGeom, innerRingMat));
 
       const dotGeom = new THREE.CircleGeometry(0.035, 20).rotateX(-Math.PI / 2);
-      const dotMat = new THREE.MeshBasicMaterial({ color: 0xc084fc, side: THREE.DoubleSide, depthTest: false });
+      const dotMat = new THREE.MeshBasicMaterial({ color: 0xc084fc, side: THREE.DoubleSide });
       reticleGroup.add(new THREE.Mesh(dotGeom, dotMat));
 
       reticleGroup.matrixAutoUpdate = false;
       reticleGroup.visible = false;
-      reticleGroup.renderOrder = 990;
       scene.add(reticleGroup);
       reticle = reticleGroup;
 
-      // 2. Meta Quest 3D Profesyonel Holografik Kontrol Paneli (1440x1040 Yüksek Çözünürlük)
+      // 2. Meta Quest 3B Kontrol Paneli (2048x1440 Ultra-HD 2K Çözünürlük + 16x Anisotropy + Sabit Uzay Konumu)
       xrMenuCanvas = document.createElement('canvas');
-      xrMenuCanvas.width = 1440;
-      xrMenuCanvas.height = 1040;
+      xrMenuCanvas.width = 2048;
+      xrMenuCanvas.height = 1440;
       xrMenuTexture = new THREE.CanvasTexture(xrMenuCanvas);
-      xrMenuTexture.minFilter = THREE.LinearFilter;
+      xrMenuTexture.generateMipmaps = true;
+      xrMenuTexture.minFilter = THREE.LinearMipmapLinearFilter;
       xrMenuTexture.magFilter = THREE.LinearFilter;
+      if (renderer.capabilities) {
+        xrMenuTexture.anisotropy = renderer.capabilities.getMaxAnisotropy() || 16;
+      }
 
-      const menuGeom = new THREE.PlaneGeometry(0.84, 0.606);
+      // Geniş ve Rahat Okunur Panel Boyutu (1.08m x 0.76m)
+      const menuGeom = new THREE.PlaneGeometry(1.08, 0.76);
       const menuMat = new THREE.MeshBasicMaterial({
         map: xrMenuTexture,
         transparent: true,
-        side: THREE.DoubleSide,
-        depthTest: false,
-        depthWrite: false
+        side: THREE.DoubleSide
       });
       xrMenuMesh = new THREE.Mesh(menuGeom, menuMat);
-      xrMenuMesh.renderOrder = 999;
 
       // Lazer İşaretçi Noktası
-      const cursorGeom = new THREE.SphereGeometry(0.011, 16, 16);
+      const cursorGeom = new THREE.SphereGeometry(0.012, 16, 16);
       const cursorMat = new THREE.MeshBasicMaterial({
-        color: 0x22d3ee,
-        depthTest: false,
-        depthWrite: false
+        color: 0x22d3ee
       });
       xrCursorDot = new THREE.Mesh(cursorGeom, cursorMat);
-      xrCursorDot.renderOrder = 1001;
       xrCursorDot.visible = false;
       scene.add(xrCursorDot);
 
@@ -6476,7 +6543,7 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
         const ctrl = event && event.target ? event.target : null;
         if (!ctrl) return;
 
-        // Eğer kullanıcı panel taşıma modundaysa, tıkladığı noktaya paneli sabitle
+        // Eğer kullanıcı panel taşıma modundaysa, tıkladığı noktaya paneli tamamen sabitle
         if (xrMenuMoveMode) {
           xrMenuMoveMode = false;
           xrDraggingMenuCtrl = null;
@@ -6499,7 +6566,7 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
           // Üst başlık taşıma çubuğuna basılı tutulduysa doğrudan sürüklemeyi başlat
           if (hit.button && hit.button.id === 'drag_handle') {
             xrDraggingMenuCtrl = ctrl;
-            xrDraggingMenuDist = Math.max(0.45, Math.min(1.6, hit.distance || 0.85));
+            xrDraggingMenuDist = Math.max(0.45, Math.min(1.6, hit.distance || 0.80));
             xrMenuAnchorMode = 'custom';
             redrawXRSpatialMenu();
             return;
@@ -6545,7 +6612,7 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
         const hit = getControllerMenuHit(ctrl);
         if (hit) {
           xrDraggingMenuCtrl = ctrl;
-          xrDraggingMenuDist = Math.max(0.45, Math.min(1.6, hit.distance || 0.85));
+          xrDraggingMenuDist = Math.max(0.45, Math.min(1.6, hit.distance || 0.80));
           xrMenuAnchorMode = 'custom';
           redrawXRSpatialMenu();
         }
@@ -6580,7 +6647,7 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       xrCam.getWorldPosition(camPos);
       xrCam.getWorldDirection(camDir);
 
-      // İlk açılışta menünün başlangıç özel konumunu kullanıcının sağ-üst karşısına hazırla
+      // İlk açılışta menüyü bir kez kullanıcının karşısına sabitle (Sonrasında kafa hareketiyle ASLA titremez!)
       if (xrNeedsInitialPlacement && camPos.lengthSq() > 0.0001) {
         xrNeedsInitialPlacement = false;
         const flatForward = new THREE.Vector3(camDir.x, 0, camDir.z);
@@ -6588,13 +6655,12 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
         else flatForward.normalize();
         xrPlacedPos.copy(camPos).add(flatForward.clone().multiplyScalar(0.80));
         xrPlacedPos.y = camPos.y - 0.38;
-        xrMenuCustomPos.copy(camPos).add(flatForward.clone().multiplyScalar(0.85));
-        xrMenuCustomPos.y = camPos.y + 0.02;
+        snapXRMenuToAnchor();
       }
 
       xrMenuGroup.visible = true;
 
-      // 1. Eğer kullanıcı paneli lazerle tutup sürüklüyorsa veya taşıma modundaysa:
+      // SADECE kullanıcı paneli aktif olarak taşıyorsa konumunu güncelle; aksi halde 3B uzayda %100 sabit (titremez) tut!
       const activeMoveCtrl = xrDraggingMenuCtrl || (xrMenuMoveMode ? (xrController0 || xrController1) : null);
       if (activeMoveCtrl) {
         activeMoveCtrl.updateMatrixWorld(true);
@@ -6602,45 +6668,15 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
         const origin = new THREE.Vector3().setFromMatrixPosition(activeMoveCtrl.matrixWorld);
         const dir = new THREE.Vector3(0, 0, -1).applyMatrix4(tempMat).normalize();
         if (origin.lengthSq() > 0.0001) {
-          xrMenuCustomPos.copy(origin).add(dir.multiplyScalar(xrDraggingMenuDist || 0.85));
-          xrMenuGroup.position.lerp(xrMenuCustomPos, 0.35);
-          xrMenuGroup.lookAt(camPos);
+          xrMenuCustomPos.copy(origin).add(dir.multiplyScalar(xrDraggingMenuDist || 0.80));
+          xrMenuGroup.position.lerp(xrMenuCustomPos, 0.22);
+          const lookTarget = new THREE.Vector3(
+            camPos.x,
+            xrMenuGroup.position.y + (camPos.y - xrMenuGroup.position.y) * 0.35,
+            camPos.z
+          );
+          xrMenuGroup.lookAt(lookTarget);
         }
-      } else if (xrMenuAnchorMode === 'custom') {
-        // Kullanıcının bıraktığı özel 3B konumda sabit durur, yüzü kullanıcıya bakar
-        xrMenuGroup.position.copy(xrMenuCustomPos);
-        xrMenuGroup.lookAt(camPos);
-      } else if (solidBlockGroup && xrPlaced) {
-        // Harita düzleme oturtulduğunda seçili sekmeye (Sol / Üst / Sağ) göre hizala
-        const offsetHeight = Math.max(0.36, xrCurrentScale * 44);
-        const toCam = new THREE.Vector3(camPos.x - xrPlacedPos.x, 0, camPos.z - xrPlacedPos.z);
-        if (toCam.lengthSq() < 0.001) toCam.set(0, 0, 1);
-        else toCam.normalize();
-        // Kullanıcının bakışına göre Sağ vektörü
-        const rightVec = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), toCam).normalize();
-
-        const targetMenuPos = xrPlacedPos.clone();
-        if (xrMenuAnchorMode === 'left') {
-          targetMenuPos.add(rightVec.clone().multiplyScalar(-0.62));
-          targetMenuPos.y += offsetHeight * 0.65;
-        } else if (xrMenuAnchorMode === 'right') {
-          targetMenuPos.add(rightVec.clone().multiplyScalar(0.62));
-          targetMenuPos.y += offsetHeight * 0.65;
-        } else {
-          targetMenuPos.y += offsetHeight;
-        }
-        xrMenuCustomPos.copy(targetMenuPos);
-        xrMenuGroup.position.lerp(targetMenuPos, 0.25);
-        xrMenuGroup.lookAt(camPos.x, xrMenuGroup.position.y + (camPos.y - xrMenuGroup.position.y) * 0.6, camPos.z);
-      } else {
-        // Yüzey seçilirken (henüz düzleme oturtulmadan önce) kullanıcının bakışının hafif üstünde dursun ki masayı kapatmasın
-        const flatForward = new THREE.Vector3(camDir.x, 0, camDir.z);
-        if (flatForward.lengthSq() < 0.001) flatForward.set(0, 0, -1);
-        else flatForward.normalize();
-        const targetPos = camPos.clone().add(flatForward.multiplyScalar(0.88));
-        targetPos.y = camPos.y + 0.14;
-        xrMenuGroup.position.lerp(targetPos, 0.2);
-        xrMenuGroup.lookAt(camPos);
       }
 
       // 2. Eğer kullanıcı bir sürgü çubuğunu (Slider) basılı tutup sürüklüyorsa anlık güncelle
@@ -6793,6 +6829,11 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       }
 
       try {
+        if (renderer && renderer.xr && typeof renderer.xr.setFramebufferScaleFactor === 'function') {
+          try {
+            renderer.xr.setFramebufferScaleFactor(1.4);
+          } catch (e) {}
+        }
         const sessionInit = {
           optionalFeatures: ['hit-test', 'dom-overlay', 'local-floor', 'bounded-floor', 'hand-tracking']
         };
@@ -6815,12 +6856,13 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       renderer.xr.setSession(session);
       scene.background = null;
       renderer.setClearColor(0x000000, 0);
+      // Masaüstü gölge haritasının küçük XR ölçeğinde bulanıklık yapmasını engelle
+      if (dirLight) dirLight.castShadow = false;
       studioModal.classList.add('in-webxr');
       studioModal.classList.remove('xr-sidebar-open');
 
       xrCurrentScale = 0.006; // 60cm masaüstü maketi
       xrModelRotationY = 0;
-      // Başlangıçta Düzleme Oturtma (Yüzey Seçim) Modu aktif olsun: kullanıcı istediği masaya/zemine haritayı oturtabilsin
       xrPlaced = false;
       xrSurfacePlacementMode = true;
       xrNeedsInitialPlacement = true;
@@ -6830,7 +6872,7 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       xrActiveDragSlider = null;
 
       if (solidBlockGroup) {
-        solidBlockGroup.visible = false; // Kullanıcı masaya/düzleme tıkladığında (veya Önüme Getir dediğinde) yerleşsin
+        solidBlockGroup.visible = false;
       }
       if (xrMenuGroup) {
         xrMenuGroup.visible = true;
@@ -6851,6 +6893,7 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       studioModal.classList.remove('xr-sidebar-open');
       scene.background = new THREE.Color(0x070b14);
       renderer.setClearColor(0x070b14, 1);
+      if (dirLight) dirLight.castShadow = true;
       if (solidBlockGroup) {
         solidBlockGroup.position.set(0, 0, 0);
         solidBlockGroup.rotation.set(0, 0, 0);
