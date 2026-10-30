@@ -3373,20 +3373,38 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
           }
         }
 
-        // Yağmur Damlalarının Yağışı
-        if (rainParticles && rainParticles.visible) {
+        // Gerçekçi 3B Yağmur Damlaları (İnce Su Çizgisi / Damla İzi Animasyonu)
+        if (rainParticles && rainParticles.visible && rainParticles.userData.drops) {
           const posArr = rainParticles.geometry.attributes.position.array;
-          const speeds = rainParticles.userData.speeds;
-          const count = speeds.length;
-          const curW = currentModelData && currentModelData.dimensions ? currentModelData.dimensions.width : 100;
-          const curD = currentModelData && currentModelData.dimensions ? currentModelData.dimensions.depth : 100;
+          const drops = rainParticles.userData.drops;
+          const count = drops.length;
+          const windX = 0.22;
+          const windZ = 0.08;
+          const waterY = (waterMesh && waterMesh.visible) ? waterMesh.position.y : -999;
+
           for (let i = 0; i < count; i++) {
-            posArr[i * 3 + 1] -= speeds[i];
-            if (posArr[i * 3 + 1] < 1) {
-              posArr[i * 3 + 1] = 30 + Math.random() * 35;
-              posArr[i * 3] = (Math.random() - 0.5) * curW;
-              posArr[i * 3 + 2] = (Math.random() - 0.5) * curD;
+            const d = drops[i];
+            d.y -= d.speed;
+            d.x += windX * (d.speed * 0.14);
+            d.z += windZ * (d.speed * 0.14);
+
+            const hitY = Math.max(d.groundY, waterY);
+            if (d.y - d.len <= hitY) {
+              // Damla araziye veya su yüzeyine çarptığında bulut seviyesinden yeniden başlat
+              d.x = d.spawnX + (Math.random() - 0.5) * 1.8;
+              d.z = d.spawnZ + (Math.random() - 0.5) * 1.8;
+              d.y = 32 + Math.random() * 28;
             }
+
+            const idx = i * 6;
+            // Üst uç (damla kuyruğu)
+            posArr[idx]     = d.x - windX;
+            posArr[idx + 1] = d.y;
+            posArr[idx + 2] = d.z - windZ;
+            // Alt uç (damla ucu)
+            posArr[idx + 3] = d.x;
+            posArr[idx + 4] = d.y - d.len;
+            posArr[idx + 5] = d.z;
           }
           rainParticles.geometry.attributes.position.needsUpdate = true;
         }
@@ -4127,27 +4145,83 @@ window.TR_LOCAL_ILCELER = {"type":"FeatureCollection","features":[{"type":"Featu
       waterMesh.visible = floodSimActive;
       solidBlockGroup.add(waterMesh);
 
-      // YAĞMUR PARÇACIKLARI SİSTEMİ
-      const rainCount = 2000;
-      const rainPositions = new Float32Array(rainCount * 3);
-      const rainSpeeds = new Float32Array(rainCount);
+      // GERÇEKÇİ 3B YAĞMUR DAMLALARI SİSTEMİ (Kare Noktalar Yerine İnce Su Çizgileri / Damla İzleri)
+      const rainCount = 2400;
+      const rainPositions = new Float32Array(rainCount * 6);
+      const rainColors = new Float32Array(rainCount * 6);
+      const rainDrops = [];
+      const qwRain = Math.max(1, gridW - 1);
+      const qhRain = Math.max(1, gridH - 1);
+
       for (let i = 0; i < rainCount; i++) {
-        rainPositions[i * 3] = (Math.random() - 0.5) * blockWidth;
-        rainPositions[i * 3 + 1] = 10 + Math.random() * 40;
-        rainPositions[i * 3 + 2] = (Math.random() - 0.5) * blockDepth;
-        rainSpeeds[i] = 0.9 + Math.random() * 1.6;
+        let rx = (Math.random() - 0.5) * blockWidth;
+        let rz = (Math.random() - 0.5) * blockDepth;
+
+        // Sınır Kesimi modunda damlaların seçili havza/il/ilçe sınırı üzerine yağmasını sağla
+        if (organicBuilt && activeInsideMask) {
+          for (let attempt = 0; attempt < 10; attempt++) {
+            const tx = (Math.random() - 0.5) * blockWidth;
+            const tz = (Math.random() - 0.5) * blockDepth;
+            const cx = Math.min(qwRain - 1, Math.max(0, Math.floor(((tx / blockWidth) + 0.5) * qwRain)));
+            const cy = Math.min(qhRain - 1, Math.max(0, Math.floor(((tz / blockDepth) + 0.5) * qhRain)));
+            if (activeInsideMask[cy * qwRain + cx]) {
+              rx = tx;
+              rz = tz;
+              break;
+            }
+          }
+        }
+
+        // Damlanın düşeceği arazi yüzey yüksekliğini hesapla
+        const gx = Math.min(gridW - 1, Math.max(0, Math.round(((rx / blockWidth) + 0.5) * (gridW - 1))));
+        const gy = Math.min(gridH - 1, Math.max(0, Math.round(((rz / blockDepth) + 0.5) * (gridH - 1))));
+        const cellElev = elevationGrid ? elevationGrid[gy * gridW + gx] : minElev;
+        const normH = Math.max(0, Math.min(1, (cellElev - minElev) / elevRange));
+        const groundY = (normH * 16 * exaggeration) + 3.1;
+
+        const ry = groundY + 4 + Math.random() * 44;
+        const dropLen = 1.9 + Math.random() * 1.6;
+        const speed = 1.05 + Math.random() * 1.15;
+
+        rainDrops.push({
+          x: rx,
+          y: ry,
+          z: rz,
+          spawnX: rx,
+          spawnZ: rz,
+          groundY,
+          len: dropLen,
+          speed
+        });
+
+        const idx = i * 6;
+        rainPositions[idx]     = rx - 0.22;
+        rainPositions[idx + 1] = ry;
+        rainPositions[idx + 2] = rz - 0.08;
+        rainPositions[idx + 3] = rx;
+        rainPositions[idx + 4] = ry - dropLen;
+        rainPositions[idx + 5] = rz;
+
+        // Üst kuyruk (hafif koyu gök mavisi) -> Alt damla ucu (parlak gümüşi su beyazı)
+        rainColors[idx]     = 0.22;
+        rainColors[idx + 1] = 0.65;
+        rainColors[idx + 2] = 0.95;
+        rainColors[idx + 3] = 0.85;
+        rainColors[idx + 4] = 0.96;
+        rainColors[idx + 5] = 1.00;
       }
+
       const rainGeom = new THREE.BufferGeometry();
       rainGeom.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
-      const rainMat = new THREE.PointsMaterial({
-        color: 0x38bdf8,
-        size: 0.6,
+      rainGeom.setAttribute('color', new THREE.BufferAttribute(rainColors, 3));
+      const rainMat = new THREE.LineBasicMaterial({
+        vertexColors: true,
         transparent: true,
-        opacity: 0.85,
-        blending: THREE.AdditiveBlending
+        opacity: 0.72,
+        depthWrite: false
       });
-      rainParticles = new THREE.Points(rainGeom, rainMat);
-      rainParticles.userData.speeds = rainSpeeds;
+      rainParticles = new THREE.LineSegments(rainGeom, rainMat);
+      rainParticles.userData.drops = rainDrops;
       rainParticles.visible = rainParticlesActive;
       solidBlockGroup.add(rainParticles);
 
